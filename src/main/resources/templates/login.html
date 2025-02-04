@@ -1,0 +1,32 @@
+<!doctype html>
+<html lang="en" xmlns:th="https://www.thymeleaf.org">
+<head th:replace="~{fragments/head :: head(~{::title})}">
+    <title>Login</title>
+</head>
+<body>
+<nav th:replace="~{fragments/unauthorizedNavbar :: unauthorizedNavbar}"></nav>
+<div class="container">
+    <div class="row">
+        <div class="col-md-6 mx-auto mt-4 card p-3">
+            <h3 class="text-primary my-2">Login to Your Account</h3>
+            <form action="#">
+                <div>
+                    <label for="email">Email</label>
+                    <input type="text" name="email" id="email" class="form-control" required/>
+                </div>
+                <br/>
+                <div>
+                    <label for="password">Password</label>
+                    <input type="password" name="password" id="password" class="form-control" required/>
+                </div>
+                <p class="lead my-1">Do not have any account? <a th:href="@{'/register'}">Register</a></p>
+                <div>
+                    <button class="btn btn-warning">Login</button>
+                    <button class="btn btn-danger">Reset</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+</body>
+</html>

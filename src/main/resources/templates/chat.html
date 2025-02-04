@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="https://www.thymeleaf.org">
+<head th:replace="~{fragments/head :: head(~{::title})}">
+    <title>Chat Page</title>
+</head>
+<body class="dark_bg">
+<div class="vh-100 overflow-hidden d-flex p-2 container-fluid">
+    <div class="row h-100 w-100 card chat_bg">
+
+        <!--   Chat List     -->
+        <div class="col-md-3 h-100 overflow-auto p-3">
+            <!--     Nav       -->
+            <nav class="navbar navbar-expand-lg bg-body-tertiary chat_bg">
+                <div class="container-fluid">
+                    <div class="collapse navbar-collapse" id="navbarSupportedContent">
+                        <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+                            <li class="nav-item dropdown">
+                                <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown"
+                                   aria-expanded="false">
+                                    <i class="bi bi-list fs-4 text-white"></i>
+                                </a>
+                                <ul class="dropdown-menu">
+                                    <li><a class="dropdown-item" href="#">Profile</a></li>
+                                    <li><a class="dropdown-item" href="#">Logout</a></li>
+                                </ul>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link text-warning fs-4">Pigeon</a>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+            </nav>
+            <!--    Nav Ends        -->
+
+            <form id="search_user" class="d-flex justify-content-between align-items-center">
+                <input type="search" class="form-control chat_bg" name="search" id="search" placeholder="Search User"/>
+                <button class="btn chat_area_bg ms-2"><i class="bi bi-search me-1"></i></button>
+            </form>
+            <hr/>
+            <!--    List        -->
+            <div id="chat_list" class="overflow-auto">
+                <ul class="list-group w-100 list-group-flush">
+                    <li class="list-group-item d-flex align-items-center chat_area_bg rounded text-light">
+                        <i class="bi bi-person-circle fs-2"></i> <span class="ms-1">Sadi</span>
+                    </li>
+
+                    <li class="list-group-item d-flex align-items-center chat_bg">
+                        <i class="bi bi-person-circle fs-2"></i> <span class="ms-1">Sajib</span>
+                    </li>
+                    <li class="list-group-item d-flex align-items-center chat_bg">
+                        <i class="bi bi-person-circle fs-2"></i> <span class="ms-1">Sajib</span>
+                    </li>
+                    <li class="list-group-item d-flex align-items-center chat_bg">
+                        <i class="bi bi-person-circle fs-2"></i> <span class="ms-1">Sajib</span>
+                    </li>
+                    <li class="list-group-item d-flex align-items-center chat_bg">
+                        <i class="bi bi-person-circle fs-2"></i> <span class="ms-1">Sajib</span>
+                    </li>
+                    <li class="list-group-item d-flex align-items-center chat_bg">
+                        <i class="bi bi-person-circle fs-2"></i> <span class="ms-1">Sajib</span>
+                    </li>
+                    <li class="list-group-item d-flex align-items-center chat_bg">
+                        <i class="bi bi-person-circle fs-2"></i> <span class="ms-1">Sajib</span>
+                    </li>
+                    <li class="list-group-item d-flex align-items-center chat_bg">
+                        <i class="bi bi-person-circle fs-2"></i> <span class="ms-1">Sajib</span>
+                    </li>
+                    <li class="list-group-item d-flex align-items-center chat_bg">
+                        <i class="bi bi-person-circle fs-2"></i> <span class="ms-1">Sajib</span>
+                    </li>
+                    <li class="list-group-item d-flex align-items-center chat_bg">
+                        <i class="bi bi-person-circle fs-2"></i> <span class="ms-1">Sajib</span>
+                    </li>
+                    <li class="list-group-item d-flex align-items-center chat_bg">
+                        <i class="bi bi-person-circle fs-2"></i> <span class="ms-1">Sajib</span>
+                    </li>
+                    <li class="list-group-item d-flex align-items-center chat_bg">
+                        <i class="bi bi-person-circle fs-2"></i> <span class="ms-1">Sajib</span>
+                    </li>
+                    <li class="list-group-item d-flex align-items-center chat_bg">
+                        <i class="bi bi-person-circle fs-2"></i> <span class="ms-1">Sajib</span>
+                    </li>
+                    <li class="list-group-item d-flex align-items-center chat_bg">
+                        <i class="bi bi-person-circle fs-2"></i> <span class="ms-1">Sajib</span>
+                    </li>
+                    <li class="list-group-item d-flex align-items-center chat_bg">
+                        <i class="bi bi-person-circle fs-2"></i> <span class="ms-1">Sajib</span>
+                    </li>
+                </ul>
+            </div>
+            <!--     List Ends       -->
+        </div>
+
+        <!--    Chat List Ends    -->
+        <div class="col-md-9 h-100 overflow-auto d-flex flex-column">
+            <div class="d-flex align-items-center p-2">
+                <i class="bi bi-person-circle fs-2"></i> <span class="ms-1 fs-3">Sadi</span>
+            </div>
+            <!--    Chat Area        -->
+            <div class="flex-grow-1 p-3 chat_area_bg overflow-auto">
+                <div class="my-1 d-flex">
+                    <i class="bi bi-person-circle fs-4"></i>
+                    <span class="ms-1 d-flex flex-column chat">
+                        <span class="fw-bold text-warning">Sajib</span>
+                        <span class="text-white">Hi</span>
+                    </span>
+                </div>
+
+                <div class="my-1 d-flex">
+                    <i class="bi bi-person-circle fs-4"></i>
+                    <span class="ms-1 d-flex flex-column chat">
+                        <span class="fw-bold text-info">Sadi</span>
+                        <span class="text-white">Hello</span>
+                    </span>
+                </div>
+            </div>
+            <!--    Chat Area Ends        -->
+            <div class="p-3">
+                <form action="#" class="d-flex">
+                    <input type="text" class="form-control chat_bg" placeholder="message" name="message" id="message"/>
+                    <button class="btn chat_area_bg ms-1 text-light">
+                        <i class="bi bi-send"></i>
+                    </button>
+                </form>
+            </div>
+        </div>
+        <!--    Chat board ends    -->
+    </div>
+</div>
+
+</body>
+</html>

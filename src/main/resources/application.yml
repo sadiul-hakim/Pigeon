@@ -1,0 +1,21 @@
+spring:
+  application:
+    name: MvcChatApp
+
+  threads:
+    virtual:
+      enabled: true
+
+  datasource:
+    url: jdbc:postgresql://localhost:5432/chat_app
+    driver-class-name: org.postgresql.Driver
+    username: postgres
+    password: hakim@123
+
+  jpa:
+    hibernate:
+      ddl-auto: update
+    open-in-view: false
+
+server:
+  port: 9093
