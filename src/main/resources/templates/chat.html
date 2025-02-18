@@ -1,6 +1,6 @@
 <!DOCTYPE html>
 <html lang="en" xmlns:th="https://www.thymeleaf.org">
-<head th:replace="~{fragments/head :: head(~{::title})}">
+<head th:replace="~{fragments/head :: head(~{::title})}" xmlns:sec="https://www.thymeleaf.org/extras/spring-security">
     <title>Chat Page</title>
 </head>
 <body class="dark_bg">
@@ -21,7 +21,8 @@
                                 </a>
                                 <ul class="dropdown-menu">
                                     <li><a class="dropdown-item" href="#"><i class="bi bi-person-circle"></i>
-                                        Profile</a></li>
+                                        <span th:text="${#authentication.principal.lastName}"></span>
+                                        </a></li>
                                     <li><a class="dropdown-item" href="#"><i class="bi bi-box-arrow-left"></i>
                                         Logout</a></li>
                                 </ul>

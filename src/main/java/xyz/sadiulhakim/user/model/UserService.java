@@ -4,10 +4,13 @@ import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.boot.context.event.ApplicationReadyEvent;
+import org.springframework.context.event.EventListener;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 import org.springframework.modulith.NamedInterface;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
@@ -20,6 +23,7 @@ import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
+import java.util.UUID;
 
 @Service
 @NamedInterface("user-service")
@@ -33,19 +37,26 @@ public class UserService {
     private final PasswordEncoder passwordEncoder;
     private final ModelMapper modelMapper;
 
-    public UserDTO findByEmail(String email) {
-        User user = userRepo.findByEmail(email).orElse(null);
-        if (user == null)
-            return null;
-
-        return modelMapper.map(user, UserDTO.class);
+    @Async("taskExecutor")
+    @EventListener
+    void appStarted(ApplicationReadyEvent event) {
+        User user = userRepo.findByEmail("sadiulhakim@gmail.com").orElse(null);
+        if (user == null) {
+            userRepo.save(
+                    new User(null, "Sadiul", "Hakim", "sadiulhakim@gmail.com",
+                            passwordEncoder.encode("hakim@123"), "ROLE_ADMIN",
+                            appProperties.getDefaultUserPhotoName(), ColorUtil.getRandomColor(),
+                            LocalDateTime.now())
+            );
+        }
     }
 
-    public Optional<User> getById(long userId) {
+    public User findByEmail(String email) {
 
-        if (userId == 0) {
-            return Optional.empty();
-        }
+        return userRepo.findByEmail(email).orElse(null);
+    }
+
+    public Optional<User> getById(UUID userId) {
 
         Optional<User> user = userRepo.findById(userId);
         if (user.isEmpty()) {
@@ -55,47 +66,37 @@ public class UserService {
         return user;
     }
 
-    public void save(UserDTO user, MultipartFile photo) {
+    public void save(UserDTO user) {
 
         try {
 
             LOGGER.info("UserService.save :: saving/updating user {}", user.getEmail());
 
-            Optional<User> existingUser = getById(user.getId());
-            if (existingUser.isEmpty()) {
-
-                if (photo == null || Objects.requireNonNull(photo.getOriginalFilename()).isEmpty()) {
-                    user.setPicture(appProperties.getDefaultUserPhotoName());
-                } else {
-
-                    String fileName = FileUtil.uploadFile(appProperties.getUserImageFolder(), photo.getOriginalFilename(),
-                            photo.getInputStream());
-                    if (fileName.isEmpty()) {
-                        user.setPicture(appProperties.getDefaultUserPhotoName());
-                    } else {
-                        user.setPicture(fileName);
-                    }
-                }
-
-                User userModel = modelMapper.map(user, User.class);
-
-                if (userModel.getRole().isEmpty()) {
-                    userModel.setRole("ROLE_USER");
-                }
-                userModel.setCreatedAt(LocalDateTime.now());
-                userModel.setPassword(passwordEncoder.encode(user.getPassword()));
-                userModel.setTextColor(ColorUtil.getRandomColor());
-                userRepo.save(userModel);
-                return;
+            User existingUser = findByEmail(user.getEmail());
+            if (existingUser != null) {
+                LOGGER.warn("UserService.save :: User with email {} already exists!", user.getEmail());
             }
 
-            update(existingUser.get(), user, photo);
+            User userModel = modelMapper.map(user, User.class);
+            userModel.setPicture(appProperties.getDefaultUserPhotoName());
+            userModel.setRole("ROLE_USER");
+            userModel.setCreatedAt(LocalDateTime.now());
+            userModel.setPassword(passwordEncoder.encode(user.getRawPassword()));
+            userModel.setTextColor(ColorUtil.getRandomColor());
+            userRepo.save(userModel);
+
         } catch (Exception ex) {
             LOGGER.error("UserService.save :: {}", ex.getMessage());
         }
     }
 
-    private void update(User exUser, UserDTO user, MultipartFile photo) throws IOException {
+    private void update(UUID userId, UserDTO user, MultipartFile photo) throws IOException {
+
+        User exUser = getById(userId).orElse(null);
+        if (exUser == null) {
+            LOGGER.warn("UserService.update :: User does not exists with id {}", user);
+            return;
+        }
 
         if (StringUtils.hasText(user.getFirstname())) {
             exUser.setFirstname(user.getFirstname());
@@ -103,14 +104,6 @@ public class UserService {
 
         if (StringUtils.hasText(user.getLastname())) {
             exUser.setLastname(user.getLastname());
-        }
-
-        if (StringUtils.hasText(user.getRole())) {
-            exUser.setFirstname(user.getRole());
-        }
-
-        if (StringUtils.hasText(user.getTextColor())) {
-            exUser.setTextColor(user.getTextColor());
         }
 
         if (photo != null && !Objects.requireNonNull(photo.getOriginalFilename()).isEmpty()) {
@@ -150,7 +143,7 @@ public class UserService {
         return PageUtil.prepareResult(page);
     }
 
-    public void delete(long id) {
+    public void delete(UUID id) {
 
         Optional<User> user = userRepo.findById(id);
         user.ifPresent(u -> {
@@ -165,7 +158,7 @@ public class UserService {
         });
     }
 
-    public String changePassword(PasswordDTO passwordDTO, long userId) {
+    public String changePassword(PasswordDTO passwordDTO, UUID userId) {
 
         try {
             Optional<User> user = getById(userId);

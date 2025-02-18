@@ -1,9 +1,11 @@
 package xyz.sadiulhakim.util;
 
 
+import lombok.Getter;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
+@Getter
 @Component
 public class AppProperties {
 
@@ -15,16 +17,4 @@ public class AppProperties {
 
     @Value("${default.user.image.name:''}")
     private String defaultUserPhotoName;
-
-    public int getPaginationSize() {
-        return paginationSize;
-    }
-
-    public String getDefaultUserPhotoName() {
-        return defaultUserPhotoName;
-    }
-
-    public String getUserImageFolder() {
-        return userImageFolder;
-    }
 }

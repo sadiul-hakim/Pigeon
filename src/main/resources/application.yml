@@ -22,7 +22,14 @@ server:
 
 default:
   user:
-    image-folder: /user/
-    image-name: user.svg
+    image:
+      folder: /user/
+      name: user.svg
   pagination:
     size: 20
+
+logging:
+  file:
+    path: logs
+  level:
+    root: warn

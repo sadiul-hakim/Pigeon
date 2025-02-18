@@ -6,8 +6,9 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 
 import java.util.Optional;
+import java.util.UUID;
 
-interface UserRepository extends JpaRepository<User, Long> {
+interface UserRepository extends JpaRepository<User, UUID> {
     Optional<User> findByEmail(String email);
 
     Page<User> findByFirstnameContainingOrLastnameContainingOrEmailContaining(String firstName, String lastName,

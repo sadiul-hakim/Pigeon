@@ -4,6 +4,7 @@ import lombok.*;
 import org.springframework.modulith.NamedInterface;
 
 import java.time.LocalDateTime;
+import java.util.UUID;
 
 @Getter
 @Setter
@@ -12,13 +13,8 @@ import java.time.LocalDateTime;
 @ToString
 @NamedInterface("user-dto")
 public class UserDTO {
-    private long id;
     private String firstname;
     private String lastname;
     private String email;
-    private String password;
-    private String role;
-    private String picture;
-    private String textColor;
-    private LocalDateTime createdAt;
+    private String rawPassword;
 }
