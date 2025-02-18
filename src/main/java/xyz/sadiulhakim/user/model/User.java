@@ -3,6 +3,7 @@ package xyz.sadiulhakim.user.model;
 import jakarta.persistence.*;
 import lombok.*;
 
+import java.time.LocalDateTime;
 import java.util.UUID;
 
 @Entity
@@ -35,4 +36,10 @@ public class User {
 
     @Column(length = 200, nullable = false)
     private String picture;
+
+    @Column(length = 35, nullable = false)
+    private String textColor;
+
+    @Temporal(TemporalType.TIMESTAMP)
+    private LocalDateTime createdAt;
 }

@@ -19,3 +19,10 @@ spring:
 
 server:
   port: 9093
+
+default:
+  user:
+    image-folder: /user/
+    image-name: user.svg
+  pagination:
+    size: 20

@@ -4,7 +4,7 @@
     <title>Home Page</title>
 </head>
 <body>
-<nav th:replace="~{fragments/unauthorizedNavbar :: unauthorizedNavbar}"></nav>
+<nav th:replace="~{fragments/navbar :: navbar}"></nav>
 <main class="bg-white">
     <section class="container">
         <div class="row">
@@ -24,7 +24,7 @@
                     Pigeon brings people together in a fast, reliable, and secure way. Dive into a new level of
                     communication where every conversation feels closer.
                 </p>
-                <a class="btn btn-warning" th:href="@{'/login'}">Let's Begin</a>
+                <a class="btn btn-warning" th:href="@{'/login_page'}">Let's Begin</a>
             </div>
             <div class="col-md-6">
                 <img alt="hero" th:src="@{'/images/Chatting.png'}" class="img-fluid" width="100%"/>

@@ -3,6 +3,8 @@ package xyz.sadiulhakim.user.model;
 import lombok.*;
 import org.springframework.modulith.NamedInterface;
 
+import java.time.LocalDateTime;
+
 @Getter
 @Setter
 @AllArgsConstructor
@@ -17,4 +19,6 @@ public class UserDTO {
     private String password;
     private String role;
     private String picture;
+    private String textColor;
+    private LocalDateTime createdAt;
 }

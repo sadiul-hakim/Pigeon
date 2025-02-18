@@ -51,6 +51,10 @@ body {
     background-color: #48425c !important;
 }
 
+.chat_area_color{
+    color:#312a43 !important;
+}
+
 .chat_area_bg{
     background-color: #312a43 !important;
     color:white !important;

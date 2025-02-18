@@ -13,15 +13,15 @@ class PageController {
         return "index";
     }
 
-    @GetMapping("/register")
-    String register(Model model) {
+    @GetMapping("/register_page")
+    String registerPage(Model model) {
 
         model.addAttribute("user", new UserDTO());
         return "register";
     }
 
-    @GetMapping("/login")
-    String login() {
+    @GetMapping("/login_page")
+    String loginPage() {
         return "login";
     }
 }
