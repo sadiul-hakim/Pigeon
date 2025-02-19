@@ -2,8 +2,12 @@ package xyz.sadiulhakim.user.model;
 
 import jakarta.persistence.*;
 import lombok.*;
+import org.hibernate.annotations.ColumnTransformer;
+import xyz.sadiulhakim.converter.ListUUIDConverter;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.UUID;
 
 @Entity
@@ -39,6 +43,11 @@ public class User {
 
     @Column(length = 35, nullable = false)
     private String textColor;
+
+    @Column(columnDefinition = "jsonb")
+    @Convert(converter = ListUUIDConverter.class)
+    @ColumnTransformer(write = "?::jsonb")
+    private List<UUID> connectedUsers = new ArrayList<>();
 
     @Temporal(TemporalType.TIMESTAMP)
     private LocalDateTime createdAt;

@@ -1,8 +1,8 @@
 @font-face {
-font-family: Overlock;
-src: url('/fonts/Overlock-Regular.ttf') format("truetype");
-font-weight: normal;
-font-style: normal;
+    font-family: Overlock;
+    src: url('/fonts/Overlock-Regular.ttf') format("truetype");
+    font-weight: normal;
+    font-style: normal;
 }
 
 /* For webkit-based browsers */
@@ -20,10 +20,6 @@ font-style: normal;
     border: 3px solid transparent; /* Create spacing around the bar */
 }
 
-::-webkit-scrollbar-thumb:hover {
-    background-color: #4a4160; /* Slightly lighter shade on hover */
-}
-
 /* For other browsers (fallback if supported) */
 .scroll-container {
     scrollbar-width: thin;
@@ -39,31 +35,49 @@ body {
     display: none !important;
 }
 
-.chat_bg{
+.chat_bg {
     background-color: #48425c !important;
-    color:white !important;
+    color: white !important;
 }
 
-.chat{
-    width:300px;
-    padding:10px;
+.chat {
+    width: 300px;
+    padding: 10px;
     border-radius: 4px;
     background-color: #48425c !important;
 }
 
-.chat_area_color{
-    color:#312a43 !important;
+.chat_area_color {
+    color: #312a43 !important;
 }
 
-.chat_area_bg{
+.chat_area_bg {
     background-color: #312a43 !important;
-    color:white !important;
+    color: white !important;
 }
 
-.dark_bg{
-    background-color:#1e1e1e !important;
+.dark_bg {
+    background-color: #1e1e1e !important;
 }
 
-.list-group > li{
-    border:none;
+.list-group > li {
+    border: none;
+}
+
+.icon-sm {
+    width: 25px;
+    height: 25px;
+    border-radius: 50%;
+}
+
+.icon-md {
+    width: 50px;
+    height: 50px;
+    border-radius: 50%;
+}
+
+.icon-lg {
+    width: 75px;
+    height: 75px;
+    border-radius: 50%;
 }

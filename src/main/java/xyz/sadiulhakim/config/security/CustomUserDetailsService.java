@@ -20,6 +20,7 @@ class CustomUserDetailsService implements UserDetailsService {
         if (user == null)
             return null;
 
-        return new CustomUserDetails(user.getEmail(), user.getPassword(), user.getRole(), user.getLastname());
+        return new CustomUserDetails(user.getId(), user.getEmail(), user.getPassword(), user.getRole(),
+                user.getLastname(), user.getPicture());
     }
 }

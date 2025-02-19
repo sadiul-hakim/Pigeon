@@ -38,6 +38,6 @@ class AppConfig implements WebMvcConfigurer {
     @Override
     public void addResourceHandlers(ResourceHandlerRegistry registry) {
         registry.addResourceHandler("/picture/**")
-                .addResourceLocations("file:F:/MVCChatApp/");
+                .addResourceLocations("file:F:/MvcChat/picture/");
     }
 }

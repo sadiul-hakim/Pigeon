@@ -6,13 +6,16 @@ import org.springframework.security.core.userdetails.UserDetails;
 
 import java.util.Collection;
 import java.util.List;
+import java.util.UUID;
 
 
-record CustomUserDetails(
+public record CustomUserDetails(
+        UUID id,
         String username,
         String password,
         String role,
-        String lastName
+        String lastName,
+        String picture
 ) implements UserDetails {
 
     @Override

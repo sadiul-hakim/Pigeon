@@ -1,13 +1,21 @@
 package xyz.sadiulhakim.util;
 
 import org.springframework.data.domain.Page;
+import xyz.sadiulhakim.user.model.User;
+
 import java.util.ArrayList;
+import java.util.List;
 
 public class PageUtil {
     private PageUtil() {
     }
 
     public static PaginationResult prepareResult(Page<?> page) {
+        return prepareResult(page, page.getContent());
+    }
+
+    public static PaginationResult prepareResult(Page<?> page, List<?> data) {
+
         var result = new PaginationResult();
         result.setFirst(page.isFirst());
         result.setLast(page.isLast());
@@ -23,7 +31,7 @@ public class PageUtil {
 
         result.setStart(start);
         result.setEnd(end);
-        result.setData(new ArrayList<>(page.getContent()));
+        result.setData(new ArrayList<>(data));
         return result;
     }
 }
