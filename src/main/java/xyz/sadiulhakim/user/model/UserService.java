@@ -1,12 +1,13 @@
 package xyz.sadiulhakim.user.model;
 
 import lombok.RequiredArgsConstructor;
-import org.modelmapper.ModelMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.boot.context.event.ApplicationReadyEvent;
 import org.springframework.context.event.EventListener;
-import org.springframework.data.domain.*;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
 import org.springframework.modulith.NamedInterface;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.security.core.Authentication;
@@ -16,6 +17,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 import org.springframework.web.multipart.MultipartFile;
+import xyz.sadiulhakim.chat.pojo.ChatSetup;
 import xyz.sadiulhakim.util.*;
 
 import java.io.IOException;
@@ -33,7 +35,6 @@ public class UserService {
     private final UserRepository userRepo;
     private final AppProperties appProperties;
     private final PasswordEncoder passwordEncoder;
-    private final ModelMapper modelMapper;
     private final ConnectionRequestRepo connectionRequestRepo;
 
     @Async("taskExecutor")
@@ -48,6 +49,23 @@ public class UserService {
                             new ArrayList<>(), LocalDateTime.now())
             );
         }
+    }
+
+    public ChatSetup getChatSetup() {
+
+        SecurityContext context = SecurityContextHolder.getContext();
+        Authentication authentication = context.getAuthentication();
+
+        if (authentication == null || authentication.getName() == null) {
+            return new ChatSetup();
+        }
+
+        User user = findByEmail(authentication.getName());
+        UserDTO userDTO = convertToDto(user);
+        List<UUID> connectedUsers = user.getConnectedUsers();
+        List<UserDTO> connections = userRepo.findAllUserConnections(connectedUsers);
+
+        return new ChatSetup(userDTO, connections, connections.getFirst());
     }
 
     public User findByEmail(String email) {
@@ -142,7 +160,7 @@ public class UserService {
         userRepo.saveAll(List.of(user, toUser));
 
         connectionRequestRepo.delete(connectionRequest);
-        return "You accepted Connection Request from " + toUser.getLastname();
+        return "You accepted Connection Request from " + user.getLastname();
     }
 
     public String removeConnection(UUID toUser) {
@@ -224,7 +242,7 @@ public class UserService {
                 LOGGER.warn("UserService.save :: User with email {} already exists!", user.getEmail());
             }
 
-            User userModel = modelMapper.map(user, User.class);
+            User userModel = convertToModel(user);
             userModel.setPicture(appProperties.getDefaultUserPhotoName());
             userModel.setRole("ROLE_USER");
             userModel.setCreatedAt(LocalDateTime.now());
@@ -405,5 +423,18 @@ public class UserService {
         } while (page.hasNext());
 
         return sb.toString().getBytes(StandardCharsets.UTF_8);
+    }
+
+    public User convertToModel(UserDTO dto) {
+        User user = new User();
+        user.setFirstname(dto.getFirstname());
+        user.setLastname(dto.getLastname());
+        user.setEmail(dto.getEmail());
+
+        return user;
+    }
+
+    public UserDTO convertToDto(User user) {
+        return new UserDTO(user.getId(), user.getFirstname(), user.getLastname(), user.getEmail(), user.getPicture());
     }
 }

@@ -79,52 +79,13 @@
             <hr/>
             <!--    List        -->
             <div id="chat_list" class="overflow-auto">
-                <ul class="list-group w-100 list-group-flush">
-                    <li class="list-group-item d-flex align-items-center chat_area_bg rounded text-light">
-                        <i class="bi bi-person-circle fs-2"></i> <span class="ms-1">Sadi</span>
-                    </li>
-
-                    <li class="list-group-item d-flex align-items-center chat_bg">
-                        <i class="bi bi-person-circle fs-2"></i> <span class="ms-1">Sajib</span>
-                    </li>
-                    <li class="list-group-item d-flex align-items-center chat_bg">
-                        <i class="bi bi-person-circle fs-2"></i> <span class="ms-1">Sajib</span>
-                    </li>
-                    <li class="list-group-item d-flex align-items-center chat_bg">
-                        <i class="bi bi-person-circle fs-2"></i> <span class="ms-1">Sajib</span>
-                    </li>
-                    <li class="list-group-item d-flex align-items-center chat_bg">
-                        <i class="bi bi-person-circle fs-2"></i> <span class="ms-1">Sajib</span>
-                    </li>
-                    <li class="list-group-item d-flex align-items-center chat_bg">
-                        <i class="bi bi-person-circle fs-2"></i> <span class="ms-1">Sajib</span>
-                    </li>
-                    <li class="list-group-item d-flex align-items-center chat_bg">
-                        <i class="bi bi-person-circle fs-2"></i> <span class="ms-1">Sajib</span>
-                    </li>
-                    <li class="list-group-item d-flex align-items-center chat_bg">
-                        <i class="bi bi-person-circle fs-2"></i> <span class="ms-1">Sajib</span>
-                    </li>
-                    <li class="list-group-item d-flex align-items-center chat_bg">
-                        <i class="bi bi-person-circle fs-2"></i> <span class="ms-1">Sajib</span>
-                    </li>
-                    <li class="list-group-item d-flex align-items-center chat_bg">
-                        <i class="bi bi-person-circle fs-2"></i> <span class="ms-1">Sajib</span>
-                    </li>
-                    <li class="list-group-item d-flex align-items-center chat_bg">
-                        <i class="bi bi-person-circle fs-2"></i> <span class="ms-1">Sajib</span>
-                    </li>
-                    <li class="list-group-item d-flex align-items-center chat_bg">
-                        <i class="bi bi-person-circle fs-2"></i> <span class="ms-1">Sajib</span>
-                    </li>
-                    <li class="list-group-item d-flex align-items-center chat_bg">
-                        <i class="bi bi-person-circle fs-2"></i> <span class="ms-1">Sajib</span>
-                    </li>
-                    <li class="list-group-item d-flex align-items-center chat_bg">
-                        <i class="bi bi-person-circle fs-2"></i> <span class="ms-1">Sajib</span>
-                    </li>
-                    <li class="list-group-item d-flex align-items-center chat_bg">
-                        <i class="bi bi-person-circle fs-2"></i> <span class="ms-1">Sajib</span>
+                <ul class="list-group w-100 list-group-flush" id="chatList">
+                    <li class="list-group-item d-flex align-items-center text-light"
+                        th:each="connection:${setup.connections}">
+                        <img th:src="@{/picture/user/{pic}(pic=${connection.picture})}" th:alt="${connection.lastname}"
+                             class="icon-md"/>&nbsp;
+                        <span class="ms-1" th:text="${connection.firstname}"></span>&nbsp;
+                        <span class="ms-1" th:text="${connection.lastname}"></span>
                     </li>
                 </ul>
             </div>
@@ -133,7 +94,7 @@
 
         <!--    Chat List Ends    -->
         <div class="col-md-9 h-100 overflow-auto d-flex flex-column">
-            <div class="d-flex align-items-center p-2">
+            <div class="d-flex align-items-center p-2 border-left-1">
                 <i class="bi bi-person-circle fs-2"></i> <span class="ms-1 fs-3">Sadi</span>
             </div>
             <!--    Chat Area        -->
@@ -155,7 +116,7 @@
                 </div>
             </div>
             <!--    Chat Area Ends        -->
-            <div class="p-3">
+            <div class="p-3 border-left-1">
                 <form action="#" class="d-flex">
                     <input type="text" class="form-control chat_bg" placeholder="message" name="message" id="message"/>
                     <button class="btn chat_area_bg ms-1 text-light">

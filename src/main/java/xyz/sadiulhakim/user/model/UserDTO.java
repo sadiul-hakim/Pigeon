@@ -19,4 +19,12 @@ public class UserDTO {
     private String email;
     private String picture;
     private String rawPassword;
+
+    public UserDTO(UUID id, String firstname, String lastname, String email, String picture) {
+        this.id = id;
+        this.firstname = firstname;
+        this.lastname = lastname;
+        this.email = email;
+        this.picture = picture;
+    }
 }

@@ -35,11 +35,6 @@ body {
     display: none !important;
 }
 
-.chat_bg {
-    background-color: #48425c !important;
-    color: white !important;
-}
-
 .chat {
     width: 300px;
     padding: 10px;
@@ -51,7 +46,27 @@ body {
     color: #312a43 !important;
 }
 
+.chat_bg {
+    background-color: #48425c !important;
+    color: white !important;
+}
+
 .chat_area_bg {
+    background-color: #312a43 !important;
+    color: white !important;
+}
+
+#chatList li:hover {
+    background-color: #312a43 !important;
+    color: white !important;
+}
+
+#chatList li {
+    background-color: #48425c !important;
+    color: white !important;
+}
+
+#chatList li:first-child {
     background-color: #312a43 !important;
     color: white !important;
 }
@@ -80,4 +95,12 @@ body {
     width: 75px;
     height: 75px;
     border-radius: 50%;
+}
+
+.border-left-1 {
+    border-left: 1px solid #333;
+}
+
+.border-right-1 {
+    border-right: 1px solid #333;
 }

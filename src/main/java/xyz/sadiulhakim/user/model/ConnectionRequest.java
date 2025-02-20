@@ -19,10 +19,10 @@ public class ConnectionRequest {
     @GeneratedValue
     private Long id;
 
-    @OneToOne
+    @ManyToOne
     private User user;
 
-    @OneToOne
+    @ManyToOne
     private User toUser;
 
     @Temporal(TemporalType.TIMESTAMP)

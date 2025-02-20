@@ -4,13 +4,12 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.*;
-import org.springframework.web.multipart.MultipartFile;
-import org.springframework.web.servlet.mvc.support.RedirectAttributes;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseBody;
 import xyz.sadiulhakim.user.model.ConnectionRequest;
-import xyz.sadiulhakim.user.model.UserDTO;
 import xyz.sadiulhakim.user.model.UserService;
-import xyz.sadiulhakim.user.model.User;
 import xyz.sadiulhakim.util.PaginationResult;
 
 import java.util.Collections;
@@ -75,19 +74,11 @@ class UserController {
         return "receivedRequests";
     }
 
-    @GetMapping("/connections")
-    String connections(Model model) {
-        var connections = userService.connections();
-        model.addAttribute("result", connections);
-
-        return "connections";
-    }
-
     @GetMapping("/connections_page")
     String connectionsPage(Model model) {
 
-        List<ConnectionRequest> requests = userService.receivedConnectionRequests();
-        model.addAttribute("requests", requests);
-        return "receivedRequests";
+        var connections = userService.connections();
+        model.addAttribute("result", connections);
+        return "connections";
     }
 }
