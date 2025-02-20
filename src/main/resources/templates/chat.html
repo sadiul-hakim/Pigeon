@@ -47,6 +47,11 @@
                                         <hr class="dropdown-divider">
                                     </li>
                                     <li>
+                                        <a class="dropdown-item" th:href="@{/notification/page}">
+                                            <i class="bi bi-bell"></i> Notifications (<span th:text="${setup.notifications}"></span>)
+                                        </a>
+                                    </li>
+                                    <li>
                                         <a class="dropdown-item" href="#">
                                             <form th:action="@{/logout}" method="post">
                                                 <input type="hidden" th:name="${_csrf.parameterName}"
@@ -96,7 +101,8 @@
         <!--    Chat List Ends    -->
         <div class="col-md-9 h-100 overflow-auto d-flex flex-column">
             <div class="d-flex align-items-center p-2 border-left-1">
-                <img th:src="@{/picture/user/{pic}(pic=${setup.selectedUser.picture})}" th:alt="${setup.selectedUser.lastname}"
+                <img th:src="@{/picture/user/{pic}(pic=${setup.selectedUser.picture})}"
+                     th:alt="${setup.selectedUser.lastname}"
                      class="icon-md"/>&nbsp;
                 <span class="ms-1 fs-3" th:text="${setup.selectedUser.firstname}"></span>&nbsp;
                 <span class="ms-1 fs-3" th:text="${setup.selectedUser.lastname}"></span>
@@ -133,5 +139,51 @@
     </div>
 </div>
 
+<!--Toast Starts-->
+
+<div class="toast-container position-fixed bottom-0 end-0 p-3">
+    <div id="liveToast" class="toast" role="alert" aria-live="assertive" aria-atomic="true">
+        <div class="toast-header">
+            <strong class="me-auto">Connection</strong>
+            <button type="button" class="btn-close" data-bs-dismiss="toast" aria-label="Close"></button>
+        </div>
+        <div class="toast-body" id="toast-body">
+
+        </div>
+    </div>
+</div>
+
+<!--Toast Ends-->
+
 </body>
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+
+        // Establish SSE connection
+        const eventSource = new EventSource('/notification/subscribe'); // Call the API first
+
+        eventSource.addEventListener("connection-request-sent", (event) => {
+            console.log("Received SSE event:", event);
+
+            // Get toast elements
+            const toastLiveExample = document.getElementById('liveToast');
+            const toastBody = document.getElementById("toast-body");
+
+            // Initialize Bootstrap toast instance
+            const toastBootstrap = new bootstrap.Toast(toastLiveExample);
+
+            // Set the message inside the toast body
+            toastBody.textContent = event.data;
+
+            // Show the toast
+            toastBootstrap.show();
+        });
+
+        eventSource.onerror = (error) => {
+            console.error("SSE Error:", error);
+            eventSource.close();
+        };
+    });
+</script>
+
 </html>

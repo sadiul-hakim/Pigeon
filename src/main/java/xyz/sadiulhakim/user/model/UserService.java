@@ -4,6 +4,7 @@ import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.boot.context.event.ApplicationReadyEvent;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.context.event.EventListener;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -15,9 +16,12 @@ import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
 import org.springframework.web.multipart.MultipartFile;
 import xyz.sadiulhakim.chat.pojo.ChatSetup;
+import xyz.sadiulhakim.notification.model.NotificationService;
+import xyz.sadiulhakim.user.event.ConnectionEvent;
 import xyz.sadiulhakim.util.*;
 
 import java.io.IOException;
@@ -36,6 +40,8 @@ public class UserService {
     private final AppProperties appProperties;
     private final PasswordEncoder passwordEncoder;
     private final ConnectionRequestRepo connectionRequestRepo;
+    private final ApplicationEventPublisher eventPublisher;
+    private final NotificationService notificationService;
 
     @Async("taskExecutor")
     @EventListener
@@ -65,7 +71,9 @@ public class UserService {
         List<UUID> connectedUsers = user.getConnectedUsers();
         List<UserDTO> connections = userRepo.findAllUserConnections(connectedUsers);
 
-        return new ChatSetup(userDTO, connections, connections.getFirst());
+        return new ChatSetup(userDTO, connections,
+                connections.isEmpty() ? new UserDTO() : connections.getFirst(),
+                notificationService.count());
     }
 
     public User findByEmail(String email) {
@@ -83,6 +91,7 @@ public class UserService {
         return user;
     }
 
+    @Transactional
     public String connect(UUID toUser) {
 
         SecurityContext context = SecurityContextHolder.getContext();
@@ -116,6 +125,8 @@ public class UserService {
                 LocalDateTime.now());
         connectionRequestRepo.save(connectionRequest);
 
+        String message = user.getLastname() + " sent you a connection request!";
+        eventPublisher.publishEvent(new ConnectionEvent(message, "connection-request-sent", toUser));
         return "Successfully sent connection Request to  " + toUserById.get().getLastname();
     }
 
@@ -130,6 +141,7 @@ public class UserService {
         return connectionRequestRepo.findByUserAndToUser(user, toUserObj).isPresent();
     }
 
+
     public String cancelConnection(long requestId) {
 
         Optional<ConnectionRequest> req = connectionRequestRepo.findById(requestId);
@@ -143,6 +155,7 @@ public class UserService {
         return "Successfully cancelled connection Request  id: " + requestId;
     }
 
+    @Transactional
     public String acceptConnection(long reqId) {
 
         Optional<ConnectionRequest> req = connectionRequestRepo.findById(reqId);
@@ -160,9 +173,13 @@ public class UserService {
         userRepo.saveAll(List.of(user, toUser));
 
         connectionRequestRepo.delete(connectionRequest);
+
+        String message = toUser.getLastname() + " has accepted your request!";
+        eventPublisher.publishEvent(new ConnectionEvent(message, "connection-request-sent", user.getId()));
         return "You accepted Connection Request from " + user.getLastname();
     }
 
+    @Transactional
     public String removeConnection(UUID toUser) {
 
         SecurityContext context = SecurityContextHolder.getContext();
@@ -184,10 +201,12 @@ public class UserService {
 
         userRepo.saveAll(List.of(user, toUserObj));
 
+        String message = user.getLastname() + " has removed you from connection!";
+        eventPublisher.publishEvent(new ConnectionEvent(message, "connection-request-sent", toUser));
         return "You successfully removed " + toUserObj.getLastname() + " from you connection!";
     }
 
-    public List<ConnectionRequest> sentConnectionRequests() {
+    public List<ConnectionRequest> getAllSentConnectionRequests() {
 
         SecurityContext context = SecurityContextHolder.getContext();
         Authentication authentication = context.getAuthentication();

@@ -17,4 +17,5 @@ public class ChatSetup {
     private UserDTO user;
     private List<UserDTO> connections;
     private UserDTO selectedUser;
+    private long notifications;
 }

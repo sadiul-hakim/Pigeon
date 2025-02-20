@@ -25,10 +25,10 @@
                             </h5>
                             <small th:text="${user.email}" class="text-muted"></small>
                         </div>
-                        <form id="removeConnectionForm">
+                        <form class="removeConnectionForm">
                             <input type="hidden" th:name="${_csrf.parameterName}"
-                                   th:value="${_csrf.token}" id="csrfField"/>
-                            <input type="hidden" name="userId" th:value="${user.id}" id="userId"/>
+                                   th:value="${_csrf.token}" class="csrfField"/>
+                            <input type="hidden" name="userId" th:value="${user.id}" class="userId"/>
                             <button type="submit" class="btn btn-warning">
                                 Remove
                             </button>
@@ -56,31 +56,30 @@
 
 <!--Toast Ends-->
 </body>
-
 <script>
-    const removeConnectionForm = document.getElementById("removeConnectionForm");
-    const csrfField = document.getElementById("csrfField");
-    const toastLiveExample = document.getElementById('liveToast')
-    const toastBody = document.getElementById("toast-body");
-    const userId = document.getElementById("userId");
+    document.addEventListener("DOMContentLoaded", function () {
+        document.querySelectorAll(".removeConnectionForm").forEach(form => {
+            form.onsubmit = async (e) => {
+                e.preventDefault();
+                let csrfToken = form.querySelector(".csrfField").value;
+                let id = form.querySelector(".userId").value;
 
-    removeConnectionForm.onsubmit = async (e) => {
-        e.preventDefault();
-        let csrfToken = csrfField.value;
-        let id = userId.value;
+                let request = await fetch(`/user/remove-connection?toUser=${id}`, {
+                    headers: {
+                        'X-CSRF-TOKEN': csrfToken
+                    }
+                });
 
-        let request = await fetch(`/user/remove-connection?toUser=${id}`, {
-            headers: {
-                'X-CSRF-TOKEN': csrfToken
-            }
+                let response = await request.json();
+                let toastBody = document.getElementById("toast-body");
+                toastBody.innerText = response.message;
+                let toastLiveExample = document.getElementById('liveToast');
+                const toastBootstrap = bootstrap.Toast.getOrCreateInstance(toastLiveExample);
+                toastBootstrap.show();
+            };
         });
-
-        let response = await request.json();
-        toastBody.innerText = response.message;
-        const toastBootstrap = bootstrap.Toast.getOrCreateInstance(toastLiveExample)
-        toastBootstrap.show();
-    }
-
+    });
 </script>
+
 
 </html>

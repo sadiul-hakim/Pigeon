@@ -26,10 +26,10 @@
                             </h5>
                             <small th:text="${user.email}" class="text-muted"></small>
                         </div>
-                        <form id="connectionForm">
+                        <form class="connectionForm">
                             <input type="hidden" th:name="${_csrf.parameterName}"
-                                   th:value="${_csrf.token}" id="csrfField"/>
-                            <input type="hidden" name="toUser" th:value="${user.id}" id="toUserField"/>
+                                   th:value="${_csrf.token}" class="csrfField"/>
+                            <input type="hidden" name="toUser" th:value="${user.id}" class="toUserField"/>
                             <button type="submit" class="btn btn-warning">
                                 +Connect
                             </button>
@@ -59,30 +59,28 @@
 </body>
 
 <script>
-    const connectionForm = document.getElementById("connectionForm");
-    const csrfField = document.getElementById("csrfField");
-    const toastLiveExample = document.getElementById('liveToast')
-    const toastBody = document.getElementById("toast-body");
+    document.addEventListener("DOMContentLoaded", function () {
+        document.querySelectorAll(".connectionForm").forEach(form => {
+            form.onsubmit = async (e) => {
+                e.preventDefault();
+                let csrfToken = form.querySelector(".csrfField").value;
+                let toUser = form.querySelector(".toUserField").value;
 
-    const toUserField = document.getElementById("toUserField");
+                let request = await fetch(`/user/send-connect-request?toUser=${toUser}`, {
+                    headers: {
+                        'X-CSRF-TOKEN': csrfToken
+                    }
+                });
 
-    connectionForm.onsubmit = async (e) => {
-        e.preventDefault();
-        let csrfToken = csrfField.value;
-        let toUser = toUserField.value;
-
-        let request = await fetch(`/user/send-connect-request?toUser=${toUser}`, {
-            headers: {
-                'X-CSRF-TOKEN': csrfToken
-            }
+                let response = await request.json();
+                let toastBody = document.getElementById("toast-body");
+                toastBody.innerText = response.message;
+                let toastLiveExample = document.getElementById('liveToast');
+                const toastBootstrap = bootstrap.Toast.getOrCreateInstance(toastLiveExample);
+                toastBootstrap.show();
+            };
         });
-
-        let response = await request.json();
-        toastBody.innerText = response.message;
-        const toastBootstrap = bootstrap.Toast.getOrCreateInstance(toastLiveExample)
-        toastBootstrap.show();
-    }
-
+    });
 </script>
 
 </html>

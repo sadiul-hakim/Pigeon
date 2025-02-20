@@ -61,7 +61,7 @@ class UserController {
     @GetMapping("/sent_connections_page")
     String sentConnectionsPage(Model model) {
 
-        List<ConnectionRequest> requests = userService.sentConnectionRequests();
+        List<ConnectionRequest> requests = userService.getAllSentConnectionRequests();
         model.addAttribute("requests", requests);
         return "sentRequests";
     }

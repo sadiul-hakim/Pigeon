@@ -25,10 +25,10 @@
                             </h5>
                             <small th:text="${req.toUser.email}" class="text-muted"></small>
                         </div>
-                        <form id="cancelConnectionForm">
+                        <form class="cancelConnectionForm">
                             <input type="hidden" th:name="${_csrf.parameterName}"
-                                   th:value="${_csrf.token}" id="csrfField"/>
-                            <input type="hidden" name="reqId" th:value="${req.id}" id="reqId"/>
+                                   th:value="${_csrf.token}" class="csrfField"/>
+                            <input type="hidden" name="reqId" th:value="${req.id}" class="reqId"/>
                             <button type="submit" class="btn btn-warning">
                                 Cancel
                             </button>
@@ -56,31 +56,29 @@
 
 <!--Toast Ends-->
 </body>
-
 <script>
-    const cancelConnectionForm = document.getElementById("cancelConnectionForm");
-    const csrfField = document.getElementById("csrfField");
-    const toastLiveExample = document.getElementById('liveToast')
-    const toastBody = document.getElementById("toast-body");
-    const reqId = document.getElementById("reqId");
+    document.addEventListener("DOMContentLoaded", function () {
+        document.querySelectorAll(".cancelConnectionForm").forEach(form => {
+            form.onsubmit = async (e) => {
+                e.preventDefault();
+                let csrfToken = form.querySelector(".csrfField").value;
+                let id = form.querySelector(".reqId").value;
 
-    cancelConnectionForm.onsubmit = async (e) => {
-        e.preventDefault();
-        let csrfToken = csrfField.value;
-        let id = reqId.value;
+                let request = await fetch(`/user/cancel-connect-request?requestId=${id}`, {
+                    headers: {
+                        'X-CSRF-TOKEN': csrfToken
+                    }
+                });
 
-        let request = await fetch(`/user/cancel-connect-request?requestId=${id}`, {
-            headers: {
-                'X-CSRF-TOKEN': csrfToken
-            }
+                let response = await request.json();
+                let toastBody = document.getElementById("toast-body");
+                toastBody.innerText = response.message;
+                let toastLiveExample = document.getElementById('liveToast');
+                const toastBootstrap = bootstrap.Toast.getOrCreateInstance(toastLiveExample);
+                toastBootstrap.show();
+            };
         });
-
-        let response = await request.json();
-        toastBody.innerText = response.message;
-        const toastBootstrap = bootstrap.Toast.getOrCreateInstance(toastLiveExample)
-        toastBootstrap.show();
-    }
-
+    });
 </script>
 
 </html>
