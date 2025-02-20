@@ -61,16 +61,6 @@ body {
     color: white !important;
 }
 
-#chatList li {
-    background-color: #48425c !important;
-    color: white !important;
-}
-
-#chatList li:first-child {
-    background-color: #312a43 !important;
-    color: white !important;
-}
-
 .dark_bg {
     background-color: #1e1e1e !important;
 }

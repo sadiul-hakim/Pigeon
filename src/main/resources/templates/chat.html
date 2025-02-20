@@ -81,7 +81,8 @@
             <div id="chat_list" class="overflow-auto">
                 <ul class="list-group w-100 list-group-flush" id="chatList">
                     <li class="list-group-item d-flex align-items-center text-light"
-                        th:each="connection:${setup.connections}">
+                        th:each="connection:${setup.connections}"
+                        th:classappend="${setup.selectedUser.id.equals(connection.id) ? 'chat_area_bg' : 'chat_bg'}">
                         <img th:src="@{/picture/user/{pic}(pic=${connection.picture})}" th:alt="${connection.lastname}"
                              class="icon-md"/>&nbsp;
                         <span class="ms-1" th:text="${connection.firstname}"></span>&nbsp;
@@ -95,7 +96,10 @@
         <!--    Chat List Ends    -->
         <div class="col-md-9 h-100 overflow-auto d-flex flex-column">
             <div class="d-flex align-items-center p-2 border-left-1">
-                <i class="bi bi-person-circle fs-2"></i> <span class="ms-1 fs-3">Sadi</span>
+                <img th:src="@{/picture/user/{pic}(pic=${setup.selectedUser.picture})}" th:alt="${setup.selectedUser.lastname}"
+                     class="icon-md"/>&nbsp;
+                <span class="ms-1 fs-3" th:text="${setup.selectedUser.firstname}"></span>&nbsp;
+                <span class="ms-1 fs-3" th:text="${setup.selectedUser.lastname}"></span>
             </div>
             <!--    Chat Area        -->
             <div class="flex-grow-1 p-3 chat_area_bg overflow-auto">
