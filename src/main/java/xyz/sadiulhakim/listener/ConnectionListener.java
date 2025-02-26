@@ -1,7 +1,8 @@
 package xyz.sadiulhakim.listener;
 
 import lombok.RequiredArgsConstructor;
-import org.springframework.modulith.events.ApplicationModuleListener;
+import org.springframework.context.event.EventListener;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Component;
 import xyz.sadiulhakim.notification.model.NotificationService;
 import xyz.sadiulhakim.user.event.ConnectionEvent;
@@ -12,7 +13,8 @@ class ConnectionListener {
 
     private final NotificationService notificationService;
 
-    @ApplicationModuleListener
+    @Async("taskExecutor")
+    @EventListener
     void connectionEvent(ConnectionEvent event) {
         notificationService.sendNotification(event.message(), event.type(), event.user());
     }

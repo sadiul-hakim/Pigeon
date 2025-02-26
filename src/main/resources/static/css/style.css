@@ -94,3 +94,7 @@ body {
 .border-right-1 {
     border-right: 1px solid #333;
 }
+
+.hidden{
+    display: none;
+}

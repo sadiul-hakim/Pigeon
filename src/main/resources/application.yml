@@ -18,6 +18,9 @@ spring:
     open-in-view: false
 
 server:
+  servlet:
+    session:
+      timeout: 2h
   port: 9093
 
 default:
@@ -33,3 +36,10 @@ logging:
     path: logs
   level:
     root: warn
+
+# Socket
+app:
+  socket:
+    endpoint: /ws
+    app_prefix: /chat
+    user_prefix: /user

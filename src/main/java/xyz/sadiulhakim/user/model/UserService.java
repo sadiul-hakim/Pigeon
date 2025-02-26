@@ -9,18 +9,14 @@ import org.springframework.context.event.EventListener;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
-import org.springframework.modulith.NamedInterface;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
 import org.springframework.web.multipart.MultipartFile;
-import xyz.sadiulhakim.chat.pojo.ChatSetup;
-import xyz.sadiulhakim.notification.model.NotificationService;
 import xyz.sadiulhakim.user.event.ConnectionEvent;
 import xyz.sadiulhakim.util.*;
 
@@ -30,7 +26,6 @@ import java.time.LocalDateTime;
 import java.util.*;
 
 @Service
-@NamedInterface("user-service")
 @RequiredArgsConstructor
 public class UserService {
 
@@ -41,7 +36,6 @@ public class UserService {
     private final PasswordEncoder passwordEncoder;
     private final ConnectionRequestRepo connectionRequestRepo;
     private final ApplicationEventPublisher eventPublisher;
-    private final NotificationService notificationService;
 
     @Async("taskExecutor")
     @EventListener
@@ -57,23 +51,8 @@ public class UserService {
         }
     }
 
-    public ChatSetup getChatSetup() {
-
-        SecurityContext context = SecurityContextHolder.getContext();
-        Authentication authentication = context.getAuthentication();
-
-        if (authentication == null || authentication.getName() == null) {
-            return new ChatSetup();
-        }
-
-        User user = findByEmail(authentication.getName());
-        UserDTO userDTO = convertToDto(user);
-        List<UUID> connectedUsers = user.getConnectedUsers();
-        List<UserDTO> connections = userRepo.findAllUserConnections(connectedUsers);
-
-        return new ChatSetup(userDTO, connections,
-                connections.isEmpty() ? new UserDTO() : connections.getFirst(),
-                notificationService.count());
+    public List<UserDTO> findAllUserConnections(List<UUID> uuids) {
+        return userRepo.findAllUserConnections(uuids);
     }
 
     public User findByEmail(String email) {
@@ -91,7 +70,6 @@ public class UserService {
         return user;
     }
 
-    @Transactional
     public String connect(UUID toUser) {
 
         SecurityContext context = SecurityContextHolder.getContext();
@@ -155,7 +133,6 @@ public class UserService {
         return "Successfully cancelled connection Request  id: " + requestId;
     }
 
-    @Transactional
     public String acceptConnection(long reqId) {
 
         Optional<ConnectionRequest> req = connectionRequestRepo.findById(reqId);
@@ -179,7 +156,6 @@ public class UserService {
         return "You accepted Connection Request from " + user.getLastname();
     }
 
-    @Transactional
     public String removeConnection(UUID toUser) {
 
         SecurityContext context = SecurityContextHolder.getContext();

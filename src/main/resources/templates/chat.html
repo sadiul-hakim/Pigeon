@@ -4,6 +4,8 @@
     <title>Chat Page</title>
 </head>
 <body class="dark_bg">
+<span class="hidden" th:text="${user}" id="user"></span>
+<span class="hidden" th:text="${toUser}" id="toUser"></span>
 <div class="vh-100 overflow-hidden d-flex p-2 container-fluid">
     <div class="row h-100 w-100 card chat_bg">
 
@@ -48,7 +50,8 @@
                                     </li>
                                     <li>
                                         <a class="dropdown-item" th:href="@{/notification/page}">
-                                            <i class="bi bi-bell"></i> Notifications (<span th:text="${setup.notifications}"></span>)
+                                            <i class="bi bi-bell"></i> Notifications (<span
+                                                th:text="${setup.notifications}"></span>)
                                         </a>
                                     </li>
                                     <li>
@@ -85,13 +88,16 @@
             <!--    List        -->
             <div id="chat_list" class="overflow-auto">
                 <ul class="list-group w-100 list-group-flush" id="chatList">
-                    <li class="list-group-item d-flex align-items-center text-light"
-                        th:each="connection:${setup.connections}"
+                    <li th:each="connection:${setup.connections}" class="list-group-item"
                         th:classappend="${setup.selectedUser.id.equals(connection.id) ? 'chat_area_bg' : 'chat_bg'}">
-                        <img th:src="@{/picture/user/{pic}(pic=${connection.picture})}" th:alt="${connection.lastname}"
-                             class="icon-md"/>&nbsp;
-                        <span class="ms-1" th:text="${connection.firstname}"></span>&nbsp;
-                        <span class="ms-1" th:text="${connection.lastname}"></span>
+                        <a th:href="@{'/chat?toUser='+${connection.id}}"
+                           class="d-flex align-items-center text-light text-decoration-none">
+                            <img th:src="@{/picture/user/{pic}(pic=${connection.picture})}"
+                                 th:alt="${connection.lastname}"
+                                 class="icon-md"/>&nbsp;
+                            <span class="ms-1" th:text="${connection.firstname}"></span>&nbsp;
+                            <span class="ms-1" th:text="${connection.lastname}"></span>
+                        </a>
                     </li>
                 </ul>
             </div>
@@ -109,20 +115,16 @@
             </div>
             <!--    Chat Area        -->
             <div class="flex-grow-1 p-3 chat_area_bg overflow-auto">
-                <div class="my-1 d-flex">
+                <div class="my-1 d-flex" th:each="chat:${setup.initialChat}">
                     <i class="bi bi-person-circle fs-4"></i>
-                    <span class="ms-1 d-flex flex-column chat">
-                        <span class="fw-bold text-warning fs-5">Sajib</span>
-                        <span class="text-white">Hi</span>
-                    </span>
-                </div>
-
-                <div class="my-1 d-flex">
-                    <i class="bi bi-person-circle fs-4"></i>
-                    <span class="ms-1 d-flex flex-column chat">
-                        <span class="fw-bold chat_area_color fs-5">Sadi</span>
-                        <span class="text-white">Hello</span>
-                    </span>
+                    <div class="ms-1 d-flex flex-column chat">
+                        <div>
+                            <span class="fw-bold chat_area_color fs-5" th:text="${chat.user.lastname}"></span>&nbsp;|&nbsp;
+                            <small th:text="${#temporals.format(chat.sendTime, 'yyyy-MM-dd HH:mm:ss')}"
+                                   class="text-muted"></small>
+                        </div>
+                        <span class="text-white" th:text="${chat.message}"></span>
+                    </div>
                 </div>
             </div>
             <!--    Chat Area Ends        -->
