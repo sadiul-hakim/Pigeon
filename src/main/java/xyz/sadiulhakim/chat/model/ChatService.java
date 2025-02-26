@@ -16,10 +16,7 @@ import xyz.sadiulhakim.user.model.UserService;
 
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
-import java.util.Collections;
-import java.util.List;
-import java.util.Optional;
-import java.util.UUID;
+import java.util.*;
 
 @Service
 @RequiredArgsConstructor
@@ -50,7 +47,7 @@ public class ChatService {
         chatSetup.setNotifications(notificationService.count());
 
         if (connections.isEmpty()) {
-            chatSetup.setSelectedUser(new UserDTO());
+            chatSetup.setSelectedUser(null);
         } else if (toUser == null) {
             chatSetup.setSelectedUser(connections.getFirst());
         } else {
@@ -59,8 +56,12 @@ public class ChatService {
             chatSetup.setSelectedUser(selectedUser.orElse(new UserDTO()));
         }
 
-        List<Chat> chats = findAllChat(chatSetup.getUser().getId(), chatSetup.getSelectedUser().getId());
-        chatSetup.setInitialChat(chats);
+        if (chatSetup.getSelectedUser() != null) {
+            List<Chat> chats = findAllChat(chatSetup.getUser().getId(), chatSetup.getSelectedUser().getId());
+            chatSetup.setInitialChat(chats);
+        } else {
+            chatSetup.setInitialChat(new ArrayList<>());
+        }
 
         return chatSetup;
     }

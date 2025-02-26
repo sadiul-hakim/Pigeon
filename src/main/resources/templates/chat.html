@@ -5,12 +5,12 @@
 </head>
 <body class="dark_bg">
 <span class="hidden" th:text="${setup.user.email}" id="user"></span>
-<span class="hidden" th:text="${setup.selectedUser.email}" id="toUser"></span>
+<span class="hidden" th:text="${setup.selectedUser != null ? setup.selectedUser.email : ''}" id="toUser"></span>
 <div class="vh-100 overflow-hidden d-flex p-2 container-fluid">
     <div class="row h-100 w-100 card chat_bg">
 
         <!--   Chat List     -->
-        <div class="col-md-3 h-100 overflow-auto p-3">
+        <div class="col-md-3 h-100 overflow-auto p-3 border-right-1">
             <!--     Nav       -->
             <nav class="navbar navbar-expand-lg bg-body-tertiary chat_bg">
                 <div class="container-fluid">
@@ -105,8 +105,8 @@
         </div>
 
         <!--    Chat List Ends    -->
-        <div class="col-md-9 h-100 overflow-auto d-flex flex-column">
-            <div class="d-flex align-items-center p-2 border-left-1">
+        <div class="col-md-9 h-100 overflow-auto d-flex flex-column" th:if="${setup.selectedUser != null}">
+            <div class="d-flex align-items-center p-2">
                 <img th:src="@{/picture/user/{pic}(pic=${setup.selectedUser.picture})}"
                      th:alt="${setup.selectedUser.lastname}"
                      class="icon-md"/>&nbsp;
@@ -132,7 +132,7 @@
             <!-- Chat Area Ends -->
 
             <!--    Chat Area Ends        -->
-            <div class="p-3 border-left-1">
+            <div class="p-3">
                 <form class="d-flex" id="chatForm">
                     <input type="text" class="form-control chat_bg" placeholder="message" name="message" id="message"/>
                     <button class="btn chat_area_bg ms-1 text-light">

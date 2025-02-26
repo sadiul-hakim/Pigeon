@@ -7,7 +7,7 @@ document.addEventListener("DOMContentLoaded", function () {
     let stompClient = Stomp.over(socket);
 
     stompClient.connect({
-        'ws-id': toUser
+        'ws-id': user
     }, function (frame) {
         console.log("Connected: " + frame);
 
