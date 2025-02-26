@@ -62,7 +62,6 @@ function createMessageElement(messageData) {
     time.textContent = messageData.sendTime;  // Format time as per your requirement
 
     header.appendChild(userName);
-    header.appendChild(document.createTextNode(" | "));
     header.appendChild(time);
 
     const textMessage = document.createElement("span");

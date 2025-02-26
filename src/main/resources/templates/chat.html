@@ -121,7 +121,9 @@
                     <img th:src="@{'/picture/user/'+${chat.user.picture}}" alt="" class="icon-sm"/>
                     <div class="ms-1 d-flex flex-column chat">
                         <div>
-                            <span class="fw-bold chat_area_color fs-5" th:text="${chat.user.lastname}"></span>&nbsp;|&nbsp;
+                            <span class="fw-bold chat_area_color fs-5" th:text="${chat.user.lastname}"
+                                  th:style="'color:'+${chat.user.textColor}+'!important;'"></span>
+                            &nbsp;
                             <small th:text="${#temporals.format(chat.sendTime, 'yyyy-MM-dd HH:mm:ss')}"
                                    class="text-muted"></small>
                         </div>
