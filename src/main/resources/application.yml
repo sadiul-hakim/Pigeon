@@ -41,5 +41,5 @@ logging:
 app:
   socket:
     endpoint: /ws
-    app_prefix: /chat
+    app_prefix: /
     user_prefix: /user

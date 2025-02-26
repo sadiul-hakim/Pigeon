@@ -4,8 +4,8 @@
     <title>Chat Page</title>
 </head>
 <body class="dark_bg">
-<span class="hidden" th:text="${user}" id="user"></span>
-<span class="hidden" th:text="${toUser}" id="toUser"></span>
+<span class="hidden" th:text="${setup.user.email}" id="user"></span>
+<span class="hidden" th:text="${setup.selectedUser.email}" id="toUser"></span>
 <div class="vh-100 overflow-hidden d-flex p-2 container-fluid">
     <div class="row h-100 w-100 card chat_bg">
 
@@ -114,8 +114,10 @@
                 <span class="ms-1 fs-3" th:text="${setup.selectedUser.lastname}"></span>
             </div>
             <!--    Chat Area        -->
-            <div class="flex-grow-1 p-3 chat_area_bg overflow-auto">
-                <div class="my-1 d-flex" th:each="chat:${setup.initialChat}">
+            <!-- Chat Area -->
+            <div class="flex-grow-1 p-3 chat_area_bg overflow-auto" id="chatArea">
+                <!-- Existing chat messages (initial messages) -->
+                <div class="my-1 d-flex" th:each="chat : ${setup.initialChat}">
                     <i class="bi bi-person-circle fs-4"></i>
                     <div class="ms-1 d-flex flex-column chat">
                         <div>
@@ -127,9 +129,11 @@
                     </div>
                 </div>
             </div>
+            <!-- Chat Area Ends -->
+
             <!--    Chat Area Ends        -->
             <div class="p-3 border-left-1">
-                <form action="#" class="d-flex">
+                <form class="d-flex" id="chatForm">
                     <input type="text" class="form-control chat_bg" placeholder="message" name="message" id="message"/>
                     <button class="btn chat_area_bg ms-1 text-light">
                         <i class="bi bi-send"></i>
@@ -187,5 +191,7 @@
         };
     });
 </script>
-
+<script th:src="@{/js/sockjs.min.js}"></script>
+<script th:src="@{/js/stomp.min.js}"></script>
+<script th:src="@{/js/chat.js}"></script>
 </html>

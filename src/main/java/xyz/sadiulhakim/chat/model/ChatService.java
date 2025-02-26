@@ -1,11 +1,13 @@
 package xyz.sadiulhakim.chat.model;
 
 import lombok.RequiredArgsConstructor;
+import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
+import xyz.sadiulhakim.chat.pojo.ChatMessage;
 import xyz.sadiulhakim.chat.pojo.ChatSetup;
 import xyz.sadiulhakim.notification.model.NotificationService;
 import xyz.sadiulhakim.user.model.User;
@@ -13,6 +15,7 @@ import xyz.sadiulhakim.user.model.UserDTO;
 import xyz.sadiulhakim.user.model.UserService;
 
 import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
@@ -25,6 +28,7 @@ public class ChatService {
     private final ChatRepo chatRepo;
     private final UserService userService;
     private final NotificationService notificationService;
+    private final SimpMessagingTemplate messagingTemplate;
 
     public ChatSetup getChatSetup(UUID toUser) {
 
@@ -61,33 +65,37 @@ public class ChatService {
         return chatSetup;
     }
 
-    public void sendMessage(String message, UUID userId, UUID toUserId) {
+    public void sendMessage(ChatMessage message) {
 
-        // TODO: send message in socket
+        User user = userService.findByEmail(message.getUser());
+        User toUser = userService.findByEmail(message.getToUser());
+
+        if (user == null || toUser == null)
+            return;
+
+        LocalDateTime now = LocalDateTime.now();
+        message.setSendTime(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss").format(now));
+        message.setUserName(user.getLastname());
+        message.setUserPicture(user.getPicture());
+
+        messagingTemplate.convertAndSendToUser(user.getEmail(), "/queue/messages", message);
+        messagingTemplate.convertAndSendToUser(toUser.getEmail(), "/queue/messages", message);
 
         Thread.ofVirtual().name("#ChatThread-", 0).start(() -> {
-            save(message, userId, toUserId);
+            save(message.getMessage(), user, toUser, now);
         });
     }
 
-
-    public void save(String message, UUID userId, UUID toUserId) {
+    public void save(String message, User user, User toUser, LocalDateTime now) {
 
         if (!StringUtils.hasText(message))
             return;
 
         Chat chat = new Chat();
-
-        Optional<User> user = userService.findById(userId);
-        Optional<User> toUser = userService.findById(toUserId);
-
-        if (user.isEmpty() || toUser.isEmpty())
-            return;
-
-        chat.setUser(user.get());
-        chat.setToUser(toUser.get());
+        chat.setUser(user);
+        chat.setToUser(toUser);
         chat.setMessage(message);
-        chat.setSendTime(LocalDateTime.now());
+        chat.setSendTime(now);
 
         chatRepo.save(chat);
     }
@@ -98,6 +106,9 @@ public class ChatService {
         if (user.isEmpty() || toUser.isEmpty())
             return Collections.emptyList();
 
-        return chatRepo.findAllByUserAndToUser(user.get(), toUser.get());
+        return chatRepo.findAllByUserAndToUserOrToUserAndUserOrderBySendTime(
+                user.get(), toUser.get(),
+                user.get(), toUser.get()
+        );
     }
 }

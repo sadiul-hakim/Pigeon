@@ -1,6 +1,7 @@
 package xyz.sadiulhakim.config;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
@@ -14,11 +15,6 @@ import java.util.concurrent.Executors;
 
 @Configuration
 class AppConfig implements WebMvcConfigurer {
-
-    @Bean
-    ObjectMapper jsonMapper() {
-        return new ObjectMapper();
-    }
 
     @Bean
     PasswordEncoder passwordEncoder() {
@@ -39,5 +35,12 @@ class AppConfig implements WebMvcConfigurer {
     @Override
     public void configureAsyncSupport(AsyncSupportConfigurer configurer) {
         configurer.setDefaultTimeout(10 * 60 * 1000); // 10 minutes
+    }
+
+    @Bean
+    public ObjectMapper objectMapper() {
+        ObjectMapper mapper = new ObjectMapper();
+        mapper.registerModule(new JavaTimeModule());
+        return mapper;
     }
 }
