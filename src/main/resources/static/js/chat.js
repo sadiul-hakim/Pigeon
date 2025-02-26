@@ -45,8 +45,9 @@ function createMessageElement(messageData) {
     const messageElement = document.createElement("div");
     messageElement.classList.add("my-1", "d-flex");
 
-    const avatar = document.createElement("i");
-    avatar.classList.add("bi", "bi-person-circle", "fs-4");
+    const avatar = document.createElement("img");
+    avatar.classList.add("icon-sm");
+    avatar.src = `/picture/user/${messageData.userPicture}`
 
     const messageContent = document.createElement("div");
     messageContent.classList.add("ms-1", "d-flex", "flex-column", "chat");

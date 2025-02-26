@@ -118,7 +118,7 @@
             <div class="flex-grow-1 p-3 chat_area_bg overflow-auto" id="chatArea">
                 <!-- Existing chat messages (initial messages) -->
                 <div class="my-1 d-flex" th:each="chat : ${setup.initialChat}">
-                    <i class="bi bi-person-circle fs-4"></i>
+                    <img th:src="@{'/picture/user/'+${chat.user.picture}}" alt="" class="icon-sm"/>
                     <div class="ms-1 d-flex flex-column chat">
                         <div>
                             <span class="fw-bold chat_area_color fs-5" th:text="${chat.user.lastname}"></span>&nbsp;|&nbsp;
