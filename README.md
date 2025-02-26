@@ -22,7 +22,7 @@ let socket = new SockJS('/ws');
 let stompClient = Stomp.over(socket);
 
 stompClient.connect({
-        'ws-id': toUser
+        'ws-id': toUser // the mail you send message to
     },
 
     function (frame) {
