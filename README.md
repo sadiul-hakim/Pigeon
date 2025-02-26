@@ -3,18 +3,37 @@
 `In Spring WebSocket if you want to send data to a specific user, use the username not anything else.`
 
 ```java
-        User user = userService.findByEmail(message.user());
-User toUser = userService.findByEmail(message.toUser());
+public void sendMessage(ChatMessage message) {
 
-        if(user ==null||toUser ==null)
+    User user = userService.findByEmail(message.getUser());
+    User toUser = userService.findByEmail(message.getToUser());
+
+    if (user == null || toUser == null)
         return;
 
-        messagingTemplate.
+    messagingTemplate.convertAndSendToUser(user.getEmail(), "/queue/messages", message);
+    messagingTemplate.convertAndSendToUser(toUser.getEmail(), "/queue/messages", message);
+}
 
-convertAndSendToUser(user.getEmail(), "/queue/messages",message);
-        messagingTemplate.
+```
 
-convertAndSendToUser(toUser.getEmail(), "/queue/messages",message);
+```javascript
+let socket = new SockJS('/ws');
+let stompClient = Stomp.over(socket);
+
+stompClient.connect({
+        'ws-id': toUser
+    },
+
+    function (frame) {
+        console.log("Connected: " + frame);
+
+        // Subscribe to user-specific messages
+        stompClient.subscribe('/user/queue/messages', function (message) {
+            let receivedMessage = JSON.parse(message.body);
+            console.log("Private Message Received:", receivedMessage);
+        });
+    });
 ```
 
 `Email/username which is used to login not id or anything.`
