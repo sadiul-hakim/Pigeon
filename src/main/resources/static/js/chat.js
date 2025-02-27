@@ -55,7 +55,8 @@ function createMessageElement(messageData) {
     const header = document.createElement("div");
     const userName = document.createElement("span");
     userName.classList.add("fw-bold", "chat_area_color", "fs-5");
-    userName.textContent = messageData.userName;  // Assuming 'user' contains the sender's name
+    userName.textContent = messageData.userName + ' ';  // Assuming 'user' contains the sender's name
+    userName.style.setProperty("color", messageData.userTextColor, "important");
 
     const time = document.createElement("small");
     time.classList.add("text-muted");

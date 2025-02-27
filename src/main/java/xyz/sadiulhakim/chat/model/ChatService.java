@@ -78,6 +78,7 @@ public class ChatService {
         message.setSendTime(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss").format(now));
         message.setUserName(user.getLastname());
         message.setUserPicture(user.getPicture());
+        message.setUserTextColor(user.getTextColor());
 
         messagingTemplate.convertAndSendToUser(user.getEmail(), "/queue/messages", message);
         messagingTemplate.convertAndSendToUser(toUser.getEmail(), "/queue/messages", message);

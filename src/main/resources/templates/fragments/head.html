@@ -11,4 +11,11 @@
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css"/>
     <link rel="icon" th:href="@{'/images/carrier-pigeon.png'}" type="image/png">
     <script th:src="@{'/js/bootstrap.bundle.min.js'}"></script>
+
+    <link rel="manifest" th:href="@{/js/manifest.json}">
+    <script>
+        if ('serviceWorker' in navigator) {
+            navigator.serviceWorker.register('/js/sw.js');
+        }
+    </script>
 </head>

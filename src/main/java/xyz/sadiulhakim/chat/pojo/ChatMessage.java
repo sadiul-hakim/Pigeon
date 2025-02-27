@@ -14,6 +14,7 @@ public class ChatMessage {
     private String user;
     private String userPicture;
     private String userName;
+    private String userTextColor;
     private String toUser;
     private String sendTime;
 }

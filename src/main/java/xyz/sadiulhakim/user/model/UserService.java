@@ -51,6 +51,24 @@ public class UserService {
         }
     }
 
+    public Optional<User> currentUser() {
+
+        SecurityContext context = SecurityContextHolder.getContext();
+        Authentication authentication = context.getAuthentication();
+
+        if (authentication == null || authentication.getName() == null) {
+            return Optional.empty();
+        }
+
+        User user = findByEmail(authentication.getName());
+        if (user == null) {
+            LOGGER.warn("User does not exists with email : {}", authentication.getName());
+            return Optional.empty();
+        }
+
+        return Optional.of(user);
+    }
+
     public List<UserDTO> findAllUserConnections(List<UUID> uuids) {
         return userRepo.findAllUserConnections(uuids);
     }
@@ -250,9 +268,39 @@ public class UserService {
         }
     }
 
-    private void update(UUID userId, UserDTO user, MultipartFile photo) throws IOException {
+    public void updateProfilePicture(MultipartFile photo, UUID userId) {
 
-        User exUser = findById(userId).orElse(null);
+        Optional<User> user = userRepo.findById(userId);
+        if (user.isEmpty()) {
+            return;
+        }
+
+        User exUser = user.get();
+        if (photo != null && !Objects.requireNonNull(photo.getOriginalFilename()).isEmpty()) {
+            try {
+                String fileName = FileUtil.uploadFile(appProperties.getUserImageFolder(), photo.getOriginalFilename(), photo.getInputStream());
+
+                if (StringUtils.hasText(fileName) && !exUser.getPicture().equals(appProperties.getDefaultUserPhotoName())) {
+                    boolean deleted = FileUtil.deleteFile(appProperties.getUserImageFolder(), exUser.getPicture());
+                    if (deleted) {
+                        LOGGER.info("UserService.update :: File {} is deleted", exUser.getPicture());
+                    }
+                }
+
+                if (StringUtils.hasText(fileName)) {
+                    exUser.setPicture(fileName);
+                }
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            }
+        }
+
+        userRepo.save(exUser);
+    }
+
+    public void update(User user) {
+
+        User exUser = findById(user.getId()).orElse(null);
         if (exUser == null) {
             LOGGER.warn("UserService.update :: User does not exists with id {}", user);
             return;
@@ -266,19 +314,8 @@ public class UserService {
             exUser.setLastname(user.getLastname());
         }
 
-        if (photo != null && !Objects.requireNonNull(photo.getOriginalFilename()).isEmpty()) {
-            String fileName = FileUtil.uploadFile(appProperties.getUserImageFolder(), photo.getOriginalFilename(), photo.getInputStream());
-
-            if (StringUtils.hasText(fileName) && !exUser.getPicture().equals(appProperties.getDefaultUserPhotoName())) {
-                boolean deleted = FileUtil.deleteFile(appProperties.getUserImageFolder(), exUser.getPicture());
-                if (deleted) {
-                    LOGGER.info("UserService.update :: File {} is deleted", exUser.getPicture());
-                }
-            }
-
-            if (StringUtils.hasText(fileName)) {
-                exUser.setPicture(fileName);
-            }
+        if (StringUtils.hasText(user.getTextColor())) {
+            exUser.setTextColor(user.getTextColor());
         }
 
         userRepo.save(exUser);
