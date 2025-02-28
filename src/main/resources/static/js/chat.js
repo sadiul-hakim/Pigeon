@@ -1,7 +1,9 @@
+const chatArea = document.getElementById("chatArea");
+let user = document.getElementById("user").textContent;
+let toUser = document.getElementById("toUser").textContent;
+let chatList = document.getElementById("chatList");
+
 document.addEventListener("DOMContentLoaded", function () {
-    let user = document.getElementById("user").textContent;
-    let toUser = document.getElementById("toUser").textContent;
-    const chatArea = document.getElementById("chatArea");
 
     let socket = new SockJS('/ws');
     let stompClient = Stomp.over(socket);
@@ -9,19 +11,12 @@ document.addEventListener("DOMContentLoaded", function () {
     stompClient.connect({
         'ws-id': user
     }, function (frame) {
-        console.log("Connected: " + frame);
 
         // Subscribe to user-specific messages
         stompClient.subscribe('/user/queue/messages', function (message) {
             let receivedMessage = JSON.parse(message.body);
-            console.log("Private Message Received:", receivedMessage);
-
-            // Create and append a new message element to the chat area
-            let newMessageElement = createMessageElement(receivedMessage);
-            chatArea.appendChild(newMessageElement);
-
-            // Auto-scroll to the latest message
-            chatArea.scrollTop = chatArea.scrollHeight;
+            console.log(receivedMessage)
+            showMessage(receivedMessage);
         });
     });
 
@@ -39,6 +34,38 @@ document.addEventListener("DOMContentLoaded", function () {
         document.getElementById("message").value = "";
     });
 });
+
+function showMessage(receivedMessage) {
+
+    // Create and append a new message element to the chat area
+
+    if (receivedMessage.user === toUser || receivedMessage.user === user) {
+        let newMessageElement = createMessageElement(receivedMessage);
+        chatArea.appendChild(newMessageElement);
+
+        // Auto-scroll to the latest message
+        chatArea.scrollTop = chatArea.scrollHeight;
+    } else {
+        showOnConnectionList(receivedMessage);
+    }
+}
+
+function showOnConnectionList(newMessageElement) {
+    let p = document.createElement("p");
+    p.innerText = newMessageElement.message.length <= 25 ?
+        newMessageElement.message :
+        newMessageElement.message.substring(0, 25) + "...";
+    p.classList.add("m-0", "small", "bold"); // Optional styling
+
+    for (let child of chatList.children) {
+        if (child.dataset.con === newMessageElement.user) {
+            let anchor = child.querySelector("a");
+            let connectionText = anchor.querySelector("#connectionText");
+
+            connectionText.append(p);
+        }
+    }
+}
 
 // Function to create a new message element for display
 function createMessageElement(messageData) {

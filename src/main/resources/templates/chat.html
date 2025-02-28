@@ -89,17 +89,24 @@
             <div id="chat_list" class="overflow-auto">
                 <ul class="list-group w-100 list-group-flush" id="chatList">
                     <li th:each="connection:${setup.connections}" class="list-group-item"
-                        th:classappend="${setup.selectedUser.id.equals(connection.id) ? 'chat_area_bg' : 'chat_bg'}">
+                        th:classappend="${setup.selectedUser.id.equals(connection.id) ? 'chat_area_bg' : 'chat_bg'}"
+                        th:data-con="${connection.email}">
                         <a th:href="@{'/chat?toUser='+${connection.id}}"
-                           class="d-flex align-items-center text-light text-decoration-none">
+                           class="d-flex text-light text-decoration-none">
                             <img th:src="@{/picture/user/{pic}(pic=${connection.picture})}"
                                  th:alt="${connection.lastname}"
                                  class="icon-md"/>&nbsp;
-                            <span class="ms-1" th:text="${connection.firstname}"></span>&nbsp;
-                            <span class="ms-1" th:text="${connection.lastname}"></span>
+                            <div class="d-flex align-items-start justify-content-center flex-column ms-1"
+                                 id="connectionText">
+                                <div class="d-flex">
+                                    <span class="ms-1 fw-bold" th:text="${connection.firstname}"></span>&nbsp;
+                                    <span class="ms-1 fw-bold" th:text="${connection.lastname}"></span>
+                                </div>
+                            </div>
                         </a>
                     </li>
                 </ul>
+
             </div>
             <!--     List Ends       -->
         </div>
