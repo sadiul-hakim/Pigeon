@@ -17,6 +17,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 import org.springframework.web.multipart.MultipartFile;
+import xyz.sadiulhakim.chat.model.ChatService;
 import xyz.sadiulhakim.user.event.ConnectionEvent;
 import xyz.sadiulhakim.util.*;
 
@@ -36,6 +37,7 @@ public class UserService {
     private final PasswordEncoder passwordEncoder;
     private final ConnectionRequestRepo connectionRequestRepo;
     private final ApplicationEventPublisher eventPublisher;
+    private final ChatService chatService;
 
     @Async("taskExecutor")
     @EventListener
@@ -197,6 +199,9 @@ public class UserService {
 
         String message = user.getLastname() + " has removed you from connection!";
         eventPublisher.publishEvent(new ConnectionEvent(message, "connection-request-sent", toUser));
+
+        Thread.ofVirtual().name("#ChatDeletingThread-", 0).start(() -> chatService.deleteAllMessage(user, toUserObj));
+
         return "You successfully removed " + toUserObj.getLastname() + " from you connection!";
     }
 

@@ -113,4 +113,11 @@ public class ChatService {
                 user.get(), toUser.get()
         );
     }
+
+    public void deleteAllMessage(User user, User toUser) {
+        chatRepo.deleteAllByUserAndToUserOrToUserAndUser(
+                user, toUser,
+                user, toUser
+        );
+    }
 }
