@@ -1,6 +1,9 @@
 package xyz.sadiulhakim.chat.model;
 
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Modifying;
+import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 import xyz.sadiulhakim.user.model.User;
 
 import java.time.LocalDateTime;
@@ -12,5 +15,8 @@ public interface ChatRepo extends JpaRepository<Chat, Long> {
 
     List<Chat> findAllBySendTimeBetween(LocalDateTime start, LocalDateTime end);
 
-    void deleteAllByUserAndToUserOrToUserAndUser(User user, User toUser, User toUser2, User user2);
+    @Modifying
+    @Query("DELETE FROM Chat c WHERE (c.user = :user AND c.toUser = :toUser) OR (c.user = :toUser AND c.toUser = :user)")
+    void deleteChatBetweenUsers(@Param("user") User user, @Param("toUser") User toUser);
+
 }
