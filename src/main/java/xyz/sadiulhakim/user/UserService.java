@@ -1,4 +1,4 @@
-package xyz.sadiulhakim.user.model;
+package xyz.sadiulhakim.user;
 
 import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
@@ -17,9 +17,10 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 import org.springframework.web.multipart.MultipartFile;
-import xyz.sadiulhakim.chat.model.ChatService;
-import xyz.sadiulhakim.user.event.ChatEvent;
+import xyz.sadiulhakim.user.event.DeleteChatEvent;
 import xyz.sadiulhakim.user.event.ConnectionEvent;
+import xyz.sadiulhakim.user.pojo.PasswordDTO;
+import xyz.sadiulhakim.user.pojo.UserDTO;
 import xyz.sadiulhakim.util.*;
 
 import java.io.IOException;
@@ -123,7 +124,7 @@ public class UserService {
                 LocalDateTime.now());
         connectionRequestRepo.save(connectionRequest);
 
-        String message = user.getLastname() + " sent you a connection request!";
+        String message = user.getFirstname() + " " + user.getLastname() + " sent you a connection request!";
         eventPublisher.publishEvent(new ConnectionEvent(message, "connection-request-sent", toUser));
         return "Successfully sent connection Request to  " + toUserById.get().getLastname();
     }
@@ -199,7 +200,7 @@ public class UserService {
 
         String message = user.getLastname() + " has removed you from connection!";
         eventPublisher.publishEvent(new ConnectionEvent(message, "connection-request-sent", toUser));
-        eventPublisher.publishEvent(new ChatEvent(user, toUserObj));
+        eventPublisher.publishEvent(new DeleteChatEvent(user, toUserObj));
 
         return "You successfully removed " + toUserObj.getLastname() + " from you connection!";
     }

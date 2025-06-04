@@ -3,8 +3,8 @@ package xyz.sadiulhakim.listener;
 import org.springframework.context.event.EventListener;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Component;
-import xyz.sadiulhakim.chat.model.ChatService;
-import xyz.sadiulhakim.user.event.ChatEvent;
+import xyz.sadiulhakim.chat.ChatService;
+import xyz.sadiulhakim.user.event.DeleteChatEvent;
 
 @Component
 class ChatListener {
@@ -17,7 +17,7 @@ class ChatListener {
 
     @Async("taskExecutor")
     @EventListener
-    void deleteChats(ChatEvent chatEvent) {
-        chatService.deleteAllMessage(chatEvent.user(), chatEvent.toUser());
+    void deleteChats(DeleteChatEvent chatEvent) {
+        chatService.deleteAllMessageBetweenTwoUsers(chatEvent.user(), chatEvent.toUser());
     }
 }

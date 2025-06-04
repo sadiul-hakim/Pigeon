@@ -4,8 +4,8 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-import xyz.sadiulhakim.chat.model.Chat;
-import xyz.sadiulhakim.user.model.UserDTO;
+import xyz.sadiulhakim.chat.Chat;
+import xyz.sadiulhakim.user.pojo.UserDTO;
 
 import java.util.ArrayList;
 import java.util.List;

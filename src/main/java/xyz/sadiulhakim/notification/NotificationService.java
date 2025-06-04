@@ -1,4 +1,4 @@
-package xyz.sadiulhakim.notification.model;
+package xyz.sadiulhakim.notification;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -67,17 +67,14 @@ public class NotificationService {
             emitters.remove(user);
             handleErrorCase(user, event, message, emitter);
         }
-
-        Thread.ofVirtual().name("#NotificationSavingThread-", 0).start(() -> {
-            Notification notification = new Notification();
-            notification.setMessage(message);
-            notification.setUserId(user);
-            save(notification);
-        });
     }
 
     public long count() {
         return notificationRepository.count();
+    }
+
+    public long countByUser(UUID userId) {
+        return notificationRepository.countByUserId(userId);
     }
 
     private void handleErrorCase(UUID user, String event, String message, SseEmitter emitter) {

@@ -1,4 +1,4 @@
-package xyz.sadiulhakim.user.model;
+package xyz.sadiulhakim.user.pojo;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;

@@ -1,10 +1,10 @@
-package xyz.sadiulhakim.chat.model;
+package xyz.sadiulhakim.chat;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
-import xyz.sadiulhakim.user.model.User;
+import xyz.sadiulhakim.user.User;
 
 import java.time.LocalDateTime;
 import java.util.List;

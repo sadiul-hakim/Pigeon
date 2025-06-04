@@ -1,4 +1,4 @@
-package xyz.sadiulhakim.user.model;
+package xyz.sadiulhakim.user;
 
 import jakarta.persistence.*;
 import lombok.*;

@@ -2,12 +2,14 @@ const chatArea = document.getElementById("chatArea");
 let user = document.getElementById("user").textContent;
 let toUser = document.getElementById("toUser").textContent;
 let chatList = document.getElementById("chatList");
+let msg_tone = document.getElementById("msg-tone");
 
 document.addEventListener("DOMContentLoaded", function () {
 
     let socket = new SockJS('/ws');
     let stompClient = Stomp.over(socket);
 
+    // Receive sent message and show
     stompClient.connect({
         'ws-id': user
     }, function (frame) {
@@ -15,11 +17,12 @@ document.addEventListener("DOMContentLoaded", function () {
         // Subscribe to user-specific messages
         stompClient.subscribe('/user/queue/messages', function (message) {
             let receivedMessage = JSON.parse(message.body);
-            console.log(receivedMessage)
+            msg_tone.play();
             showMessage(receivedMessage);
         });
     });
 
+    // Send a message
     document.querySelector("#chatForm").addEventListener("submit", function (event) {
         event.preventDefault();
 

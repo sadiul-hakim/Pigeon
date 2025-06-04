@@ -1,7 +1,6 @@
 package xyz.sadiulhakim.util;
 
 import org.springframework.data.domain.Page;
-import xyz.sadiulhakim.user.model.User;
 
 import java.util.ArrayList;
 import java.util.List;

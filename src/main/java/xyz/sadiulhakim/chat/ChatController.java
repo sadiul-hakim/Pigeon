@@ -6,9 +6,8 @@ import org.springframework.messaging.handler.annotation.Payload;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import xyz.sadiulhakim.chat.model.ChatService;
 import xyz.sadiulhakim.chat.pojo.ChatMessage;
 import xyz.sadiulhakim.chat.pojo.ChatSetup;
 
@@ -22,10 +21,19 @@ public class ChatController {
     private final ChatService chatService;
 
     @GetMapping
-    public String chat(@RequestParam(defaultValue = "") UUID toUser, Model model) {
-        ChatSetup chatSetup = chatService.getChatSetup(toUser);
-        model.addAttribute("setup", chatSetup);
+    public String chatWithoutUser(Model model) {
 
+        // Handle case when no user is provided
+        ChatSetup chatSetup = chatService.getChatSetup(null);
+        model.addAttribute("setup", chatSetup); // or some default
+        return "chat";
+    }
+
+    @GetMapping("/{toUser}")
+    public String chat(@PathVariable String toUser, Model model) {
+        UUID userId = UUID.fromString(toUser);
+        ChatSetup chatSetup = chatService.getChatSetup(userId);
+        model.addAttribute("setup", chatSetup);
         return "chat";
     }
 

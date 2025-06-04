@@ -1,11 +1,10 @@
-package xyz.sadiulhakim.chat.model;
+package xyz.sadiulhakim.user;
 
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-import xyz.sadiulhakim.user.model.User;
 
 import java.time.LocalDateTime;
 
@@ -14,20 +13,17 @@ import java.time.LocalDateTime;
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
-public class Chat {
+public class ConnectionRequest {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private long id;
+    @GeneratedValue
+    private Long id;
 
     @ManyToOne
     private User user;
 
     @ManyToOne
     private User toUser;
-
-    @Column(length = 350)
-    private String message;
 
     @Temporal(TemporalType.TIMESTAMP)
     private LocalDateTime sendTime;

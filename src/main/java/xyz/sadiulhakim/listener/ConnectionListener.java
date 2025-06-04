@@ -4,7 +4,8 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.context.event.EventListener;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Component;
-import xyz.sadiulhakim.notification.model.NotificationService;
+import xyz.sadiulhakim.notification.Notification;
+import xyz.sadiulhakim.notification.NotificationService;
 import xyz.sadiulhakim.user.event.ConnectionEvent;
 
 @Component
@@ -16,6 +17,13 @@ class ConnectionListener {
     @Async("taskExecutor")
     @EventListener
     void connectionEvent(ConnectionEvent event) {
-        notificationService.sendNotification(event.message(), event.type(), event.user());
+        notificationService.sendNotification(event.message(), event.eventName(), event.user());
+
+        Thread.ofVirtual().name("#NotificationSavingThread-", 0).start(() -> {
+            Notification notification = new Notification();
+            notification.setMessage(event.message());
+            notification.setUserId(event.user());
+            notificationService.save(notification);
+        });
     }
 }

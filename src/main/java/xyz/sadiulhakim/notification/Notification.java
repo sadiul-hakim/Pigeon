@@ -1,4 +1,4 @@
-package xyz.sadiulhakim.notification.model;
+package xyz.sadiulhakim.notification;
 
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;

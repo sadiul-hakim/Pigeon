@@ -1,4 +1,4 @@
-package xyz.sadiulhakim.user.web;
+package xyz.sadiulhakim.user;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -6,9 +6,9 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
-import xyz.sadiulhakim.user.model.ConnectionRequest;
-import xyz.sadiulhakim.user.model.User;
-import xyz.sadiulhakim.user.model.UserService;
+import xyz.sadiulhakim.user.ConnectionRequest;
+import xyz.sadiulhakim.user.User;
+import xyz.sadiulhakim.user.UserService;
 import xyz.sadiulhakim.util.PaginationResult;
 
 import java.util.Collections;

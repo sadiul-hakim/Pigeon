@@ -1,4 +1,4 @@
-package xyz.sadiulhakim.notification.model;
+package xyz.sadiulhakim.notification;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 
@@ -9,4 +9,5 @@ public interface NotificationRepository extends JpaRepository<Notification, Long
 
     List<Notification> findAllByUserId(UUID user);
     long count();
+    long countByUserId(UUID userId);
 }

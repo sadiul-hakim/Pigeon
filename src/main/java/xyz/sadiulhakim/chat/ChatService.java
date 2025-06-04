@@ -1,4 +1,4 @@
-package xyz.sadiulhakim.chat.model;
+package xyz.sadiulhakim.chat;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
@@ -9,10 +9,10 @@ import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 import xyz.sadiulhakim.chat.pojo.ChatMessage;
 import xyz.sadiulhakim.chat.pojo.ChatSetup;
-import xyz.sadiulhakim.notification.model.NotificationService;
-import xyz.sadiulhakim.user.model.User;
-import xyz.sadiulhakim.user.model.UserDTO;
-import xyz.sadiulhakim.user.model.UserService;
+import xyz.sadiulhakim.notification.NotificationService;
+import xyz.sadiulhakim.user.User;
+import xyz.sadiulhakim.user.pojo.UserDTO;
+import xyz.sadiulhakim.user.UserService;
 
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
@@ -44,7 +44,7 @@ public class ChatService {
         ChatSetup chatSetup = new ChatSetup();
         chatSetup.setUser(userDTO);
         chatSetup.setConnections(connections);
-        chatSetup.setNotifications(notificationService.count());
+        chatSetup.setNotifications(notificationService.countByUser(user.getId()));
 
         if (connections.isEmpty()) {
             chatSetup.setSelectedUser(null);
@@ -114,7 +114,7 @@ public class ChatService {
         );
     }
 
-    public void deleteAllMessage(User user, User toUser) {
+    public void deleteAllMessageBetweenTwoUsers(User user, User toUser) {
         chatRepo.deleteChatBetweenUsers(
                 user, toUser
         );

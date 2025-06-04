@@ -91,7 +91,7 @@
                     <li th:each="connection:${setup.connections}" class="list-group-item"
                         th:classappend="${setup.selectedUser.id.equals(connection.id) ? 'chat_area_bg' : 'chat_bg'}"
                         th:data-con="${connection.email}">
-                        <a th:href="@{'/chat?toUser='+${connection.id}}"
+                        <a th:href="@{'/chat/'+${connection.id}}"
                            class="d-flex text-light text-decoration-none">
                             <img th:src="@{/picture/user/{pic}(pic=${connection.picture})}"
                                  th:alt="${connection.lastname}"
@@ -132,7 +132,7 @@
                                   th:style="'color:'+${chat.user.textColor}+'!important;'"></span>
                             &nbsp;
                             <small th:text="${#temporals.format(chat.sendTime, 'yyyy-MM-dd HH:mm:ss')}"
-                                   class="text-muted"></small>
+                                   class="text-light-dark"></small>
                         </div>
                         <span class="text-white" th:text="${chat.message}"></span>
                     </div>
@@ -153,6 +153,10 @@
         <!--    Chat board ends    -->
     </div>
 </div>
+
+<!--Audio Starts-->
+<audio th:src="@{'/audio/tone.mp3'}" class="hidden" id="msg-tone"></audio>
+<!--Audio Ends-->
 
 <!--Toast Starts-->
 
