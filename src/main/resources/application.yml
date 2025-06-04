@@ -1,7 +1,6 @@
 spring:
   application:
     name: MvcChatApp
-
   threads:
     virtual:
       enabled: true
@@ -22,6 +21,10 @@ server:
     session:
       timeout: 2h
   port: 9093
+  compression:
+    enabled: true
+    min-response-size: 10KB
+    mime-types: text/html, text/css, text/javascript, text/xml, application/font-woff, application/json, image/jpeg, image/png, image/svg+xml, video/mp4
 
 default:
   user:

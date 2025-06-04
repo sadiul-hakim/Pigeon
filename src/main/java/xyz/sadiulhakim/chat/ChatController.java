@@ -1,16 +1,19 @@
 package xyz.sadiulhakim.chat;
 
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.ResponseEntity;
 import org.springframework.messaging.handler.annotation.MessageMapping;
 import org.springframework.messaging.handler.annotation.Payload;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import xyz.sadiulhakim.chat.pojo.ChatMessage;
 import xyz.sadiulhakim.chat.pojo.ChatSetup;
 
+import java.util.Map;
 import java.util.UUID;
 
 @Controller
@@ -43,5 +46,11 @@ public class ChatController {
     ) {
         chatService.sendMessage(message);
         return message;
+    }
+
+    @DeleteMapping("/{chatId}")
+    ResponseEntity<?> delete(@PathVariable long chatId) {
+        String message = chatService.delete(chatId);
+        return ResponseEntity.ok(Map.of("message", message));
     }
 }

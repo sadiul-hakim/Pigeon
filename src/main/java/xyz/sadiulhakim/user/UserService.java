@@ -4,6 +4,7 @@ import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.boot.context.event.ApplicationReadyEvent;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.context.event.EventListener;
 import org.springframework.data.domain.Page;
@@ -76,6 +77,7 @@ public class UserService {
         return userRepo.findAllUserConnections(uuids);
     }
 
+    @Cacheable(value = "findByEmail", key = "#email")
     public User findByEmail(String email) {
 
         return userRepo.findByEmail(email).orElse(null);

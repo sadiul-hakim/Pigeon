@@ -122,21 +122,35 @@
             </div>
             <!--    Chat Area        -->
             <!-- Chat Area -->
-            <div class="flex-grow-1 p-3 chat_area_bg overflow-auto" id="chatArea">
+            <div class="flex-grow-1 p-3 chat_area_bg overflow-auto border-1" id="chatArea">
                 <!-- Existing chat messages (initial messages) -->
-                <div class="my-1 d-flex" th:each="chat : ${setup.initialChat}">
+                <div class="my-1 d-flex chat-wrapper" th:each="chat : ${setup.initialChat}" th:attr="data-id=${chat.id}">
                     <img th:src="@{'/picture/user/'+${chat.user.picture}}" alt="" class="icon-sm"/>
                     <div class="ms-1 d-flex flex-column chat">
-                        <div>
-                            <span class="fw-bold chat_area_color fs-5" th:text="${chat.user.lastname}"
-                                  th:style="'color:'+${chat.user.textColor}+'!important;'"></span>
-                            &nbsp;
-                            <small th:text="${#temporals.format(chat.sendTime, 'yyyy-MM-dd HH:mm:ss')}"
-                                   class="text-light-dark"></small>
+                        <div class="d-flex justify-content-between">
+                            <div>
+                                <span class="fw-bold chat_area_color fs-6" th:text="${chat.user.lastname}"
+                                      th:style="'color:'+${chat.user.textColor}+'!important;'"></span>
+                                &nbsp;
+                                <small th:text="${#temporals.format(chat.sendTime, 'yyyy-MM-dd HH:mm:ss')}"
+                                       class="text-light-dark"></small>
+                            </div>
+                            <div class="dropdown">
+                                <i class="bi bi-three-dots dropdown-toggle" data-bs-toggle="dropdown"
+                                   aria-expanded="false"></i>
+                                <ul class="dropdown-menu">
+                                    <li
+                                            class="dropdown-item remove_chat"
+                                            th:data-id="${chat.id}"
+                                    >Remove
+                                    </li>
+                                </ul>
+                            </div>
                         </div>
                         <span class="text-white" th:text="${chat.message}"></span>
                     </div>
                 </div>
+
             </div>
             <!-- Chat Area Ends -->
 
@@ -163,7 +177,7 @@
 <div class="toast-container position-fixed bottom-0 end-0 p-3">
     <div id="liveToast" class="toast" role="alert" aria-live="assertive" aria-atomic="true">
         <div class="toast-header">
-            <strong class="me-auto">Connection</strong>
+            <strong class="me-auto">Message</strong>
             <button type="button" class="btn-close" data-bs-dismiss="toast" aria-label="Close"></button>
         </div>
         <div class="toast-body" id="toast-body">
@@ -179,29 +193,29 @@
     document.addEventListener("DOMContentLoaded", function () {
 
         // Establish SSE connection
-        const eventSource = new EventSource('/notification/subscribe'); // Call the API first
-
-        eventSource.addEventListener("connection-request-sent", (event) => {
-            console.log("Received SSE event:", event);
-
-            // Get toast elements
-            const toastLiveExample = document.getElementById('liveToast');
-            const toastBody = document.getElementById("toast-body");
-
-            // Initialize Bootstrap toast instance
-            const toastBootstrap = new bootstrap.Toast(toastLiveExample);
-
-            // Set the message inside the toast body
-            toastBody.textContent = event.data;
-
-            // Show the toast
-            toastBootstrap.show();
-        });
-
-        eventSource.onerror = (error) => {
-            console.error("SSE Error:", error);
-            eventSource.close();
-        };
+        // const eventSource = new EventSource('/notification/subscribe'); // Call the API first
+        //
+        // eventSource.addEventListener("connection-request-sent", (event) => {
+        //     console.log("Received SSE event:", event);
+        //
+        //     // Get toast elements
+        //     const toastLiveExample = document.getElementById('liveToast');
+        //     const toastBody = document.getElementById("toast-body");
+        //
+        //     // Initialize Bootstrap toast instance
+        //     const toastBootstrap = new bootstrap.Toast(toastLiveExample);
+        //
+        //     // Set the message inside the toast body
+        //     toastBody.textContent = event.data;
+        //
+        //     // Show the toast
+        //     toastBootstrap.show();
+        // });
+        //
+        // eventSource.onerror = (error) => {
+        //     console.error("SSE Error:", error);
+        //     eventSource.close();
+        // };
     });
 </script>
 <script th:src="@{/js/sockjs.min.js}"></script>

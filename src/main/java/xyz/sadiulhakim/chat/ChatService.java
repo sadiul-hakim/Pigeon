@@ -1,6 +1,7 @@
 package xyz.sadiulhakim.chat;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContext;
@@ -18,6 +19,7 @@ import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.*;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class ChatService {
@@ -75,6 +77,13 @@ public class ChatService {
             return;
 
         LocalDateTime now = LocalDateTime.now();
+
+        // Launch a thread to save the message
+        Thread.ofVirtual().name("#ChatThread-", 0).start(() -> {
+            save(message.getMessage(), user, toUser, now);
+        });
+
+        // Prepare and send the message to both users so that they can see on screen
         message.setSendTime(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss").format(now));
         message.setUserName(user.getLastname());
         message.setUserPicture(user.getPicture());
@@ -82,10 +91,6 @@ public class ChatService {
 
         messagingTemplate.convertAndSendToUser(user.getEmail(), "/queue/messages", message);
         messagingTemplate.convertAndSendToUser(toUser.getEmail(), "/queue/messages", message);
-
-        Thread.ofVirtual().name("#ChatThread-", 0).start(() -> {
-            save(message.getMessage(), user, toUser, now);
-        });
     }
 
     public void save(String message, User user, User toUser, LocalDateTime now) {
@@ -118,5 +123,25 @@ public class ChatService {
         chatRepo.deleteChatBetweenUsers(
                 user, toUser
         );
+    }
+
+    public String delete(long chatId) {
+        Optional<Chat> chatOpt = chatRepo.findById(chatId);
+        if (chatOpt.isEmpty()) {
+            log.warn("ChatService.delete :: Could not find chat with id {}", chatId);
+            return "Could not find the chat!";
+        }
+
+        SecurityContext context = SecurityContextHolder.getContext();
+        Authentication authentication = context.getAuthentication();
+        String username = authentication.getName();
+        Chat chat = chatOpt.get();
+        if (!(username.equals(chat.getUser().getEmail()) || username.equals(chat.getToUser().getEmail()))) {
+
+            return "You are not allowed to delete this chat!";
+        }
+
+        chatRepo.delete(chat);
+        return "Successfully deleted the chat message!";
     }
 }

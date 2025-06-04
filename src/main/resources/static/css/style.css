@@ -157,3 +157,7 @@ body {
     color: #e74c3c;
     margin-bottom: 20px;
 }
+
+.remove_chat {
+    cursor: pointer;
+}
