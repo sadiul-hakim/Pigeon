@@ -1,7 +1,9 @@
 <!DOCTYPE html>
 <html lang="en" xmlns:th="https://www.thymeleaf.org" xmlns:sec="https://www.thymeleaf.org/extras/spring-security">
 <head th:replace="~{fragments/head :: head(~{::title})}">
-    <title th:text="${setup.selectedUser.getFirstname()}+' '+${setup.selectedUser.getLastname()} + ' | Pigeon'"></title>
+    <title
+            th:text="${setup.selectedUser != null ? setup.selectedUser.getFirstname() : ''}+' '+${setup.selectedUser != null ? setup.selectedUser.getLastname() : ''} + ' | Pigeon'"
+    ></title>
 </head>
 <body class="dark_bg">
 <span class="hidden" th:text="${setup.user.email}" id="user"></span>
@@ -171,7 +173,7 @@
         <!--    User Profile Stars    -->
         <div class="col-md-2">
             <div class="row mt-2">
-                <div class="col-md-12 d-flex flex-column justify-content-center align-items-center mt-5">
+                <div class="col-md-12 d-flex flex-column justify-content-center align-items-center mt-5" th:if="${setup.selectedUser != null}">
                     <img th:src="@{/picture/user/{pic}(pic=${setup.selectedUser.picture})}"
                          th:alt="${setup.selectedUser.lastname}"
                          class="icon-lg"/>
