@@ -13,8 +13,9 @@
             </div>
 
             <ul class="list-group list-group-flush">
-                <li class="list-group-item list-group-item-action list-group-item-light d-flex"
+                <li class="list-group-item list-group-item-action list-group-item-light d-flex request_wrapper"
                     th:each="req:${requests}"
+                    th:attr="data-req=${req.id}"
                 >
                     <img th:src="@{|/picture/user/${req.user.picture}|}"
                          alt="user" class="icon-md me-2"/>
@@ -78,6 +79,11 @@
                         'X-CSRF-TOKEN': csrfToken
                     }
                 });
+
+                if (request.ok) {
+                    const reqWrapper = document.querySelector(`.request_wrapper[data-req="${id}"]`);
+                    reqWrapper.remove();
+                }
 
                 let response = await request.json();
                 let toastBody = document.getElementById("toast-body");

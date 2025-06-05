@@ -12,8 +12,9 @@
             </div>
 
             <ul class="list-group list-group-flush">
-                <li class="list-group-item list-group-item-action list-group-item-light d-flex"
+                <li class="list-group-item list-group-item-action list-group-item-light d-flex connection_wrapper"
                     th:each="user:${result.data}"
+                    th:attr="data-user=${user.id}"
                 >
                     <img th:src="@{|/picture/user/${user.picture}|}"
                          alt="user" class="icon-md me-2"/>
@@ -57,6 +58,7 @@
 <!--Toast Ends-->
 </body>
 <script>
+
     document.addEventListener("DOMContentLoaded", function () {
         document.querySelectorAll(".removeConnectionForm").forEach(form => {
             form.onsubmit = async (e) => {
@@ -70,6 +72,12 @@
                     }
                 });
 
+                if (request.ok) {
+                    const connectionWrapper = document.querySelector(`.connection_wrapper[data-user="${id}"]`);
+                    connectionWrapper.remove();
+                }
+
+                // Show notification on toast
                 let response = await request.json();
                 let toastBody = document.getElementById("toast-body");
                 toastBody.innerText = response.message;

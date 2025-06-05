@@ -119,7 +119,7 @@ public class ChatService {
         );
     }
 
-    public void deleteAllMessageBetweenTwoUsers(User user, User toUser) {
+    public void deleteAllMessageBetweenTwoUsers(String user, String toUser) {
         chatRepo.deleteChatBetweenUsers(
                 user, toUser
         );

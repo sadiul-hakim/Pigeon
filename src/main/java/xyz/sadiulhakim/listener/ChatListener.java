@@ -18,6 +18,6 @@ class ChatListener {
     @Async("taskExecutor")
     @EventListener
     void deleteChats(DeleteChatEvent chatEvent) {
-        chatService.deleteAllMessageBetweenTwoUsers(chatEvent.user(), chatEvent.toUser());
+        chatService.deleteAllMessageBetweenTwoUsers(chatEvent.user().getEmail(), chatEvent.toUser().getEmail());
     }
 }

@@ -72,40 +72,34 @@ function showOnConnectionList(newMessageElement) {
 
 // Function to create a new message element for display
 function createMessageElement(messageData) {
-    const messageElement = document.createElement("div");
-    messageElement.classList.add("my-1", "d-flex");
+    const html = `
+        <div class="my-1 d-flex chat-wrapper" data-id="${messageData.id}">
+            <img src="/picture/user/${messageData.userPicture}" alt="" class="icon-sm"/>
+            <div class="ms-1 d-flex flex-column chat">
+                <div class="d-flex justify-content-between">
+                    <div>
+                        <span class="fw-bold chat_area_color fs-6" style="color: ${messageData.userTextColor} !important;">
+                            ${messageData.userName}
+                        </span>
+                        &nbsp;
+                        <small class="text-light-dark">${messageData.sendTime}</small>
+                    </div>
+                    <div class="dropdown">
+                        <i class="bi bi-three-dots dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false"></i>
+                        <ul class="dropdown-menu">
+                            <li class="dropdown-item remove_chat" data-id="${messageData.id}">Remove</li>
+                        </ul>
+                    </div>
+                </div>
+                <span class="text-white">${messageData.message}</span>
+            </div>
+        </div>
+    `.trim();
 
-    const avatar = document.createElement("img");
-    avatar.classList.add("icon-sm");
-    avatar.src = `/picture/user/${messageData.userPicture}`
-
-    const messageContent = document.createElement("div");
-    messageContent.classList.add("ms-1", "d-flex", "flex-column", "chat");
-
-    const header = document.createElement("div");
-    const userName = document.createElement("span");
-    userName.classList.add("fw-bold", "chat_area_color", "fs-6");
-    userName.textContent = messageData.userName + ' ';  // Assuming 'user' contains the sender's name
-    userName.style.setProperty("color", messageData.userTextColor, "important");
-
-    const time = document.createElement("small");
-    time.classList.add("text-light-dark");
-    time.textContent = messageData.sendTime;  // Format time as per your requirement
-
-    header.appendChild(userName);
-    header.appendChild(time);
-
-    const textMessage = document.createElement("span");
-    textMessage.classList.add("text-white");
-    textMessage.textContent = messageData.message;
-
-    messageContent.appendChild(header);
-    messageContent.appendChild(textMessage);
-
-    messageElement.appendChild(avatar);
-    messageElement.appendChild(messageContent);
-
-    return messageElement;
+    // Convert string HTML to a DOM element
+    const template = document.createElement('template');
+    template.innerHTML = html;
+    return template.content.firstElementChild;
 }
 
 // ------------------------------------ Delete Chat -------------------------------
