@@ -22,11 +22,11 @@ interface UserRepository extends JpaRepository<User, UUID> {
 
     Page<User> findAllByIdIn(List<UUID> ids, Pageable pageable);
 
-    @Query(value = "select new xyz.sadiulhakim.user.pojo.UserDTO(u.id,u.firstname,u.lastname,u.email,u.picture) " +
+    @Query(value = "select new xyz.sadiulhakim.user.pojo.UserDTO(u.id,u.firstname,u.lastname,u.email,u.picture,u.textColor) " +
             "from User u where u.email= :email")
     UserDTO findByEmailProjection(@Param("email") String email);
 
-    @Query("SELECT new xyz.sadiulhakim.user.pojo.UserDTO(u.id, u.firstname, u.lastname, u.email, u.picture) " +
+    @Query("SELECT new xyz.sadiulhakim.user.pojo.UserDTO(u.id, u.firstname, u.lastname, u.email, u.picture,u.textColor) " +
             "FROM User u WHERE u.id IN :userIds")
     List<UserDTO> findAllUserConnections(@Param("userIds") List<UUID> userIds);
 }

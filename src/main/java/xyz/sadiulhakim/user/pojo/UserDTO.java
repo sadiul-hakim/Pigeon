@@ -16,12 +16,16 @@ public class UserDTO {
     private String email;
     private String picture;
     private String rawPassword;
+    private String textColor;
 
-    public UserDTO(UUID id, String firstname, String lastname, String email, String picture) {
+
+
+    public UserDTO(UUID id, String firstname, String lastname, String email, String picture, String textColor) {
         this.id = id;
         this.firstname = firstname;
         this.lastname = lastname;
         this.email = email;
         this.picture = picture;
+        this.textColor = textColor;
     }
 }

@@ -77,7 +77,7 @@ public class UserService {
         return userRepo.findAllUserConnections(uuids);
     }
 
-//    @Cacheable(value = "findByEmail", key = "#email")
+    //    @Cacheable(value = "findByEmail", key = "#email")
     public User findByEmail(String email) {
 
         return userRepo.findByEmail(email).orElse(null);
@@ -474,6 +474,7 @@ public class UserService {
     }
 
     public UserDTO convertToDto(User user) {
-        return new UserDTO(user.getId(), user.getFirstname(), user.getLastname(), user.getEmail(), user.getPicture());
+        return new UserDTO(user.getId(), user.getFirstname(), user.getLastname(), user.getEmail(), user.getPicture(),
+                user.getTextColor());
     }
 }

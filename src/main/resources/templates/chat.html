@@ -10,7 +10,7 @@
     <div class="row h-100 w-100 card chat_bg">
 
         <!--   Chat List     -->
-        <div class="col-md-3 h-100 overflow-auto p-3 border-right-1">
+        <div class="col-md-2 h-100 overflow-auto p-3 border-right-1">
             <!--     Nav       -->
             <nav class="navbar navbar-expand-lg bg-body-tertiary chat_bg">
                 <div class="container-fluid">
@@ -112,19 +112,21 @@
         </div>
 
         <!--    Chat List Ends    -->
-        <div class="col-md-9 h-100 overflow-auto d-flex flex-column" th:if="${setup.selectedUser != null}">
-            <div class="d-flex align-items-center p-2">
+        <div class="col-md-8 h-100 overflow-auto d-flex flex-column justify-content-center align-items-center border-right-1"
+             th:if="${setup.selectedUser != null}">
+            <div class="d-flex align-items-center p-2 w-100">
                 <img th:src="@{/picture/user/{pic}(pic=${setup.selectedUser.picture})}"
                      th:alt="${setup.selectedUser.lastname}"
                      class="icon-md"/>&nbsp;
                 <span class="ms-1 fs-3" th:text="${setup.selectedUser.firstname}"></span>&nbsp;
                 <span class="ms-1 fs-3" th:text="${setup.selectedUser.lastname}"></span>
             </div>
-            <!--    Chat Area        -->
+
             <!-- Chat Area -->
-            <div class="flex-grow-1 p-3 chat_area_bg overflow-auto border-1" id="chatArea">
+            <div class="flex-grow-1 p-3 chat_area_bg overflow-auto border-1 w-100" id="chatArea">
                 <!-- Existing chat messages (initial messages) -->
-                <div class="my-1 d-flex chat-wrapper" th:each="chat : ${setup.initialChat}" th:attr="data-id=${chat.id}">
+                <div class="my-1 d-flex chat-wrapper" th:each="chat : ${setup.initialChat}"
+                     th:attr="data-id=${chat.id}">
                     <img th:src="@{'/picture/user/'+${chat.user.picture}}" alt="" class="icon-sm"/>
                     <div class="ms-1 d-flex flex-column chat">
                         <div class="d-flex justify-content-between">
@@ -154,8 +156,8 @@
             </div>
             <!-- Chat Area Ends -->
 
-            <!--    Chat Area Ends        -->
-            <div class="p-3">
+            <!--    Chat board Starts        -->
+            <div class="p-3 w-100">
                 <form class="d-flex" id="chatForm">
                     <input type="text" class="form-control chat_bg" placeholder="message" name="message" id="message"/>
                     <button class="btn chat_area_bg ms-1 text-light">
@@ -163,8 +165,22 @@
                     </button>
                 </form>
             </div>
+            <!--    Chat board ends    -->
         </div>
-        <!--    Chat board ends    -->
+        <div class="col-md-2">
+            <div class="row mt-2">
+                <div class="col-md-12 d-flex flex-column justify-content-center align-items-center mt-5">
+                    <img th:src="@{/picture/user/{pic}(pic=${setup.selectedUser.picture})}"
+                         th:alt="${setup.selectedUser.lastname}"
+                         class="icon-lg"/>
+                    <p th:style="'color:'+${setup.selectedUser.getTextColor()}+'!important;'">
+                        <span class="fs-3" th:text="${setup.selectedUser.firstname}"></span>&nbsp;
+                        <span class="fs-3" th:text="${setup.selectedUser.lastname}"></span>
+                    </p>
+                    <p th:text="${setup.selectedUser.getEmail()}"></p>
+                </div>
+            </div>
+        </div>
     </div>
 </div>
 
