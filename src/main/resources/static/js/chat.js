@@ -6,6 +6,8 @@ let msg_tone = document.getElementById("msg-tone");
 
 document.addEventListener("DOMContentLoaded", function () {
 
+    chatArea.scrollTop = chatArea.scrollHeight;
+
     let socket = new SockJS('/ws');
     let stompClient = Stomp.over(socket);
 
