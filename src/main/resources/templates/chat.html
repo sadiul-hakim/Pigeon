@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="en" xmlns:th="https://www.thymeleaf.org" xmlns:sec="https://www.thymeleaf.org/extras/spring-security">
 <head th:replace="~{fragments/head :: head(~{::title})}">
-    <title>Chat Page</title>
+    <title th:text="${setup.selectedUser.getFirstname()}+' '+${setup.selectedUser.getLastname()} + ' | Pigeon'"></title>
 </head>
 <body class="dark_bg">
 <span class="hidden" th:text="${setup.user.email}" id="user"></span>
@@ -167,20 +167,23 @@
             </div>
             <!--    Chat board ends    -->
         </div>
+
+        <!--    User Profile Stars    -->
         <div class="col-md-2">
             <div class="row mt-2">
                 <div class="col-md-12 d-flex flex-column justify-content-center align-items-center mt-5">
                     <img th:src="@{/picture/user/{pic}(pic=${setup.selectedUser.picture})}"
                          th:alt="${setup.selectedUser.lastname}"
                          class="icon-lg"/>
-                    <p th:style="'color:'+${setup.selectedUser.getTextColor()}+'!important;'">
+                    <p th:style="'color:'+${setup.selectedUser.getTextColor()}+'!important;'" class="mb-0">
                         <span class="fs-3" th:text="${setup.selectedUser.firstname}"></span>&nbsp;
                         <span class="fs-3" th:text="${setup.selectedUser.lastname}"></span>
                     </p>
-                    <p th:text="${setup.selectedUser.getEmail()}"></p>
+                    <p th:text="${setup.selectedUser.getEmail()}" class="mt-2"></p>
                 </div>
             </div>
         </div>
+        <!--    User Profile Ends    -->
     </div>
 </div>
 

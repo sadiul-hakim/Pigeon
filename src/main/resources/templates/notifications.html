@@ -12,8 +12,9 @@
             </div>
 
             <ul class="list-group list-group-flush">
-                <li class="list-group-item list-group-item-action list-group-item-light d-flex"
+                <li class="list-group-item list-group-item-action list-group-item-light d-flex notification_wrapper"
                     th:each="notification:${notifications}"
+                    th:attr="data-notification=${notification.id}"
                 >
                     <div class="d-flex justify-content-between align-items-center w-100">
                         <p class="lead" th:text="${notification.message}"></p>
@@ -62,6 +63,11 @@
                         'X-CSRF-TOKEN': csrfToken
                     }
                 });
+
+                if (request.ok) {
+                    const notificationWrapper = document.querySelector(`.notification_wrapper[data-notification="${id}"]`);
+                    notificationWrapper.remove();
+                }
 
                 let response = await request.json();
                 let toastBody = document.getElementById("toast-body");
