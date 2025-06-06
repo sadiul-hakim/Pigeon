@@ -6,10 +6,7 @@ import org.springframework.messaging.handler.annotation.MessageMapping;
 import org.springframework.messaging.handler.annotation.Payload;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.DeleteMapping;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.*;
 import xyz.sadiulhakim.chat.pojo.ChatMessage;
 import xyz.sadiulhakim.chat.pojo.ChatSetup;
 
@@ -48,9 +45,16 @@ public class ChatController {
         return message;
     }
 
+    @ResponseBody
     @DeleteMapping("/{chatId}")
     ResponseEntity<?> delete(@PathVariable long chatId) {
         String message = chatService.delete(chatId);
         return ResponseEntity.ok(Map.of("message", message));
+    }
+
+    @GetMapping("/user/{user}/toUser/{toUser}")
+    String delete(@PathVariable String user, @PathVariable String toUser, @RequestParam String selectedUser) {
+        chatService.deleteAllMessageBetweenTwoUsers(user, toUser);
+        return "redirect:/chat/" + selectedUser;
     }
 }

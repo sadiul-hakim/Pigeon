@@ -120,6 +120,14 @@ public class ChatService {
     }
 
     public void deleteAllMessageBetweenTwoUsers(String user, String toUser) {
+
+        SecurityContext context = SecurityContextHolder.getContext();
+        Authentication authentication = context.getAuthentication();
+        User userModel = userService.findByEmail(authentication.getName());
+        if (!(userModel.getEmail().equals(user) || userModel.getEmail().equals(toUser))) {
+            return;
+        }
+
         chatRepo.deleteChatBetweenUsers(
                 user, toUser
         );
