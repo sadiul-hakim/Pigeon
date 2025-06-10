@@ -37,6 +37,14 @@
                                 <hr class="dropdown-divider">
                             </li>
                             <li>
+                                <a class="dropdown-item" th:href="@{/user/change_password_page}">
+                                    <i class="bi bi-shield-lock-fill"></i> Change Password
+                                </a>
+                            </li>
+                            <li>
+                                <hr class="dropdown-divider">
+                            </li>
+                            <li>
                                 <a class="dropdown-item" th:href="@{/notification/page}">
                                     <i class="bi bi-bell"></i> Notifications (<span
                                         th:text="${setup.notifications}"></span>)

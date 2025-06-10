@@ -3,14 +3,10 @@ package xyz.sadiulhakim.user;
 import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.boot.context.event.ApplicationReadyEvent;
-import org.springframework.cache.annotation.Cacheable;
 import org.springframework.context.ApplicationEventPublisher;
-import org.springframework.context.event.EventListener;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
-import org.springframework.scheduling.annotation.Async;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -18,8 +14,10 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 import org.springframework.web.multipart.MultipartFile;
-import xyz.sadiulhakim.user.event.DeleteChatEvent;
+import xyz.sadiulhakim.notification.Notification;
+import xyz.sadiulhakim.notification.NotificationService;
 import xyz.sadiulhakim.user.event.ConnectionEvent;
+import xyz.sadiulhakim.user.event.DeleteChatEvent;
 import xyz.sadiulhakim.user.pojo.PasswordDTO;
 import xyz.sadiulhakim.user.pojo.UserDTO;
 import xyz.sadiulhakim.util.*;
@@ -40,20 +38,21 @@ public class UserService {
     private final PasswordEncoder passwordEncoder;
     private final ConnectionRequestRepo connectionRequestRepo;
     private final ApplicationEventPublisher eventPublisher;
+    private final NotificationService notificationService;
 
-    @Async("taskExecutor")
-    @EventListener
-    void appStarted(ApplicationReadyEvent event) {
-        User user = userRepo.findByEmail("sadiulhakim@gmail.com").orElse(null);
-        if (user == null) {
-            userRepo.save(
-                    new User(null, "Sadiul", "Hakim", "sadiulhakim@gmail.com",
-                            passwordEncoder.encode("hakim@123"), "ROLE_ADMIN",
-                            appProperties.getDefaultUserPhotoName(), ColorUtil.getRandomColor(),
-                            new ArrayList<>(), LocalDateTime.now())
-            );
-        }
-    }
+//    @Async("taskExecutor")
+//    @EventListener
+//    void appStarted(ApplicationReadyEvent event) {
+//        User user = userRepo.findByEmail("sadiulhakim@gmail.com").orElse(null);
+//        if (user == null) {
+//            userRepo.save(
+//                    new User(null, "Sadiul", "Hakim", "sadiulhakim@gmail.com",
+//                            passwordEncoder.encode("hakim@123"), "ROLE_ADMIN",
+//                            appProperties.getDefaultUserPhotoName(), ColorUtil.getRandomColor(),
+//                            new ArrayList<>(), LocalDateTime.now())
+//            );
+//        }
+//    }
 
     public Optional<User> currentUser() {
 
@@ -66,7 +65,7 @@ public class UserService {
 
         User user = findByEmail(authentication.getName());
         if (user == null) {
-            LOGGER.warn("User does not exists with email : {}", authentication.getName());
+            LOGGER.warn("Could not find user with email : {}", authentication.getName());
             return Optional.empty();
         }
 
@@ -122,8 +121,7 @@ public class UserService {
             return "Connection request is already sent to user : " + toUser;
         }
 
-        ConnectionRequest connectionRequest = new ConnectionRequest(null, user, toUserById.get(),
-                LocalDateTime.now());
+        ConnectionRequest connectionRequest = new ConnectionRequest(null, user, toUserById.get(), LocalDateTime.now());
         connectionRequestRepo.save(connectionRequest);
 
         String message = user.getFirstname() + " " + user.getLastname() + " sent you a connection request!";
@@ -328,6 +326,7 @@ public class UserService {
         userRepo.save(exUser);
     }
 
+    @SuppressWarnings("unused")
     public PaginationResult findAllPaginated(int pageNumber) {
         return findAllPaginatedWithSize(pageNumber, appProperties.getPaginationSize());
     }
@@ -342,8 +341,7 @@ public class UserService {
     public PaginationResult searchUser(String text, int pageNumber, boolean filterByConnection) {
 
         LOGGER.info("UserService.searchUser :: search user by text : {}", text);
-        Page<User> page = userRepo.findByFirstnameContainingOrLastnameContainingOrEmailContaining(text, text, text,
-                PageRequest.of(pageNumber, 200));
+        Page<User> page = userRepo.findByFirstnameContainingOrLastnameContainingOrEmailContaining(text, text, text, PageRequest.of(pageNumber, 200));
 
         if (filterByConnection) {
             List<User> users = filterUserByConnection(page);
@@ -373,10 +371,7 @@ public class UserService {
         }
 
         // Filter users who are NOT in the connections list
-        return page.getContent()
-                .stream()
-                .filter(u -> !connections.contains(u.getId()))
-                .toList(); // Create a new filtered list
+        return page.getContent().stream().filter(u -> !connections.contains(u.getId())).toList(); // Create a new filtered list
     }
 
     public void delete(UUID id) {
@@ -394,13 +389,17 @@ public class UserService {
         });
     }
 
-    public String changePassword(PasswordDTO passwordDTO, UUID userId) {
+    public String changePassword(PasswordDTO passwordDTO) {
 
         try {
-            Optional<User> user = findById(userId);
-            if (user.isEmpty()) {
-                return "User does not exist!";
+
+            SecurityContext context = SecurityContextHolder.getContext();
+            Authentication authentication = context.getAuthentication();
+
+            if (authentication == null || authentication.getName() == null) {
+                throw new IllegalStateException("User is not authenticated");
             }
+            User exUser = findByEmail(authentication.getName());
 
             if (!StringUtils.hasText(passwordDTO.getCurrentPassword()) ||
                     !StringUtils.hasText(passwordDTO.getNewPassword()) ||
@@ -412,7 +411,6 @@ public class UserService {
                 return "Password Does not Match!";
             }
 
-            User exUser = user.get();
             if (passwordEncoder.matches(passwordDTO.getNewPassword(), exUser.getPassword())) {
                 return "Invalid Password!";
             }
@@ -420,17 +418,25 @@ public class UserService {
             exUser.setPassword(passwordEncoder.encode(passwordDTO.getNewPassword()));
             userRepo.save(exUser);
 
-            return "Password is reset successfully!";
+            Thread.ofVirtual().name("#NotificationSavingThread-", 0).start(() -> {
+                Notification notification = new Notification();
+                notification.setMessage("Password is changed successfully!");
+                notification.setUserId(exUser.getId());
+                notificationService.save(notification);
+            });
+            return "Password is changed successfully!";
         } catch (Exception ex) {
             LOGGER.error("UserService.changePassword :: {}", ex.getMessage());
             return "Could not reset password, Please try again!";
         }
     }
 
+    @SuppressWarnings("unused")
     public long count() {
         return userRepo.numberOfUsers();
     }
 
+    @SuppressWarnings("unused")
     public byte[] getCsvData() {
         final int batchSize = 500;
         int batchNumber = 0;
@@ -440,22 +446,7 @@ public class UserService {
             page = userRepo.findAll(PageRequest.of(batchNumber, batchSize));
             List<User> users = page.getContent();
             for (User user : users) {
-                sb.append(user.getId())
-                        .append(",")
-                        .append(user.getFirstname())
-                        .append(",")
-                        .append(user.getLastname())
-                        .append(",")
-                        .append(user.getEmail())
-                        .append(",")
-                        .append(user.getRole())
-                        .append(",")
-                        .append(user.getPicture())
-                        .append(",")
-                        .append(user.getTextColor())
-                        .append(",")
-                        .append(DateUtil.format(user.getCreatedAt()))
-                        .append("\n");
+                sb.append(user.getId()).append(",").append(user.getFirstname()).append(",").append(user.getLastname()).append(",").append(user.getEmail()).append(",").append(user.getRole()).append(",").append(user.getPicture()).append(",").append(user.getTextColor()).append(",").append(DateUtil.format(user.getCreatedAt())).append("\n");
 
             }
             batchNumber++;
@@ -474,7 +465,6 @@ public class UserService {
     }
 
     public UserDTO convertToDto(User user) {
-        return new UserDTO(user.getId(), user.getFirstname(), user.getLastname(), user.getEmail(), user.getPicture(),
-                user.getTextColor());
+        return new UserDTO(user.getId(), user.getFirstname(), user.getLastname(), user.getEmail(), user.getPicture(), user.getTextColor());
     }
 }

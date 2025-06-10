@@ -1,14 +1,18 @@
 package xyz.sadiulhakim.user;
 
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
+import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 import xyz.sadiulhakim.user.ConnectionRequest;
 import xyz.sadiulhakim.user.User;
 import xyz.sadiulhakim.user.UserService;
+import xyz.sadiulhakim.user.pojo.PasswordDTO;
 import xyz.sadiulhakim.util.PaginationResult;
 
 import java.util.Collections;
@@ -100,5 +104,26 @@ class UserController {
         Optional<User> user = userService.currentUser();
         model.addAttribute("user", user.orElseGet(User::new));
         return "profile";
+    }
+
+    @GetMapping("/change_password_page")
+    String changePasswordPage(Model model) {
+        model.addAttribute("dto", new PasswordDTO());
+        return "change_password";
+    }
+
+    @PostMapping("/change_password")
+    String changePassword(@ModelAttribute @Valid PasswordDTO dto, BindingResult result, Model model) {
+
+        if (result.hasErrors()) {
+            model.addAttribute("dto", dto);
+            return "change_password";
+        }
+
+        String message = userService.changePassword(dto);
+        model.addAttribute("dto", dto);
+        model.addAttribute("message", message);
+        model.addAttribute("changed", true);
+        return "change_password";
     }
 }

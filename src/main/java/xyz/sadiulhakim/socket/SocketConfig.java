@@ -48,10 +48,6 @@ public class SocketConfig implements WebSocketMessageBrokerConfigurer {
     public void configureMessageBroker(MessageBrokerRegistry registry) {
 
         // Use a shared scheduled executor
-//        ThreadPoolTaskScheduler scheduler = new ThreadPoolTaskScheduler();
-//        scheduler.setThreadFactory(Thread.ofVirtual().factory());
-//        scheduler.initialize();
-
         SimpleAsyncTaskScheduler taskScheduler = new SimpleAsyncTaskScheduler();
         taskScheduler.setVirtualThreads(true);
 
