@@ -14,19 +14,3 @@ discussions,
 <mark>Pigeon</mark>
 Pigeon brings people together in a fast, reliable, and secure way. Dive into a new level of
 communication where every conversation feels closer.
-
-## Technologies
-
-### Backend
-
-1. Java
-2. Spring Boot
-3. WebSocket
-4. Postgres
-5. Redis
-
-### Frontend
-
-1. Thymeleaf (Spring Boot Template Engine)
-2. Bootstrap
-3. Vanilla JavaScript
