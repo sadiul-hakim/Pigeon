@@ -12,12 +12,11 @@ import xyz.sadiulhakim.chat.pojo.ChatMessage;
 import xyz.sadiulhakim.chat.pojo.ChatSetup;
 import xyz.sadiulhakim.notification.NotificationService;
 import xyz.sadiulhakim.user.User;
-import xyz.sadiulhakim.user.pojo.UserDTO;
 import xyz.sadiulhakim.user.UserService;
+import xyz.sadiulhakim.user.pojo.UserDTO;
 import xyz.sadiulhakim.util.AppProperties;
 import xyz.sadiulhakim.util.FileUtil;
 
-import java.io.IOException;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.*;

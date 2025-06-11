@@ -21,7 +21,7 @@ public class FileUtil {
     public static String uploadFile(String folderName, String fileName, InputStream is) {
         try {
 
-            fileName = UUID.randomUUID() + "_" + fileName;
+            fileName = SecureTextGenerator.generateRandomText(20) + "." + getFileExtension(fileName);
             File file = new File(BASE_PATH, (folderName + fileName));
             Files.copy(is, file.toPath());
             return fileName;
@@ -33,7 +33,7 @@ public class FileUtil {
 
     public static String uploadFile(String folderName, String fileName, byte[] content) {
         try {
-            fileName = UUID.randomUUID() + "_" + fileName;
+            fileName = SecureTextGenerator.generateRandomText(20) + "." + getFileExtension(fileName);
             Path path = Paths.get(BASE_PATH, (folderName + fileName));
             Files.write(path, content);
             return fileName;
@@ -56,5 +56,9 @@ public class FileUtil {
         }
 
         return false;
+    }
+
+    public static String getFileExtension(String fileName) {
+        return fileName.substring(fileName.lastIndexOf('.') + 1);
     }
 }
