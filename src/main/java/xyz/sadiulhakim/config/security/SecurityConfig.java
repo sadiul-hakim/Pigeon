@@ -43,6 +43,8 @@ class SecurityConfig {
                 .logout(logout -> logout.logoutUrl("/logout")
                         .logoutSuccessUrl("/login_page?logout=true")
                         .permitAll()
+                        .clearAuthentication(true)
+                        .deleteCookies("JSESSIONID", "SESSION", "session")
                 )
                 .build();
     }
