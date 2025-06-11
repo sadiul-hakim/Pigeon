@@ -16,6 +16,7 @@ import org.springframework.util.StringUtils;
 import org.springframework.web.multipart.MultipartFile;
 import xyz.sadiulhakim.notification.Notification;
 import xyz.sadiulhakim.notification.NotificationService;
+import xyz.sadiulhakim.user.enumeration.UserStatus;
 import xyz.sadiulhakim.user.event.ConnectionEvent;
 import xyz.sadiulhakim.user.event.DeleteChatEvent;
 import xyz.sadiulhakim.user.pojo.PasswordDTO;
@@ -273,13 +274,14 @@ public class UserService {
         }
     }
 
-    public void updateLastSeen(String email) {
+    public void updateStatus(String email, boolean connected) {
         User user = userRepo.findByEmail(email).orElse(null);
         if (user == null) {
             return;
         }
 
         user.setLastSeen(LocalDateTime.now());
+        user.setStatus(connected ? UserStatus.ONLINE : UserStatus.OFFLINE);
         userRepo.save(user);
     }
 
@@ -476,6 +478,6 @@ public class UserService {
 
     public UserDTO convertToDto(User user) {
         return new UserDTO(user.getId(), user.getFirstname(), user.getLastname(), user.getEmail(),
-                user.getPicture(), user.getTextColor(),user.getLastSeen());
+                user.getPicture(), user.getTextColor(), user.getLastSeen(), user.getStatus());
     }
 }

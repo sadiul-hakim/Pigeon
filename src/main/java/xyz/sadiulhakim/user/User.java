@@ -4,6 +4,7 @@ import jakarta.persistence.*;
 import lombok.*;
 import org.hibernate.annotations.ColumnTransformer;
 import xyz.sadiulhakim.converter.ListUUIDConverter;
+import xyz.sadiulhakim.user.enumeration.UserStatus;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -50,6 +51,8 @@ public class User {
     @ColumnTransformer(write = "?::jsonb")
     private List<UUID> connectedUsers = new ArrayList<>();
 
+    @Enumerated(EnumType.STRING)
+    private UserStatus status;
     private LocalDateTime createdAt;
     private LocalDateTime lastSeen;
 }

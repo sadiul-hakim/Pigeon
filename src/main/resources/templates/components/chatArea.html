@@ -11,10 +11,15 @@
             </div>
             <span
                     class="text-light-dark"
-                    th:if="setup.selectedUser.lastSeen != null"
-                    th:text="'last seen at '+${#temporals.format(setup.selectedUser.lastSeen, 'yyyy-MM-dd HH:mm:ss')}"
-            >
+                    th:if="${setup.selectedUser.status == null || setup.selectedUser.status.name().equals('OFFLINE')}"
+                    th:text="'last seen at ' + ${#temporals.format(setup.selectedUser.lastSeen, 'yyyy-MM-dd HH:mm:ss')}">
             </span>
+            <span
+                    class="text-success"
+                    th:if="${setup.selectedUser.status != null && setup.selectedUser.status.name().equals('ONLINE')}"
+                    th:text="${setup.selectedUser.status}">
+            </span>
+
         </div>
     </div>
 
