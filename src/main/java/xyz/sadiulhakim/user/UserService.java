@@ -273,6 +273,16 @@ public class UserService {
         }
     }
 
+    public void updateLastSeen(String email) {
+        User user = userRepo.findByEmail(email).orElse(null);
+        if (user == null) {
+            return;
+        }
+
+        user.setLastSeen(LocalDateTime.now());
+        userRepo.save(user);
+    }
+
     public void updateProfilePicture(MultipartFile photo, UUID userId) {
 
         Optional<User> user = userRepo.findById(userId);
@@ -465,6 +475,7 @@ public class UserService {
     }
 
     public UserDTO convertToDto(User user) {
-        return new UserDTO(user.getId(), user.getFirstname(), user.getLastname(), user.getEmail(), user.getPicture(), user.getTextColor());
+        return new UserDTO(user.getId(), user.getFirstname(), user.getLastname(), user.getEmail(),
+                user.getPicture(), user.getTextColor(),user.getLastSeen());
     }
 }

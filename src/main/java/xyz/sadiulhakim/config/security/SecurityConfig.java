@@ -6,6 +6,10 @@ import org.springframework.security.config.annotation.method.configuration.Enabl
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.authentication.rememberme.JdbcTokenRepositoryImpl;
+import org.springframework.security.web.authentication.rememberme.PersistentTokenRepository;
+
+import javax.sql.DataSource;
 
 @Configuration
 @EnableMethodSecurity
@@ -18,7 +22,7 @@ class SecurityConfig {
     }
 
     @Bean
-    SecurityFilterChain config(HttpSecurity http) throws Exception {
+    SecurityFilterChain config(HttpSecurity http, DataSource dataSource) throws Exception {
 
         String[] permittedEndpoints = {
                 "/css/**",
@@ -40,6 +44,13 @@ class SecurityConfig {
                         .permitAll()
                         .defaultSuccessUrl("/chat", true)
                 )
+                .rememberMe(me -> me.rememberMeParameter("remember-me")
+                        .rememberMeCookieName("remember_me")
+                        .useSecureCookie(true)
+                        .userDetailsService(userDetailsService)
+                        .tokenValiditySeconds(60 * 60 * 24 * 7)
+                        .tokenRepository(persistentTokenRepository(dataSource))
+                )
                 .logout(logout -> logout.logoutUrl("/logout")
                         .logoutSuccessUrl("/login_page?logout=true")
                         .permitAll()
@@ -48,4 +59,13 @@ class SecurityConfig {
                 )
                 .build();
     }
+
+    @Bean
+    public PersistentTokenRepository persistentTokenRepository(DataSource dataSource) {
+        JdbcTokenRepositoryImpl repo = new JdbcTokenRepositoryImpl();
+        repo.setDataSource(dataSource);
+        repo.setCreateTableOnStartup(true);
+        return repo;
+    }
+
 }

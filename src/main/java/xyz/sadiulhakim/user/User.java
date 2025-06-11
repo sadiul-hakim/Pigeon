@@ -50,6 +50,6 @@ public class User {
     @ColumnTransformer(write = "?::jsonb")
     private List<UUID> connectedUsers = new ArrayList<>();
 
-    @Temporal(TemporalType.TIMESTAMP)
     private LocalDateTime createdAt;
+    private LocalDateTime lastSeen;
 }
