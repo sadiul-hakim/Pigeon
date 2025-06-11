@@ -1,53 +1,55 @@
 <div class="col-md-8 h-100 overflow-auto d-flex flex-column justify-content-center align-items-center border-right-1"
      th:if="${setup.selectedUser != null}" th:fragment="chatArea(setup)">
-  <div class="d-flex align-items-center p-2 w-100">
-    <img th:src="@{/picture/user/{pic}(pic=${setup.selectedUser.picture})}"
-         th:alt="${setup.selectedUser.lastname}"
-         class="icon-md"/>&nbsp;
-    <span class="ms-1 fs-3" th:text="${setup.selectedUser.firstname}"></span>&nbsp;
-    <span class="ms-1 fs-3" th:text="${setup.selectedUser.lastname}"></span>
-  </div>
-
-  <div class="flex-grow-1 p-3 chat_area_bg overflow-auto border-1 w-100" id="chatArea">
-    <!-- Existing chat messages (initial messages) -->
-    <div class="my-1 d-flex chat-wrapper" th:each="chat : ${setup.initialChat}"
-         th:attr="data-id=${chat.id}">
-      <img th:src="@{'/picture/user/'+${chat.user.picture}}" alt="" class="icon-sm"/>
-      <div class="ms-1 d-flex flex-column chat">
-        <div class="d-flex justify-content-between">
-          <div>
-                                <span class="fw-bold chat_area_color fs-6" th:text="${chat.user.lastname}"
-                                      th:style="'color:'+${chat.user.textColor}+'!important;'"></span>
-            &nbsp;
-            <small th:text="${#temporals.format(chat.sendTime, 'yyyy-MM-dd HH:mm:ss')}"
-                   class="text-light-dark"></small>
-          </div>
-          <div class="dropdown">
-            <i class="bi bi-three-dots dropdown-toggle" data-bs-toggle="dropdown"
-               aria-expanded="false"></i>
-            <ul class="dropdown-menu">
-              <li
-                      class="dropdown-item remove_chat"
-                      th:data-id="${chat.id}"
-              >Remove
-              </li>
-            </ul>
-          </div>
-        </div>
-        <span class="text-white" th:text="${chat.message}"></span>
-      </div>
+    <div class="d-flex align-items-center p-2 w-100">
+        <img th:src="@{/picture/user/{pic}(pic=${setup.selectedUser.picture})}"
+             th:alt="${setup.selectedUser.lastname}"
+             class="icon-md"/>&nbsp;
+        <span class="ms-1 fs-3" th:text="${setup.selectedUser.firstname}"></span>&nbsp;
+        <span class="ms-1 fs-3" th:text="${setup.selectedUser.lastname}"></span>
     </div>
 
-  </div>
+    <div class="flex-grow-1 p-3 chat_area_bg overflow-auto border-1 w-100" id="chatArea">
+        <!-- Existing chat messages (initial messages) -->
+        <div class="my-1 d-flex chat-wrapper" th:each="chat : ${setup.initialChat}"
+             th:attr="data-id=${chat.id}">
+            <img th:src="@{'/picture/user/'+${chat.user.picture}}" alt="" class="icon-sm"/>
+            <div class="ms-1 d-flex flex-column chat">
+                <div class="d-flex justify-content-between">
+                    <div>
+                                <span class="fw-bold chat_area_color fs-6" th:text="${chat.user.lastname}"
+                                      th:style="'color:'+${chat.user.textColor}+'!important;'"></span>
+                        &nbsp;
+                        <small th:text="${#temporals.format(chat.sendTime, 'yyyy-MM-dd HH:mm:ss')}"
+                               class="text-light-dark"></small>
+                    </div>
+                    <div class="dropdown">
+                        <img th:src="@{/icons/three-dots.svg}" alt="send" class="dropdown-toggle"
+                             data-bs-toggle="dropdown"
+                             aria-expanded="false"/>
 
-  <!--    Chat board Starts        -->
-  <div class="p-3 w-100">
-    <form class="d-flex" id="chatForm">
-      <input type="text" class="form-control chat_bg" placeholder="message" name="message" id="message"/>
-      <button class="btn chat_area_bg ms-1 text-light">
-        <i class="bi bi-send"></i>
-      </button>
-    </form>
-  </div>
-  <!--    Chat board ends    -->
+                        <ul class="dropdown-menu">
+                            <li
+                                    class="dropdown-item remove_chat"
+                                    th:data-id="${chat.id}"
+                            >Remove
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+                <span class="text-white" th:text="${chat.message}"></span>
+            </div>
+        </div>
+
+    </div>
+
+    <!--    Chat board Starts        -->
+    <div class="p-3 w-100">
+        <form class="d-flex" id="chatForm">
+            <input type="text" class="form-control chat_bg" placeholder="message" name="message" id="message" required/>
+            <button class="btn chat_area_bg ms-1 text-light d-flex justify-content-center align-items-center">
+                <img th:src="@{/icons/send.svg}" alt="send"/>
+            </button>
+        </form>
+    </div>
+    <!--    Chat board ends    -->
 </div>

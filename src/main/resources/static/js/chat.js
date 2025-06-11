@@ -87,7 +87,9 @@ function createMessageElement(messageData) {
                         <small class="text-light-dark">${messageData.sendTime}</small>
                     </div>
                     <div class="dropdown">
-                        <i class="bi bi-three-dots dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false"></i>
+                        <img src="/icons/three-dots.svg" alt="send" class="dropdown-toggle"
+                             data-bs-toggle="dropdown"
+                             aria-expanded="false"/>
                         <ul class="dropdown-menu">
                             <li class="dropdown-item remove_chat" data-id="${messageData.id}">Remove</li>
                         </ul>

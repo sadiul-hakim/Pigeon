@@ -15,6 +15,9 @@ public class AppProperties {
     @Value("${default.user.image.folder:''}")
     private String userImageFolder;
 
+    @Value("${default.message.image.folder:''}")
+    private String messageImageFolder;
+
     @Value("${default.user.image.name:''}")
     private String defaultUserPhotoName;
 }

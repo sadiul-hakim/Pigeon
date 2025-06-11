@@ -17,4 +17,6 @@ public class ChatMessage {
     private String userTextColor;
     private String toUser;
     private String sendTime;
+    private String fileName;
+    private String fileContent;
 }

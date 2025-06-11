@@ -7,7 +7,7 @@
                     <li class="nav-item dropdown">
                         <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown"
                            aria-expanded="false">
-                            <i class="bi bi-list fs-4 text-white"></i>
+                            <img th:src="@{/icons/list.svg}" alt="list" class="text-white" width="30" height="30"/>
                         </a>
                         <ul class="dropdown-menu">
                             <li><a class="dropdown-item d-flex align-items-center" th:href="@{/user/profile}">
@@ -19,34 +19,39 @@
                                 <hr class="dropdown-divider">
                             </li>
                             <li>
-                                <a class="dropdown-item" th:href="@{/user/connections_page}">
-                                    <i class="bi bi-person-check"></i> Connections
+                                <a class="dropdown-item d-flex justify-content-start align-items-center"
+                                   th:href="@{/user/connections_page}">
+                                    <img th:src="@{/icons/person-add.svg}" alt="person" class="me-1"/> Connections
                                 </a>
                             </li>
                             <li>
-                                <a class="dropdown-item" th:href="@{/user/sent_connections_page}">
-                                    <i class="bi bi-person-add"></i> Sent Request
+                                <a class="dropdown-item d-flex justify-content-start align-items-center"
+                                   th:href="@{/user/sent_connections_page}">
+                                    <img th:src="@{/icons/person-add.svg}" alt="person" class="me-1"/> Sent Request
                                 </a>
                             </li>
                             <li>
-                                <a class="dropdown-item" th:href="@{/user/received_connections_page}">
-                                    <i class="bi bi-person-add"></i> Received Request
-                                </a>
-                            </li>
-                            <li>
-                                <hr class="dropdown-divider">
-                            </li>
-                            <li>
-                                <a class="dropdown-item" th:href="@{/user/change_password_page}">
-                                    <i class="bi bi-shield-lock-fill"></i> Change Password
+                                <a class="dropdown-item d-flex justify-content-start align-items-center"
+                                   th:href="@{/user/received_connections_page}">
+                                    <img th:src="@{/icons/person-add.svg}" alt="person" class="me-1"/> Received Request
                                 </a>
                             </li>
                             <li>
                                 <hr class="dropdown-divider">
                             </li>
                             <li>
-                                <a class="dropdown-item" th:href="@{/notification/page}">
-                                    <i class="bi bi-bell"></i> Notifications (<span
+                                <a class="dropdown-item d-flex justify-content-start align-items-center"
+                                   th:href="@{/user/change_password_page}">
+                                    <img th:src="@{/icons/shield-lock.svg}" alt="shield" class="me-1"/> Change Password
+                                </a>
+                            </li>
+                            <li>
+                                <hr class="dropdown-divider">
+                            </li>
+                            <li>
+                                <a class="dropdown-item d-flex justify-content-start align-items-center"
+                                   th:href="@{/notification/page}">
+                                    <img th:src="@{/icons/bell.svg}" alt="bell" class="me-1"/> Notifications (<span
                                         th:text="${setup.notifications}"></span>)
                                 </a>
                             </li>
@@ -57,7 +62,7 @@
                                                th:value="${_csrf.token}"/>
                                         <button type="submit" class="nav-link"
                                                 aria-current="page">
-                                            <i class="bi bi-box-arrow-left"></i>
+                                            <img th:src="@{/icons/box-arrow-left.svg}" alt="box arrow left"/>
                                             Logout
                                         </button>
                                     </form>
@@ -78,7 +83,8 @@
     <form id="search_user" class="d-flex justify-content-between align-items-center"
           th:action="@{/user/search}">
         <input type="search" class="form-control chat_bg" name="text" placeholder="Search User"/>
-        <button class="btn chat_area_bg ms-2"><i class="bi bi-search me-1"></i></button>
+        <button class="btn chat_area_bg ms-2 d-flex justify-content-center align-items-center"><img
+                th:src="@{/icons/search.svg}" alt="search" class="me-1"/></button>
     </form>
     <!--User Search Ends-->
     <hr/>

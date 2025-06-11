@@ -14,7 +14,10 @@ import xyz.sadiulhakim.notification.NotificationService;
 import xyz.sadiulhakim.user.User;
 import xyz.sadiulhakim.user.pojo.UserDTO;
 import xyz.sadiulhakim.user.UserService;
+import xyz.sadiulhakim.util.AppProperties;
+import xyz.sadiulhakim.util.FileUtil;
 
+import java.io.IOException;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.*;
@@ -28,6 +31,7 @@ public class ChatService {
     private final UserService userService;
     private final NotificationService notificationService;
     private final SimpMessagingTemplate messagingTemplate;
+    private final AppProperties appProperties;
 
     public ChatSetup getChatSetup(UUID toUser) {
 
@@ -76,11 +80,21 @@ public class ChatService {
         if (user == null || toUser == null)
             return;
 
-        LocalDateTime now = LocalDateTime.now();
+        // Handle File
+        if (StringUtils.hasText(message.getFileName()) && StringUtils.hasText(message.getFileContent())) {
+            try {
+                byte[] fileData = Base64.getDecoder().decode(message.getFileContent());
+                String filePath = FileUtil.uploadFile(appProperties.getMessageImageFolder(), message.getFileName(), fileData);
+                message.setFileName(filePath);
+            } catch (Exception e) {
+                log.error("sendMessage() :: Could not upload file!");
+            }
+        }
 
         // Launch a thread to save the message
+        LocalDateTime now = LocalDateTime.now();
         Thread.ofVirtual().name("#ChatThread-", 0).start(() -> {
-            save(message.getMessage(), user, toUser, now);
+            save(message.getMessage(), message.getFileName(), user, toUser, now);
         });
 
         // Prepare and send the message to both users so that they can see on screen
@@ -93,7 +107,7 @@ public class ChatService {
         messagingTemplate.convertAndSendToUser(toUser.getEmail(), "/queue/messages", message);
     }
 
-    public void save(String message, User user, User toUser, LocalDateTime now) {
+    public void save(String message, String fileName, User user, User toUser, LocalDateTime now) {
 
         if (!StringUtils.hasText(message))
             return;
@@ -103,6 +117,7 @@ public class ChatService {
         chat.setToUser(toUser);
         chat.setMessage(message);
         chat.setSendTime(now);
+        chat.setFilename(fileName);
 
         chatRepo.save(chat);
     }

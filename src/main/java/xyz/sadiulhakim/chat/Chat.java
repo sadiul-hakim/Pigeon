@@ -29,6 +29,9 @@ public class Chat {
     @Column(length = 350)
     private String message;
 
+    @Column(length = 120)
+    private String filename;
+
     @Temporal(TemporalType.TIMESTAMP)
     private LocalDateTime sendTime;
 }

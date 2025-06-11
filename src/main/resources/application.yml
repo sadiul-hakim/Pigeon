@@ -29,6 +29,9 @@ default:
     image:
       folder: /user/
       name: user.svg
+  message:
+    image:
+      folder: /message/
   pagination:
     size: 100
 

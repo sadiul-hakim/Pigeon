@@ -6,6 +6,8 @@ import org.slf4j.LoggerFactory;
 import java.io.File;
 import java.io.InputStream;
 import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.UUID;
 
 public class FileUtil {
@@ -25,6 +27,18 @@ public class FileUtil {
             return fileName;
         } catch (Exception ex) {
             LOGGER.error("FileUtil.upload :: failed to upload file {}", (folderName + fileName));
+            return "";
+        }
+    }
+
+    public static String uploadFile(String folderName, String fileName, byte[] content) {
+        try {
+            fileName = UUID.randomUUID() + "_" + fileName;
+            Path path = Paths.get(BASE_PATH, (folderName + fileName));
+            Files.write(path, content);
+            return fileName;
+        } catch (Exception ex) {
+            LOGGER.error("FileUtil.uploadFile :: failed to upload file {}", (folderName + fileName));
             return "";
         }
     }
