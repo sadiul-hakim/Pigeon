@@ -116,7 +116,7 @@ function createMessageElement(messageData) {
     console.log(messageData)
 
     const imageTag = messageData.fileName
-        ? `<img src="/picture/message/${messageData.fileName}" width="190" height="170" class="img-fluid" alt="file" />`
+        ? `<img src="/picture/message/${messageData.fileName}" width="190" height="170" class="img-fluid clickable-image" alt="file" />`
         : ''; // show nothing if no file
 
     const html = `
@@ -195,3 +195,19 @@ function showToast(message) {
     const toastBootstrap = bootstrap.Toast.getOrCreateInstance(toastLiveExample);
     toastBootstrap.show();
 }
+
+// ------------------------------------- Image Modal ---------------------------
+
+document.addEventListener("DOMContentLoaded", function () {
+    document.body.addEventListener("click", function (e) {
+        if (e.target.classList.contains("clickable-image")) {
+            const src = e.target.getAttribute("src");
+            const modalImg = document.getElementById("modalImage");
+            modalImg.src = src;
+
+            const modal = new bootstrap.Modal(document.getElementById("imageModal"));
+            modal.show();
+        }
+    });
+});
+

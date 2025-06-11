@@ -42,7 +42,7 @@
                         th:src="@{'/picture/message/'+${chat.filename}}"
                         width="190"
                         height="170"
-                        class="img-fluid"
+                        class="img-fluid clickable-image"
                         alt="file"
                 />
             </div>
@@ -102,4 +102,16 @@
         </div>
     </div>
     <!--Modal Ends-->
+    <!--Image Modal Stars-->
+    <!-- Image Modal -->
+    <div class="modal fade" id="imageModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered modal-lg">
+            <div class="modal-content bg-dark">
+                <div class="modal-body p-0">
+                    <img src="" id="modalImage" class="img-fluid w-100" alt="Preview"/>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!--Image Modal Ends-->
 </div>
