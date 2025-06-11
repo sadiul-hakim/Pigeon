@@ -38,6 +38,45 @@ document.addEventListener("DOMContentLoaded", function () {
 
         document.getElementById("message").value = "";
     });
+
+    document.querySelector("#chatFormWithFile").addEventListener("submit", function (event) {
+        event.preventDefault();
+
+        const msg = document.getElementById("msg").value;
+        const fileInput = document.querySelector('#file');
+        const file = fileInput.files[0];
+
+        const messageObject = {
+            message: msg,
+            user: user,
+            toUser: toUser,
+            fileName: null,
+            fileContent: null
+        };
+
+        if (file) {
+            const reader = new FileReader();
+
+            reader.onload = function () {
+                const base64Content = reader.result.split(',')[1]; // remove data:*/*;base64, prefix
+
+                messageObject.fileName = file.name;
+                messageObject.fileContent = base64Content;
+
+                // Send full message with file
+                stompClient.send("/sent", {}, JSON.stringify(messageObject));
+            };
+
+            reader.readAsDataURL(file);
+        } else {
+            // No file, just send text message
+            stompClient.send("/sent", {}, JSON.stringify(messageObject));
+        }
+
+        // Clear inputs
+        document.getElementById("msg").value = "";
+        fileInput.value = "";
+    });
 });
 
 function showMessage(receivedMessage) {
@@ -74,6 +113,12 @@ function showOnConnectionList(newMessageElement) {
 
 // Function to create a new message element for display
 function createMessageElement(messageData) {
+    console.log(messageData)
+
+    const imageTag = messageData.fileName
+        ? `<img src="/picture/message/${messageData.fileName}" width="190" height="170" class="img-fluid" alt="file" />`
+        : ''; // show nothing if no file
+
     const html = `
         <div class="my-1 d-flex chat-wrapper" data-id="${messageData.id}">
             <img src="/picture/user/${messageData.userPicture}" alt="" class="icon-sm"/>
@@ -96,6 +141,7 @@ function createMessageElement(messageData) {
                     </div>
                 </div>
                 <span class="text-white">${messageData.message}</span>
+                ${imageTag}
             </div>
         </div>
     `.trim();

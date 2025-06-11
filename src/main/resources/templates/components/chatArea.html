@@ -37,14 +37,28 @@
                     </div>
                 </div>
                 <span class="text-white" th:text="${chat.message}"></span>
+                <img
+                        th:if="${chat.filename != null && !chat.filename.isEmpty()}"
+                        th:src="@{'/picture/message/'+${chat.filename}}"
+                        width="190"
+                        height="170"
+                        class="img-fluid"
+                        alt="file"
+                />
             </div>
         </div>
-
     </div>
 
     <!--    Chat board Starts        -->
-    <div class="p-3 w-100">
-        <form class="d-flex" id="chatForm">
+    <div class="p-3 w-100 d-flex align-items-center">
+        <img
+                th:src="@{/icons/file-image.svg}"
+                alt="file image" class="me-1" width="20"
+                height="20"
+                data-bs-toggle="modal"
+                data-bs-target="#sendMessageModal"
+        />
+        <form class="d-flex flex-grow-1" id="chatForm">
             <input type="text" class="form-control chat_bg" placeholder="message" name="message" id="message" required/>
             <button class="btn chat_area_bg ms-1 text-light d-flex justify-content-center align-items-center">
                 <img th:src="@{/icons/send.svg}" alt="send"/>
@@ -52,4 +66,40 @@
         </form>
     </div>
     <!--    Chat board ends    -->
+    <!--Modal Stars -->
+    <div class="modal fade" id="sendMessageModal" tabindex="-1" aria-labelledby="sendMessageModalLabel"
+         aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h1 class="modal-title fs-5 text-warning" id="sendMessageModalLabel">Send Message</h1>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="chatFormWithFile">
+                        <div>
+                            <label for="msg" class="text-dark">Message</label>
+                            <input type="text" name="msg" id="msg" class="form-control" required/>
+                        </div>
+                        <br/>
+                        <div>
+                            <label for="file" class="text-dark">File</label>
+                            <input type="file" name="file" id="file" class="form-control"
+                                   accept=".svg,.png,.jpg,.jpeg"/>
+                        </div>
+                        <br/>
+                        <div>
+                            <button class="btn chat_area_bg ms-1 text-light d-flex justify-content-center align-items-center">
+                                <img th:src="@{/icons/send.svg}" alt="send" width="20" height="20"/>
+                            </button>
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!--Modal Ends-->
 </div>

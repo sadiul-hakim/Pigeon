@@ -80,19 +80,20 @@ public class ChatService {
         if (user == null || toUser == null)
             return;
 
+        LocalDateTime now = LocalDateTime.now();
+
         // Handle File
         if (StringUtils.hasText(message.getFileName()) && StringUtils.hasText(message.getFileContent())) {
             try {
                 byte[] fileData = Base64.getDecoder().decode(message.getFileContent());
-                String filePath = FileUtil.uploadFile(appProperties.getMessageImageFolder(), message.getFileName(), fileData);
-                message.setFileName(filePath);
+                String fileName = FileUtil.uploadFile(appProperties.getMessageImageFolder(), message.getFileName(), fileData);
+                message.setFileName(fileName);
             } catch (Exception e) {
                 log.error("sendMessage() :: Could not upload file!");
             }
         }
 
         // Launch a thread to save the message
-        LocalDateTime now = LocalDateTime.now();
         Thread.ofVirtual().name("#ChatThread-", 0).start(() -> {
             save(message.getMessage(), message.getFileName(), user, toUser, now);
         });
@@ -102,6 +103,9 @@ public class ChatService {
         message.setUserName(user.getLastname());
         message.setUserPicture(user.getPicture());
         message.setUserTextColor(user.getTextColor());
+
+        // empty the content
+        message.setFileContent("");
 
         messagingTemplate.convertAndSendToUser(user.getEmail(), "/queue/messages", message);
         messagingTemplate.convertAndSendToUser(toUser.getEmail(), "/queue/messages", message);
@@ -128,10 +132,7 @@ public class ChatService {
         if (user.isEmpty() || toUser.isEmpty())
             return Collections.emptyList();
 
-        return chatRepo.findAllByUserAndToUserOrToUserAndUserOrderBySendTime(
-                user.get(), toUser.get(),
-                user.get(), toUser.get()
-        );
+        return chatRepo.findConversation(user.get(), toUser.get());
     }
 
     public void deleteAllMessageBetweenTwoUsers(String user, String toUser) {
@@ -143,9 +144,17 @@ public class ChatService {
             return;
         }
 
-        chatRepo.deleteChatBetweenUsers(
-                user, toUser
-        );
+        User toUserModel = userService.findByEmail(toUser);
+        List<Chat> chats = chatRepo.findConversation(userModel, toUserModel);
+        for (Chat chat : chats) {
+
+            // Delete the file if there is any
+            if (StringUtils.hasText(chat.getFilename())) {
+                FileUtil.deleteFile(appProperties.getMessageImageFolder(), chat.getFilename());
+            }
+        }
+
+        chatRepo.deleteAll(chats);
     }
 
     public String delete(long chatId) {
@@ -162,6 +171,11 @@ public class ChatService {
         if (!(username.equals(chat.getUser().getEmail()) || username.equals(chat.getToUser().getEmail()))) {
 
             return "You are not allowed to delete this chat!";
+        }
+
+        // Delete the file if there is any
+        if (StringUtils.hasText(chat.getFilename())) {
+            FileUtil.deleteFile(appProperties.getMessageImageFolder(), chat.getFilename());
         }
 
         chatRepo.delete(chat);

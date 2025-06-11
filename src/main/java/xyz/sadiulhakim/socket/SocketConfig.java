@@ -11,6 +11,7 @@ import org.springframework.scheduling.concurrent.SimpleAsyncTaskScheduler;
 import org.springframework.web.socket.config.annotation.EnableWebSocketMessageBroker;
 import org.springframework.web.socket.config.annotation.StompEndpointRegistry;
 import org.springframework.web.socket.config.annotation.WebSocketMessageBrokerConfigurer;
+import org.springframework.web.socket.config.annotation.WebSocketTransportRegistration;
 import org.springframework.web.socket.server.support.DefaultHandshakeHandler;
 
 import java.util.List;
@@ -58,5 +59,12 @@ public class SocketConfig implements WebSocketMessageBrokerConfigurer {
         registry.setUserDestinationPrefix(userPrefix);
     }
 
+    @Override
+    public void configureWebSocketTransport(WebSocketTransportRegistration registration) {
+        registration
+                .setMessageSizeLimit((1024 * 1024) * 2)      // 2MB
+                .setSendBufferSizeLimit((1024 * 1024) * 2)   // 2MB
+                .setSendTimeLimit(20 * 1000);          // 20s
+    }
 
 }
