@@ -51,7 +51,7 @@
                         </ul>
                     </div>
                 </div>
-                <span class="text-white" th:text="${chat.message}"></span>
+                <span class="text-white" th:utext="${chat.message}"></span>
                 <img
                         th:if="${chat.filename != null && !chat.filename.isEmpty()}"
                         th:src="@{'/picture/message/'+${chat.filename}}"
@@ -94,7 +94,7 @@
                     <form id="chatFormWithFile">
                         <div>
                             <label for="msg" class="text-dark">Message</label>
-                            <input type="text" name="msg" id="msg" class="form-control" required/>
+                            <textarea rows="3" name="msg" id="msg" class="form-control" required></textarea>
                         </div>
                         <br/>
                         <div>

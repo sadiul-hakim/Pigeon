@@ -10,6 +10,7 @@ import lombok.Setter;
 @AllArgsConstructor
 @NoArgsConstructor
 public class ChatMessage {
+    private long id;
     private String message;
     private String user;
     private String userPicture;

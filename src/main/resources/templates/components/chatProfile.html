@@ -30,7 +30,7 @@
                                     <a th:href="@{'/chat/user/'+${setup.user.getEmail()}+'/toUser/'+${setup.selectedUser.getEmail()}+'?selectedUser='+${setup.selectedUser.getId()}}"
                                        class="text-decoration-none text-light d-flex align-items-center">
                                         <img th:src="@{/icons/x-circle.svg}" alt="remove chats" class="me-1"/>
-                                        Delete All Chat with
+                                        Delete All Chat with &nbsp;
                                         <span th:text="${setup.selectedUser.getLastname()}"></span></a>
                                 </li>
                                 <li class="list-group-item chat_bg mt-1">

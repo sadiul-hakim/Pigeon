@@ -16,6 +16,7 @@ import xyz.sadiulhakim.user.UserService;
 import xyz.sadiulhakim.user.pojo.UserDTO;
 import xyz.sadiulhakim.util.AppProperties;
 import xyz.sadiulhakim.util.FileUtil;
+import xyz.sadiulhakim.util.MarkdownUtils;
 
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
@@ -92,10 +93,12 @@ public class ChatService {
             }
         }
 
-        // Launch a thread to save the message
-        Thread.ofVirtual().name("#ChatThread-", 0).start(() -> {
-            save(message.getMessage(), message.getFileName(), user, toUser, now);
-        });
+        String rawMarkdown = message.getMessage();
+        String html = MarkdownUtils.toHtml(rawMarkdown);
+        message.setMessage(html);
+
+        Chat save = save(message.getMessage(), message.getFileName(), user, toUser, now);
+        message.setId(save.getId());
 
         // Prepare and send the message to both users so that they can see on screen
         message.setSendTime(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss").format(now));
@@ -110,10 +113,10 @@ public class ChatService {
         messagingTemplate.convertAndSendToUser(toUser.getEmail(), "/queue/messages", message);
     }
 
-    public void save(String message, String fileName, User user, User toUser, LocalDateTime now) {
+    public Chat save(String message, String fileName, User user, User toUser, LocalDateTime now) {
 
         if (!StringUtils.hasText(message))
-            return;
+            return new Chat();
 
         Chat chat = new Chat();
         chat.setUser(user);
@@ -122,7 +125,7 @@ public class ChatService {
         chat.setSendTime(now);
         chat.setFilename(fileName);
 
-        chatRepo.save(chat);
+        return chatRepo.save(chat);
     }
 
     public List<Chat> findAllChat(UUID userId, UUID toUserId) {

@@ -113,7 +113,6 @@ function showOnConnectionList(newMessageElement) {
 
 // Function to create a new message element for display
 function createMessageElement(messageData) {
-    console.log(messageData)
 
     const imageTag = messageData.fileName
         ? `<img src="/picture/message/${messageData.fileName}" width="190" height="170" class="img-fluid clickable-image" alt="file" />`
@@ -140,7 +139,7 @@ function createMessageElement(messageData) {
                         </ul>
                     </div>
                 </div>
-                <span class="text-white">${messageData.message}</span>
+                <div class="text-white">${messageData.message}</div>
                 ${imageTag}
             </div>
         </div>
@@ -179,10 +178,8 @@ document.querySelectorAll('.remove_chat').forEach(function (item) {
                 } else {
                     alert('Failed to remove chat.');
                 }
-                console.log(data)
             })
             .catch(error => {
-                console.error('Error:', error);
                 alert('An error occurred.');
             });
     });

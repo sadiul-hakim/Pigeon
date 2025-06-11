@@ -77,7 +77,7 @@ public class UserService {
         return userRepo.findAllUserConnections(uuids);
     }
 
-    //    @Cacheable(value = "findByEmail", key = "#email")
+
     public User findByEmail(String email) {
 
         return userRepo.findByEmail(email).orElse(null);
