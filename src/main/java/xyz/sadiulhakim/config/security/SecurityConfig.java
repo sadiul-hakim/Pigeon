@@ -48,14 +48,14 @@ class SecurityConfig {
                         .rememberMeCookieName("remember_me")
                         .useSecureCookie(true)
                         .userDetailsService(userDetailsService)
-                        .tokenValiditySeconds(60 * 60 * 24 * 7)
+                        .tokenValiditySeconds(60 * 60 * 24 * 5) // 5 Days
                         .tokenRepository(persistentTokenRepository(dataSource))
                 )
                 .logout(logout -> logout.logoutUrl("/logout")
                         .logoutSuccessUrl("/login_page?logout=true")
                         .permitAll()
                         .clearAuthentication(true)
-                        .deleteCookies("JSESSIONID", "SESSION", "session")
+                        .deleteCookies("JSESSIONID", "SESSION", "session", "remember_me")
                 )
                 .build();
     }
@@ -64,8 +64,7 @@ class SecurityConfig {
     public PersistentTokenRepository persistentTokenRepository(DataSource dataSource) {
         JdbcTokenRepositoryImpl repo = new JdbcTokenRepositoryImpl();
         repo.setDataSource(dataSource);
-        repo.setCreateTableOnStartup(true);
+//        repo.setCreateTableOnStartup(true); // Enable only once
         return repo;
     }
-
 }
