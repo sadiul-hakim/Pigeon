@@ -26,7 +26,7 @@ public class Chat {
     @ManyToOne
     private User toUser;
 
-    @Column(length = 350)
+    @Column(length = 1500)
     private String message;
 
     @Column(length = 120)

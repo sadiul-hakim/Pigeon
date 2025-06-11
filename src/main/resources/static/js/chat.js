@@ -96,9 +96,16 @@ function showMessage(receivedMessage) {
 
 function showOnConnectionList(newMessageElement) {
     let p = document.createElement("p");
-    p.innerText = newMessageElement.message.length <= 25 ?
-        newMessageElement.message :
-        newMessageElement.message.substring(0, 25) + "...";
+
+    const isHtml = /<\/?[a-z][\s\S]*>/i.test(newMessageElement.message);
+    if (isHtml) {
+        p.innerText = `Special Message`;
+        p.classList.add("text-primary")
+    } else {
+        p.innerText = newMessageElement.message.length <= 25 ?
+            newMessageElement.message :
+            newMessageElement.message.substring(0, 25) + "...";
+    }
     p.classList.add("m-0", "small", "bold"); // Optional styling
 
     for (let child of chatList.children) {
@@ -139,7 +146,7 @@ function createMessageElement(messageData) {
                         </ul>
                     </div>
                 </div>
-                <div class="text-white">${messageData.message}</div>
+                <div class="text-white" id="message-content"></div>
                 ${imageTag}
             </div>
         </div>
@@ -148,7 +155,10 @@ function createMessageElement(messageData) {
     // Convert string HTML to a DOM element
     const template = document.createElement('template');
     template.innerHTML = html;
-    return template.content.firstElementChild;
+
+    const element = template.content.firstElementChild;
+    element.querySelector("#message-content").innerHTML = messageData.message;
+    return element;
 }
 
 // ------------------------------------ Delete Chat -------------------------------

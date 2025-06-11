@@ -93,8 +93,7 @@ public class ChatService {
             }
         }
 
-        String rawMarkdown = message.getMessage();
-        String html = MarkdownUtils.toHtml(rawMarkdown);
+        String html = MarkdownUtils.toHtml(message.getMessage());
         message.setMessage(html);
 
         Chat save = save(message.getMessage(), message.getFileName(), user, toUser, now);

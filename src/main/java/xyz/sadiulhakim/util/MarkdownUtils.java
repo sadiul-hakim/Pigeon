@@ -14,9 +14,15 @@ public class MarkdownUtils {
     private static final Parser parser = Parser.builder().extensions(extensions).build();
     private static final HtmlRenderer renderer = HtmlRenderer.builder().extensions(extensions).build();
 
-    public static String toHtml(String markdown) {
-        String html = renderer.render(parser.parse(markdown));
-        return sanitizeHtml(html);
+    public static String toHtml(String input) {
+        if (isLikelyMarkdown(input)) {
+            String html = renderer.render(parser.parse(input));
+            return sanitizeHtml(html);
+        } else {
+            // Just sanitize & escape plain text (preserve line breaks as <br>)
+            String escaped = sanitizeHtml(escapeHtml(input));
+            return escaped.replace("\n", "<br>");
+        }
     }
 
     public static String sanitizeHtml(String unsafeHtml) {
@@ -30,5 +36,21 @@ public class MarkdownUtils {
                 .toFactory();
 
         return policy.sanitize(unsafeHtml);
+    }
+
+    private static boolean isLikelyMarkdown(String text) {
+        if (text == null || text.isBlank()) return false;
+
+        // Common Markdown indicators
+        return text.contains("**") || text.contains("* ")
+                || text.contains("```") || text.contains("__")
+                || text.contains("#") || text.contains("- ")
+                || text.contains(">") || text.contains("|"); // tables
+    }
+
+    private static String escapeHtml(String text) {
+        return text.replace("&", "&amp;")
+                .replace("<", "&lt;")
+                .replace(">", "&gt;");
     }
 }
