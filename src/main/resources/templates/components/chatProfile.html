@@ -14,7 +14,7 @@
     <div class="row mt-2">
         <div class="col-12">
             <div class="accordion accordion-flush" id="usersChatActionsAccordion">
-                <div class="accordion-item">
+                <div class="accordion-item chat_area_bg">
                     <h2 class="accordion-header">
                         <button class="accordion-button collapsed chat_area_bg" type="button" data-bs-toggle="collapse"
                                 data-bs-target="#flush-collapseOne" aria-expanded="false"
@@ -25,14 +25,19 @@
                     <div id="flush-collapseOne" class="accordion-collapse collapse chat_area_bg"
                          data-bs-parent="#usersChatActionsAccordion">
                         <div class="accordion-body">
-                            <ul class="list-group">
-                                <li class="list-group-item chat_bg list-group-item-action border-bottom">
+                            <ul class="list-group list-group-flush">
+                                <li class="list-group-item chat_bg">
                                     <a th:href="@{'/chat/user/'+${setup.user.getEmail()}+'/toUser/'+${setup.selectedUser.getEmail()}+'?selectedUser='+${setup.selectedUser.getId()}}"
-                                       class="text-decoration-none text-light">Delete All Chat with <span
-                                            th:text="${setup.selectedUser.getLastname()}"></span></a>
+                                       class="text-decoration-none text-light d-flex align-items-center">
+                                        <img th:src="@{/icons/x-circle.svg}" alt="remove chats" class="me-1"/>
+                                        Delete All Chat with
+                                        <span th:text="${setup.selectedUser.getLastname()}"></span></a>
                                 </li>
-                                <li class="list-group-item chat_bg list-group-item-action">
-                                    <a href="#" class="text-decoration-none text-light">Remove Connection</a>
+                                <li class="list-group-item chat_bg mt-1">
+                                    <a href="#" class="text-decoration-none text-light d-flex align-items-center">
+                                        <img th:src="@{/icons/person-x-fill.svg}" alt="remove connection" class="me-1"/>
+                                        Remove Connection
+                                    </a>
                                 </li>
                             </ul>
                         </div>
