@@ -45,7 +45,9 @@ public class MarkdownUtils {
         return text.contains("**") || text.contains("* ")
                 || text.contains("```") || text.contains("__")
                 || text.contains("#") || text.contains("- ")
-                || text.contains(">") || text.contains("|"); // tables
+                || text.contains(">") || text.contains("|")
+                || text.contains("`") || text.contains("~~")
+                || text.contains("[ ]") || text.contains("[x]");
     }
 
     private static String escapeHtml(String text) {

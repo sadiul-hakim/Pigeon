@@ -8,7 +8,6 @@ import java.io.InputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.UUID;
 
 public class FileUtil {
 
@@ -18,29 +17,31 @@ public class FileUtil {
     private FileUtil() {
     }
 
-    public static String uploadFile(String folderName, String fileName, InputStream is) {
-        try {
+    public static void uploadFile(String folderName, String fileName, InputStream is) {
+        Thread.ofVirtual().name("#FileUploadingThread-", 0).start(() -> {
+            try {
 
-            fileName = SecureTextGenerator.generateRandomText(20) + "." + getFileExtension(fileName);
-            File file = new File(BASE_PATH, (folderName + fileName));
-            Files.copy(is, file.toPath());
-            return fileName;
-        } catch (Exception ex) {
-            LOGGER.error("FileUtil.upload :: failed to upload file {}", (folderName + fileName));
-            return "";
-        }
+                File file = new File(BASE_PATH, (folderName + fileName));
+                Files.copy(is, file.toPath());
+            } catch (Exception ex) {
+                LOGGER.error("FileUtil.upload :: failed to upload file {}", (folderName + fileName));
+            }
+        });
     }
 
-    public static String uploadFile(String folderName, String fileName, byte[] content) {
-        try {
-            fileName = SecureTextGenerator.generateRandomText(20) + "." + getFileExtension(fileName);
-            Path path = Paths.get(BASE_PATH, (folderName + fileName));
-            Files.write(path, content);
-            return fileName;
-        } catch (Exception ex) {
-            LOGGER.error("FileUtil.uploadFile :: failed to upload file {}", (folderName + fileName));
-            return "";
-        }
+    public static void uploadFile(String folderName, String fileName, byte[] content) {
+        Thread.ofVirtual().name("#FileUploadingThread-", 0).start(() -> {
+            try {
+                Path path = Paths.get(BASE_PATH, (folderName + fileName));
+                Files.write(path, content);
+            } catch (Exception ex) {
+                LOGGER.error("FileUtil.uploadFile :: failed to upload file {}", (folderName + fileName));
+            }
+        });
+    }
+
+    public static String getUniqueFileName(String fileName, int length) {
+        return SecureTextGenerator.generateRandomText(length) + "." + getFileExtension(fileName);
     }
 
     public static boolean deleteFile(String folderName, String fileName) {

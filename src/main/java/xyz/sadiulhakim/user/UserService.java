@@ -295,17 +295,20 @@ public class UserService {
         User exUser = user.get();
         if (photo != null && !Objects.requireNonNull(photo.getOriginalFilename()).isEmpty()) {
             try {
-                String fileName = FileUtil.uploadFile(appProperties.getUserImageFolder(), photo.getOriginalFilename(), photo.getInputStream());
+                String uniqueFileName = FileUtil.getUniqueFileName(photo.getOriginalFilename(), 20);
+                FileUtil.uploadFile(appProperties.getUserImageFolder(), uniqueFileName, photo.getInputStream());
 
-                if (StringUtils.hasText(fileName) && !exUser.getPicture().equals(appProperties.getDefaultUserPhotoName())) {
-                    boolean deleted = FileUtil.deleteFile(appProperties.getUserImageFolder(), exUser.getPicture());
-                    if (deleted) {
-                        LOGGER.info("UserService.update :: File {} is deleted", exUser.getPicture());
-                    }
+                if (StringUtils.hasText(uniqueFileName) && !exUser.getPicture().equals(appProperties.getDefaultUserPhotoName())) {
+                    Thread.ofVirtual().name("#FileDeletingThread").start(() -> {
+                        boolean deleted = FileUtil.deleteFile(appProperties.getUserImageFolder(), exUser.getPicture());
+                        if (deleted) {
+                            LOGGER.info("UserService.update :: File {} is deleted", exUser.getPicture());
+                        }
+                    });
                 }
 
-                if (StringUtils.hasText(fileName)) {
-                    exUser.setPicture(fileName);
+                if (StringUtils.hasText(uniqueFileName)) {
+                    exUser.setPicture(uniqueFileName);
                 }
             } catch (IOException e) {
                 throw new RuntimeException(e);
@@ -392,10 +395,12 @@ public class UserService {
         user.ifPresent(u -> {
 
             if (!u.getPicture().equals(appProperties.getDefaultUserPhotoName())) {
-                boolean deleted = FileUtil.deleteFile(appProperties.getUserImageFolder(), u.getPicture());
-                if (deleted) {
-                    LOGGER.info("UserService.delete :: deleted file {}", u.getPicture());
-                }
+                Thread.ofVirtual().name("#FileDeletingThread").start(() -> {
+                    boolean deleted = FileUtil.deleteFile(appProperties.getUserImageFolder(), u.getPicture());
+                    if (deleted) {
+                        LOGGER.info("UserService.delete :: deleted file {}", u.getPicture());
+                    }
+                });
             }
             userRepo.delete(u);
         });

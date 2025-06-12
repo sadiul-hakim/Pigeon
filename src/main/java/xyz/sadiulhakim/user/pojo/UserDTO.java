@@ -21,6 +21,7 @@ public class UserDTO {
     private String textColor;
     private LocalDateTime lastSeen;
     private UserStatus status;
+    private String lastSeenText;
 
     public UserDTO(UUID id, String firstname, String lastname, String email, String picture, String textColor,
                    LocalDateTime lastSeen, UserStatus status) {

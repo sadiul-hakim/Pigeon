@@ -15,6 +15,7 @@ import xyz.sadiulhakim.user.User;
 import xyz.sadiulhakim.user.UserService;
 import xyz.sadiulhakim.user.pojo.UserDTO;
 import xyz.sadiulhakim.util.AppProperties;
+import xyz.sadiulhakim.util.DateUtil;
 import xyz.sadiulhakim.util.FileUtil;
 import xyz.sadiulhakim.util.MarkdownUtils;
 
@@ -46,6 +47,10 @@ public class ChatService {
         UserDTO userDTO = userService.convertToDto(user);
         List<UUID> connectedUsers = user.getConnectedUsers();
         List<UserDTO> connections = userService.findAllUserConnections(connectedUsers);
+        for (UserDTO connection : connections) {
+            String text = DateUtil.getLastSeenTime(connection.getLastSeen());
+            connection.setLastSeenText(text);
+        }
 
         ChatSetup chatSetup = new ChatSetup();
         chatSetup.setUser(userDTO);
@@ -86,8 +91,9 @@ public class ChatService {
         if (StringUtils.hasText(message.getFileName()) && StringUtils.hasText(message.getFileContent())) {
             try {
                 byte[] fileData = Base64.getDecoder().decode(message.getFileContent());
-                String fileName = FileUtil.uploadFile(appProperties.getMessageImageFolder(), message.getFileName(), fileData);
-                message.setFileName(fileName);
+                String uniqueFileName = FileUtil.getUniqueFileName(message.getFileName(), 20);
+                message.setFileName(uniqueFileName);
+                FileUtil.uploadFile(appProperties.getMessageImageFolder(), uniqueFileName, fileData);
             } catch (Exception e) {
                 log.error("sendMessage() :: Could not upload file!");
             }
@@ -151,7 +157,9 @@ public class ChatService {
 
             // Delete the file if there is any
             if (StringUtils.hasText(chat.getFilename())) {
-                FileUtil.deleteFile(appProperties.getMessageImageFolder(), chat.getFilename());
+                Thread.ofVirtual().name("#FileDeletingThread").start(() -> {
+                    FileUtil.deleteFile(appProperties.getMessageImageFolder(), chat.getFilename());
+                });
             }
         }
 
@@ -170,13 +178,14 @@ public class ChatService {
         String username = authentication.getName();
         Chat chat = chatOpt.get();
         if (!(username.equals(chat.getUser().getEmail()) || username.equals(chat.getToUser().getEmail()))) {
-
             return "You are not allowed to delete this chat!";
         }
 
         // Delete the file if there is any
         if (StringUtils.hasText(chat.getFilename())) {
-            FileUtil.deleteFile(appProperties.getMessageImageFolder(), chat.getFilename());
+            Thread.ofVirtual().name("#FileDeletingThread").start(() -> {
+                FileUtil.deleteFile(appProperties.getMessageImageFolder(), chat.getFilename());
+            });
         }
 
         chatRepo.delete(chat);
