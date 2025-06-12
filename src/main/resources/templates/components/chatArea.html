@@ -92,21 +92,23 @@
          aria-hidden="true">
         <div class="modal-dialog">
             <div class="modal-content">
-                <div class="modal-header">
-                    <h1 class="modal-title fs-5 text-warning" id="sendMessageModalLabel">Send Message</h1>
+                <div class="modal-header chat_bg">
+                    <h1 class="modal-title fs-5 text-light d-flex align-items-center" id="sendMessageModalLabel"><img
+                            th:src="@{/icons/message.svg}" class="me-1" alt="message"/> Send Message</h1>
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
-                <div class="modal-body">
+                <div class="modal-body chat_bg">
                     <form id="chatFormWithFile">
                         <div>
-                            <label for="msg" class="text-dark">Message</label>
-                            <textarea rows="3" name="msg" id="msg" class="form-control" required></textarea>
+                            <label for="msg" class="text-light">Message</label>
+                            <textarea rows="3" name="msg" id="msg" class="form-control chat_area_bg"
+                                      required></textarea>
                         </div>
                         <br/>
                         <div>
-                            <label for="file" class="text-dark">File <span
-                                    class="text-muted">(.svg,.png,.jpg,.jpeg) Maximum 2MB</span></label>
-                            <input type="file" name="file" id="file" class="form-control"
+                            <label for="file" class="text-light">File <small
+                                    class="text-light">(.svg,.png,.jpg,.jpeg) Maximum 2MB</small></label>
+                            <input type="file" name="file" id="file" class="form-control chat_area_bg"
                                    accept=".svg,.png,.jpg,.jpeg"/>
                         </div>
                         <br/>
@@ -117,8 +119,8 @@
                         </div>
                     </form>
                 </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                <div class="modal-footer chat_bg">
+                    <button type="button" class="btn chat_area_bg" data-bs-dismiss="modal">Close</button>
                 </div>
             </div>
         </div>
