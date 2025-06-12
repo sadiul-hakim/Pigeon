@@ -16,6 +16,17 @@ spring:
     open-in-view: false
   session:
     timeout: 7d
+  web:
+    resources:
+      chain:
+        enabled: true
+        strategy:
+          content:
+            enabled: true
+            paths: /**
+      cache:
+        period: 7d
+
 
 server:
   port: 9093
