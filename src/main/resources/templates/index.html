@@ -1,5 +1,5 @@
 <!doctype html>
-<html lang="en" xmlns:th="https://www.thymeleaf.org">
+<html lang="en" xmlns:th="https://www.thymeleaf.org" xmlns:sec="https://www.thymeleaf.org/extras/spring-security">
 <head th:replace="~{fragments/head :: head(~{::title})}">
     <title>Home Page</title>
 </head>
@@ -24,7 +24,8 @@
                     Pigeon brings people together in a fast, reliable, and secure way. Dive into a new level of
                     communication where every conversation feels closer.
                 </p>
-                <a class="btn btn-warning" th:href="@{'/login_page'}">Let's Begin</a>
+                <a class="btn btn-warning" th:href="@{'/login_page'}" sec:authorize="!isAuthenticated()">Let's Begin</a>
+                <a class="btn btn-warning" th:href="@{'/chat'}" sec:authorize="isAuthenticated()">Start Chatting</a>
             </div>
             <div class="col-md-6">
                 <img alt="hero" th:src="@{'/images/Chatting.png'}" class="img-fluid" width="100%"/>
