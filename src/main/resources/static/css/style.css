@@ -178,3 +178,12 @@ input::placeholder {
     color: #818181 !important;
     opacity: 1;
 }
+
+#chatArea {
+    background-image: url("../images/bg.jpg");
+    background-position: center;
+    background-repeat: no-repeat;
+    background-attachment: fixed;
+    background-origin: border-box;
+    background-size: cover;
+}
