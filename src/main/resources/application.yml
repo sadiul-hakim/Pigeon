@@ -1,21 +1,26 @@
 spring:
   application:
     name: MvcChatApp
+    # Threading
   threads:
     virtual:
       enabled: true
+      # Database
   datasource:
     url: jdbc:postgresql://localhost:5432/chat_app
     driver-class-name: org.postgresql.Driver
     username: postgres
     password: hakim@123
 
+  # JPA Properties
   jpa:
     hibernate:
       ddl-auto: update
     open-in-view: false
+    # Session Properties
   session:
     timeout: 7d
+  # Caching resources
   web:
     resources:
       chain:
@@ -27,14 +32,16 @@ spring:
       cache:
         period: 7d
 
-
+# Server Properties
 server:
   port: 9093
+  # Compressing static resources
   compression:
     enabled: true
     min-response-size: 10KB
     mime-types: text/html, text/css, text/javascript, text/xml, application/font-woff, application/json, image/jpeg, image/png, image/svg+xml, video/mp4
 
+# Custom App properties
 default:
   user:
     image:
@@ -46,13 +53,14 @@ default:
   pagination:
     size: 100
 
+# logging properties
 logging:
   file:
     path: logs
   level:
     root: warn
 
-# Socket
+# Custom Socket properties
 app:
   socket:
     endpoint: /ws
