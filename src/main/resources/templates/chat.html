@@ -8,8 +8,8 @@
 <body class="dark_bg">
 <span class="hidden" th:text="${setup.user.email}" id="user"></span>
 <span class="hidden" th:text="${setup.selectedUser != null ? setup.selectedUser.email : ''}" id="toUser"></span>
-<div class="vh-100 overflow-hidden d-flex p-2 container-fluid">
-    <div class="row h-100 w-100 card chat_bg">
+<div class="vh-100 overflow-hidden d-flex container-fluid">
+    <div class="row h-100 w-100 card chat_bg mx-auto">
 
         <!--   Chat List  Stars   -->
         <div th:replace="~{components/chatList :: chatList(${setup})}"></div>
