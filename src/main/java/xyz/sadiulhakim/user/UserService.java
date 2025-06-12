@@ -85,6 +85,9 @@ public class UserService {
 
     public Optional<User> findById(UUID userId) {
 
+        if (userId == null)
+            return Optional.empty();
+
         Optional<User> user = userRepo.findById(userId);
         if (user.isEmpty()) {
             LOGGER.error("UserService.getById :: Could not find user {}", userId);
@@ -201,8 +204,8 @@ public class UserService {
 
         String userMessage = "you have removed " + toUserObj.getLastname() + " from your connection!";
         String toUserMessage = user.getLastname() + " has removed you from connection!";
-        eventPublisher.publishEvent(new ConnectionEvent(userMessage,  user.getId()));
-        eventPublisher.publishEvent(new ConnectionEvent(toUserMessage,  toUser));
+        eventPublisher.publishEvent(new ConnectionEvent(userMessage, user.getId()));
+        eventPublisher.publishEvent(new ConnectionEvent(toUserMessage, toUser));
         eventPublisher.publishEvent(new DeleteChatEvent(user, toUserObj));
 
         return "You successfully removed " + toUserObj.getLastname() + " from you connection!";
