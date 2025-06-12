@@ -5,48 +5,49 @@
 </head>
 <body>
 <nav th:replace="~{fragments/navbar :: navbar}"></nav>
-<main class="bg-white">
+<main class="chat_bg p-2">
     <section class="container">
         <div class="row">
             <div class="col-md-6 mt-4 pt-5">
-                <h1 class="text-warning my-2">Pigeon</h1>
+                <h1 class="chat_area_color my-2 fw-bold">Pigeon</h1>
                 <p class="lead">
                     Introducing
-                    <mark>Pigeon</mark>
+                    Pigeon
                     – a modern chat app designed to make communication seamless and enjoyable! With both one-on-one
                     messaging and vibrant group chat features,
-                    <mark>Pigeon</mark>
+                    Pigeon
                     lets you stay connected with friends, family, and colleagues effortlessly.
                     Enjoy smooth conversations with real-time messaging, media sharing, and customizable chat settings
                     to personalize your experience. Whether you're catching up privately or joining in group
                     discussions,
-                    <mark>Pigeon</mark>
+                    Pigeon
                     Pigeon brings people together in a fast, reliable, and secure way. Dive into a new level of
                     communication where every conversation feels closer.
                 </p>
-                <a class="btn btn-warning" th:href="@{'/login_page'}" sec:authorize="!isAuthenticated()">Let's Begin</a>
-                <a class="btn btn-warning" th:href="@{'/chat'}" sec:authorize="isAuthenticated()">Start Chatting</a>
+                <a class="btn chat_area_bg" th:href="@{'/login_page'}" sec:authorize="!isAuthenticated()">Let's
+                    Begin</a>
+                <a class="btn chat_area_bg" th:href="@{'/chat'}" sec:authorize="isAuthenticated()">Start Chatting</a>
             </div>
-            <div class="col-md-6">
-                <img alt="hero" th:src="@{'/images/Chatting.png'}" class="img-fluid" width="100%"/>
+            <div class="col-md-6 d-flex justify-content-end align-items-center">
+                <img alt="hero" th:src="@{'/images/chating.png'}" class="img-fluid" width="350" height="320"/>
             </div>
         </div>
-        <div class="row">
-            <div class="col-md-6">
-                <img alt="hero" th:src="@{'/images/group_chatting.png'}" class="img-fluid" width="100%"/>
+        <div class="row my-2">
+            <div class="col-md-6 d-flex justify-content-start align-items-center">
+                <img alt="hero" th:src="@{'/images/group.png'}" class="img-fluid" width="350" height="320"/>
             </div>
             <div class="col-md-6 pt-5">
-                <h1 class="text-warning my-2">Group Chatting</h1>
+                <h1 class="chat_area_color my-2 fw-bold">Group Chatting</h1>
                 <p class="lead">
                     Group chat in
-                    <mark>Pigeon</mark>
+                    Pigeon
                     provides a seamless way for users to connect and communicate with multiple people at once. This
                     feature allows users to create and join groups, share messages, images, and files, and engage in
                     real-time conversations. With an intuitive interface designed for ease of use, group chat supports
                     personalized notifications, message reactions, and typing indicators, making interactions lively and
                     engaging.
                     Additionally,
-                    <mark>Pigeon</mark>
+                    Pigeon
                     emphasizes security and privacy, ensuring that group messages are encrypted and accessible only to
                     authorized members, creating a safe and collaborative digital space for friends, family, and
                     colleagues.
@@ -55,7 +56,7 @@
         </div>
     </section>
 </main>
-<footer class="bg-dark">
+<footer class="chat_area_bg m-0">
     <div class="container">
         <div class="row p-2">
             <div class="col-md-6 text-center d-flex justify-content-center align-items-center">
@@ -80,7 +81,8 @@
                     <a href="https://x.com/SadiulHakim" target="_" class="text-white mx-2"><img
                             th:src="@{/icons/twitter-x.svg}" alt="x"/></a>
                     <a href="#" class="text-white mx-2"><img th:src="@{/icons/instagram.svg}" alt="instagram"/></a>
-                    <a href="https://www.linkedin.com/in/sadiul-hakim-709387233/" target="_" class="text-white mx-2"><img th:src="@{/icons/linkedin.svg}" alt="linkedin"/></a>
+                    <a href="https://www.linkedin.com/in/sadiul-hakim-709387233/" target="_"
+                       class="text-white mx-2"><img th:src="@{/icons/linkedin.svg}" alt="linkedin"/></a>
                 </div>
             </div>
         </div>
