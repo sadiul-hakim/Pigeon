@@ -9,7 +9,7 @@
                            aria-expanded="false">
                             <img th:src="@{/icons/list.svg}" alt="list" class="text-white" width="30" height="30"/>
                         </a>
-                        <ul class="dropdown-menu">
+                        <ul class="dropdown-menu chat_menu">
                             <li><a class="dropdown-item d-flex align-items-center" th:href="@{/user/profile}">
                                 <img th:src="@{/picture/user/{pic}(pic=${#authentication.principal.picture})}"
                                      alt="logged in user" class="icon-sm"/>

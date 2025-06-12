@@ -3,17 +3,17 @@
 <head th:replace="~{fragments/head :: head(~{::title})}" xmlns:sec="https://www.thymeleaf.org/extras/spring-security">
     <title>Chat Page</title>
 </head>
-<body class="bg-light">
+<body class="chat_bg">
 
 <div class="container mt-4">
     <div class="row">
-        <div class="col-md-10 mx card card-body p-3">
+        <div class="col-md-10 mx card card-body p-3 chat_area_bg">
             <div class="my-3">
-                <a th:href="@{/chat}" class="btn btn-warning">Back To Chat</a>
+                <a th:href="@{/chat}" class="btn chat_bg">Back To Chat</a>
             </div>
 
             <ul class="list-group list-group-flush">
-                <li class="list-group-item list-group-item-action list-group-item-light d-flex request_wrapper"
+                <li class="list-group-item list-group-item-action list-group-item-light d-flex request_wrapper chat_bg my-1"
                     th:each="req:${requests}"
                     th:attr="data-req=${req.id}"
                 >
@@ -31,10 +31,10 @@
                             <input type="hidden" th:name="${_csrf.parameterName}"
                                    th:value="${_csrf.token}" class="csrfField"/>
                             <input type="hidden" name="reqId" th:value="${req.id}" class="reqId"/>
-                            <button class="btn btn-warning acceptBtn">
+                            <button class="btn chat_area_bg acceptBtn">
                                 Accept
                             </button>
-                            <button class="btn btn-warning rejectBtn">
+                            <button class="btn btn-danger rejectBtn">
                                 Reject
                             </button>
                         </form>

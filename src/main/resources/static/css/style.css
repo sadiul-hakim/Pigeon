@@ -187,3 +187,19 @@ input::placeholder {
     background-origin: border-box;
     background-size: cover;
 }
+
+.chat_menu {
+    background-color: var(--p-primary-color) !important;
+}
+
+.chat_menu button,
+.chat_menu a {
+    color: white !important;
+}
+
+.chat_menu button:hover,
+.chat_menu li:hover,
+.chat_menu a:hover {
+    background-color: var(--p-secondary-color) !important;
+    color: white !important;
+}

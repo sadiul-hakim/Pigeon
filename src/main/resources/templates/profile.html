@@ -3,13 +3,13 @@
 <head th:replace="~{fragments/head :: head(~{::title})}">
     <title>Profile</title>
 </head>
-<body>
+<body class="chat_bg">
 <div class="container mt-4">
     <div class="row">
         <div class="col-md-10 mx-auto">
-            <div class="card p-3">
+            <div class="card p-3 chat_area_bg">
                 <div class="my-3">
-                    <a th:href="@{/chat}" class="btn btn-warning">Go Back To Chat</a>
+                    <a th:href="@{/chat}" class="btn chat_bg">Go Back To Chat</a>
                 </div>
                 <div class="d-flex justify-content-center align-items-center flex-column">
                     <div class="d-flex justify-content-center align-items-center flex-column">
@@ -18,8 +18,8 @@
                         <form th:action="@{/user/change_picture}" class="d-flex justify-content-between w-100"
                               method="post" enctype="multipart/form-data">
                             <input type="hidden" name="userId" th:value="${user.id}">
-                            <input type="file" name="photo" class="form-control" accept=".png,.svg,.jpg"/>
-                            <input type="submit" value="Change Picture" class="btn btn-warning ms-2">
+                            <input type="file" name="photo" class="form-control chat_bg" accept=".png,.svg,.jpg"/>
+                            <input type="submit" value="Change Picture" class="btn chat_bg ms-2">
                         </form>
                     </div>
                 </div>
@@ -29,13 +29,13 @@
                     <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}"/>
                     <div>
                         <label for="firstName"> First Name</label>
-                        <input type="text" placeholder="First Name" id="firstName" class="form-control" name="firstName"
+                        <input type="text" placeholder="First Name" id="firstName" class="form-control chat_bg" name="firstName"
                                th:field="*{firstname}"/>
                     </div>
                     <br/>
                     <div>
                         <label for="lastName">Last Name</label>
-                        <input type="text" placeholder="Last Name" id="lastName" class="form-control" name="lastName"
+                        <input type="text" placeholder="Last Name" id="lastName" class="form-control chat_bg" name="lastName"
                                th:field="*{lastname}"/>
                     </div>
                     <br/>
@@ -44,7 +44,7 @@
                         <input type="color" name="textColor" id="textColor" th:field="*{textColor}"/>
                     </div>
                     <br/>
-                    <input type="submit" value="Edit Profile" class="btn btn-warning">
+                    <input type="submit" value="Edit Profile" class="btn chat_bg">
                 </form>
             </div>
         </div>

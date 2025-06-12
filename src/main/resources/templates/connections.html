@@ -3,16 +3,16 @@
 <head th:replace="~{fragments/head :: head(~{::title})}" xmlns:sec="https://www.thymeleaf.org/extras/spring-security">
     <title>Connections Page</title>
 </head>
-<body class="bg-light">
+<body class="chat_bg">
 <div class="container mt-4">
     <div class="row">
-        <div class="col-md-10 mx card card-body p-3">
+        <div class="col-md-10 mx card card-body p-3 chat_area_bg">
             <div class="my-3">
-                <a th:href="@{/chat}" class="btn btn-warning">Back To Chat</a>
+                <a th:href="@{/chat}" class="btn chat_bg">Back To Chat</a>
             </div>
 
             <ul class="list-group list-group-flush">
-                <li class="list-group-item list-group-item-action list-group-item-light d-flex connection_wrapper"
+                <li class="list-group-item list-group-item-action list-group-item-light d-flex connection_wrapper chat_bg my-1"
                     th:each="user:${result.data}"
                     th:attr="data-user=${user.id}"
                 >
@@ -24,13 +24,13 @@
                                 <span th:text="${user.firstname}"></span>&nbsp;
                                 <span th:text="${user.lastname}"></span>
                             </h5>
-                            <small th:text="${user.email}" class="text-muted"></small>
+                            <small th:text="${user.email}"></small>
                         </div>
                         <form class="removeConnectionForm">
                             <input type="hidden" th:name="${_csrf.parameterName}"
                                    th:value="${_csrf.token}" class="csrfField"/>
                             <input type="hidden" name="userId" th:value="${user.id}" class="userId"/>
-                            <button type="submit" class="btn btn-warning">
+                            <button type="submit" class="btn chat_area_bg">
                                 Remove
                             </button>
                         </form>
