@@ -4,7 +4,6 @@ import java.util.UUID;
 
 public record ConnectionEvent(
         String message,
-        String eventName,
         UUID user
 ) {
 }

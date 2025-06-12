@@ -126,7 +126,7 @@ public class UserService {
         connectionRequestRepo.save(connectionRequest);
 
         String message = user.getFirstname() + " " + user.getLastname() + " sent you a connection request!";
-        eventPublisher.publishEvent(new ConnectionEvent(message, "connection-request-sent", toUser));
+        eventPublisher.publishEvent(new ConnectionEvent(message, toUser));
         return "Successfully sent connection Request to  " + toUserById.get().getLastname();
     }
 
@@ -174,7 +174,7 @@ public class UserService {
         connectionRequestRepo.delete(connectionRequest);
 
         String message = toUser.getLastname() + " has accepted your request!";
-        eventPublisher.publishEvent(new ConnectionEvent(message, "connection-request-sent", user.getId()));
+        eventPublisher.publishEvent(new ConnectionEvent(message, user.getId()));
         return "You accepted Connection Request from " + user.getLastname();
     }
 
@@ -199,8 +199,10 @@ public class UserService {
 
         userRepo.saveAll(List.of(user, toUserObj));
 
-        String message = user.getLastname() + " has removed you from connection!";
-        eventPublisher.publishEvent(new ConnectionEvent(message, "connection-request-sent", toUser));
+        String userMessage = "you have removed " + toUserObj.getLastname() + " from your connection!";
+        String toUserMessage = user.getLastname() + " has removed you from connection!";
+        eventPublisher.publishEvent(new ConnectionEvent(userMessage,  user.getId()));
+        eventPublisher.publishEvent(new ConnectionEvent(toUserMessage,  toUser));
         eventPublisher.publishEvent(new DeleteChatEvent(user, toUserObj));
 
         return "You successfully removed " + toUserObj.getLastname() + " from you connection!";
