@@ -1,7 +1,6 @@
 package xyz.sadiulhakim.notification;
 
 import lombok.RequiredArgsConstructor;
-import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -9,7 +8,6 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
-import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 
 import java.util.Collections;
 import java.util.List;
@@ -21,18 +19,10 @@ public class NotificationController {
 
     private final NotificationService notificationService;
 
-    @GetMapping(value = "/subscribe", produces = MediaType.TEXT_EVENT_STREAM_VALUE)
-    ResponseEntity<SseEmitter> subscribe() {
-        SseEmitter emitter = notificationService.subscribeCurrentUser();
-
-        return ResponseEntity.ok(emitter);
-    }
-
     @GetMapping("/page")
     String notificationPage(Model model) {
         List<Notification> notifications = notificationService.notificationsOfCurrentUser();
         model.addAttribute("notifications", notifications);
-
         return "notifications";
     }
 

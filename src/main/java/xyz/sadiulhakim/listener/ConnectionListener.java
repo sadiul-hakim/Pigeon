@@ -17,12 +17,9 @@ class ConnectionListener {
     @Async("taskExecutor")
     @EventListener
     void connectionEvent(ConnectionEvent event) {
-        Thread.ofVirtual().name("#NotificationSavingThread-", 0).start(() -> {
-            Notification notification = new Notification();
-            notification.setMessage(event.message());
-            notification.setUserId(event.user());
-            notificationService.save(notification);
-        });
-        notificationService.sendNotification(event.message(), event.eventName(), event.user());
+        Notification notification = new Notification();
+        notification.setMessage(event.message());
+        notification.setUserId(event.user());
+        notificationService.save(notification);
     }
 }

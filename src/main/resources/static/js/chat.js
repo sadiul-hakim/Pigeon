@@ -95,25 +95,20 @@ function showMessage(receivedMessage) {
 }
 
 function showOnConnectionList(newMessageElement) {
-    let p = document.createElement("p");
-
     const isHtml = /<\/?[a-z][\s\S]*>/i.test(newMessageElement.message);
-    if (isHtml) {
-        p.innerText = `Special Message`;
-        p.classList.add("text-primary")
-    } else {
-        p.innerText = newMessageElement.message.length <= 25 ?
-            newMessageElement.message :
-            newMessageElement.message.substring(0, 25) + "...";
-    }
-    p.classList.add("m-0", "small", "bold"); // Optional styling
-
     for (let child of chatList.children) {
         if (child.dataset.con === newMessageElement.user) {
             let anchor = child.querySelector("a");
-            let connectionText = anchor.querySelector("#connectionText");
+            let unseenText = anchor.querySelector("#unseenText");
 
-            connectionText.append(p);
+            if (isHtml) {
+                unseenText.innerText = `Special Message`;
+                unseenText.classList.add("text-primary")
+            } else {
+                unseenText.innerText = newMessageElement.message.length <= 25 ?
+                    newMessageElement.message :
+                    newMessageElement.message.substring(0, 25) + "...";
+            }
         }
     }
 }
