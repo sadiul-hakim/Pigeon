@@ -1,3 +1,14 @@
+:root {
+    --p-primary-color-2: #48425c;
+    --p-secondary-color-2: #312a43;
+    --p-primary-color: #2E3A46;
+    --p-secondary-color: #0B1A2A;
+    --p-primary-color-3: #b49168;
+    --p-secondary-color-3: #a45824;
+    --p-primary-color-1: #3B3F45;
+    --p-secondary-color-1: #123032;
+}
+
 @font-face {
     font-family: Overlock;
     src: url('/fonts/Overlock-Regular.ttf') format("truetype");
@@ -11,7 +22,7 @@
 }
 
 ::-webkit-scrollbar-track {
-    background: #4c4c6c; /* Remove background */
+    background: var(--p-secondary-color); /* Remove background */
 }
 
 ::-webkit-scrollbar-thumb {
@@ -20,10 +31,11 @@
     border: 3px solid transparent; /* Create spacing around the bar */
 }
 
+
 /* For other browsers (fallback if supported) */
 .scroll-container {
     scrollbar-width: thin;
-    scrollbar-color: #312a43 transparent; /* Bar color and transparent background */
+    scrollbar-color: var(--p-secondary-color) transparent; /* Bar color and transparent background */
 }
 
 body {
@@ -39,25 +51,25 @@ body {
     width: 400px;
     padding: 10px;
     border-radius: 4px;
-    background-color: #48425c !important;
+    background-color: var(--p-primary-color) !important;
 }
 
 .chat_area_color {
-    color: #312a43 !important;
+    color: var(--p-secondary-color) !important;
 }
 
 .chat_bg {
-    background-color: #48425c !important;
+    background-color: var(--p-primary-color) !important;
     color: white !important;
 }
 
 .chat_area_bg {
-    background-color: #312a43 !important;
+    background-color: var(--p-secondary-color) !important;
     color: white !important;
 }
 
 #chatList li:hover {
-    background-color: #312a43 !important;
+    background-color: var(--p-secondary-color) !important;
     color: white !important;
 }
 
