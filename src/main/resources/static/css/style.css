@@ -161,3 +161,8 @@ body {
 .remove_chat {
     cursor: pointer;
 }
+
+input::placeholder {
+    color: #818181 !important;
+    opacity: 1;
+}

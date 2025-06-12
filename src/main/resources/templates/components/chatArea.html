@@ -74,7 +74,13 @@
                 data-bs-target="#sendMessageModal"
         />
         <form class="d-flex flex-grow-1" id="chatForm">
-            <input type="text" class="form-control chat_bg" placeholder="message" name="message" id="message" required/>
+            <input
+                    type="text"
+                    class="form-control chat_bg"
+                    th:placeholder="'Say Something to '+${setup.selectedUser.lastname}"
+                    name="message" id="message" required
+                    title="Markdown is supported"
+            />
             <button class="btn chat_area_bg ms-1 text-light d-flex justify-content-center align-items-center">
                 <img th:src="@{/icons/send.svg}" alt="send"/>
             </button>
