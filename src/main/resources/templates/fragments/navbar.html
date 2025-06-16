@@ -18,7 +18,7 @@
                         <a class="nav-link active" aria-current="page" th:href="@{'/login_page'}">Login</a>
                     </li>
                 </th:block>
-                <li class="nav-item btn chat_bg">
+                <li class="nav-item btn chat_bg" sec:authorize="isAuthenticated()">
                     <a class="nav-link" aria-current="page" th:href="@{'/chat'}">Chat</a>
                 </li>
             </ul>

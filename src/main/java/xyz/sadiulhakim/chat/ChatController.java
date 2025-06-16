@@ -39,8 +39,8 @@ public class ChatController {
 
     @MessageMapping("/sent")
     ChatMessage sendMessage(
-            @Payload ChatMessage message
-    ) {
+            @Payload ChatMessage message) {
+
         chatService.sendMessage(message);
         return message;
     }
