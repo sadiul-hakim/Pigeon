@@ -180,12 +180,14 @@ input::placeholder {
 }
 
 #chatArea {
-    background-image: url("../images/bg.jpg");
+    /*background-image: url("../images/bg.jpg");*/
     background-position: center;
     background-repeat: no-repeat;
     background-attachment: fixed;
     background-origin: border-box;
     background-size: cover;
+    box-shadow: rgb(0 0 0) 1px 0 3px 0 inset, rgb(2 2 2 / 50%) 1px 0 4px 0 inset;
+    border: 1px solid #222;
 }
 
 .chat_menu {
@@ -202,4 +204,8 @@ input::placeholder {
 .chat_menu a:hover {
     background-color: var(--p-secondary-color) !important;
     color: white !important;
+}
+
+.remove_chat:hover{
+    background-color: var(--p-secondary-color) !important;
 }

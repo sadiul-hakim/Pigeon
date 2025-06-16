@@ -136,8 +136,10 @@ function createMessageElement(messageData) {
                         <img src="/icons/three-dots.svg" alt="send" class="dropdown-toggle"
                              data-bs-toggle="dropdown"
                              aria-expanded="false"/>
-                        <ul class="dropdown-menu">
-                            <li class="dropdown-item remove_chat" data-id="${messageData.id}">Remove</li>
+                        <ul class="dropdown-menu chat_bg">
+                            <li class="dropdown-item remove_chat chat_bg d-flex align-items-center" data-id="${messageData.id}">
+                            <img src="/icons/x-circle.svg" class="me-1" alt="x circle"/>
+                            Remove</li>
                         </ul>
                     </div>
                 </div>

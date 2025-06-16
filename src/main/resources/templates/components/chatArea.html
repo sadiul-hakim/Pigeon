@@ -42,11 +42,11 @@
                              data-bs-toggle="dropdown"
                              aria-expanded="false"/>
 
-                        <ul class="dropdown-menu">
+                        <ul class="dropdown-menu chat_bg">
                             <li
-                                    class="dropdown-item remove_chat"
+                                    class="dropdown-item remove_chat chat_bg d-flex align-items-center"
                                     th:data-id="${chat.id}"
-                            >Remove
+                            ><img th:src="@{/icons/x-circle.svg}" class="me-1" alt="x circle"/> Remove
                             </li>
                         </ul>
                     </div>
