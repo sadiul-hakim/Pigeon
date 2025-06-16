@@ -4,10 +4,14 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
+import org.springframework.security.config.annotation.web.configurers.HeadersConfigurer;
+import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.rememberme.JdbcTokenRepositoryImpl;
 import org.springframework.security.web.authentication.rememberme.PersistentTokenRepository;
+import org.springframework.security.web.csrf.CookieCsrfTokenRepository;
+import org.springframework.security.web.session.HttpSessionEventPublisher;
 
 import javax.sql.DataSource;
 
@@ -34,8 +38,39 @@ class SecurityConfig {
                 "/register"
         };
         return http
-                .authorizeHttpRequests(auth -> auth.requestMatchers(permittedEndpoints).permitAll())
-                .authorizeHttpRequests(auth -> auth.anyRequest().authenticated())
+                .csrf(csrf -> csrf
+                        .csrfTokenRepository(CookieCsrfTokenRepository.withHttpOnlyFalse())
+                )
+                .headers(headers -> headers
+                        .contentSecurityPolicy(csp -> csp
+                                .policyDirectives("""
+                                            default-src 'self';
+                                            script-src 'self';
+                                            style-src 'self' 'unsafe-inline';
+                                            img-src 'self' data:;
+                                            font-src 'self';
+                                            connect-src 'self';
+                                            object-src 'none';
+                                            base-uri 'self';
+                                            form-action 'self';
+                                        """)
+                        )
+                        .frameOptions(HeadersConfigurer.FrameOptionsConfig::deny)
+                        .httpStrictTransportSecurity(hsts -> hsts
+                                .includeSubDomains(true)
+                                .maxAgeInSeconds(31536000)
+                        )
+                )
+                .sessionManagement(session -> session
+                        .sessionCreationPolicy(SessionCreationPolicy.IF_REQUIRED)
+                        .maximumSessions(1)
+                        .maxSessionsPreventsLogin(false)
+                        .expiredUrl("/login_page?expired=true")
+                )
+                .authorizeHttpRequests(auth -> auth
+                        .requestMatchers(permittedEndpoints).permitAll()
+                        .anyRequest().authenticated()
+                )
                 .userDetailsService(userDetailsService)
                 .formLogin(login -> login
                         .loginPage("/login_page")
@@ -66,5 +101,10 @@ class SecurityConfig {
         repo.setDataSource(dataSource);
 //        repo.setCreateTableOnStartup(true); // Enable only once
         return repo;
+    }
+
+    @Bean
+    public HttpSessionEventPublisher httpSessionEventPublisher() {
+        return new HttpSessionEventPublisher();
     }
 }
