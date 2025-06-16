@@ -7,7 +7,7 @@
 </head>
 <body class="dark_bg">
 <span class="hidden" th:text="${setup.user.email}" id="user"></span>
-<span class="hidden" th:text="${setup.selectedUser != null ? setup.selectedUser.email : ''}" id="toUser"></span>
+<span class="hidden" th:text="${setup.selectedUser != null ? setup.selectedUser.email : ''}" id="selectedUser"></span>
 <div class="vh-100 overflow-hidden d-flex container-fluid">
     <div class="row h-100 w-100 card chat_bg mx-auto">
 
@@ -40,9 +40,8 @@
 </div>
 
 <!--Toast Ends-->
-
 </body>
 <script th:src="@{/js/sockjs.min.js}"></script>
 <script th:src="@{/js/stomp.min.js}"></script>
-<script th:src="@{/js/chat.js}"></script>
+<script th:src="@{/js/chat.js}" defer></script>
 </html>

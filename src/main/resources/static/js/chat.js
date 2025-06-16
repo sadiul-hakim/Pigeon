@@ -1,10 +1,11 @@
 const chatArea = document.getElementById("chatArea");
-let user = document.getElementById("user").textContent;
-let toUser = document.getElementById("toUser").textContent;
 let chatList = document.getElementById("chatList");
 let msg_tone = document.getElementById("msg-tone");
 
 document.addEventListener("DOMContentLoaded", function () {
+
+    let user = document.getElementById("user").textContent;
+    let selectedUser = document.getElementById("selectedUser").textContent;
 
     chatArea.scrollTop = chatArea.scrollHeight;
 
@@ -12,9 +13,7 @@ document.addEventListener("DOMContentLoaded", function () {
     let stompClient = Stomp.over(socket);
 
     // Receive sent message and show
-    stompClient.connect({
-        'ws-id': user
-    }, function (frame) {
+    stompClient.connect({}, function (frame) {
 
         // Subscribe to user-specific messages
         stompClient.subscribe('/user/queue/messages', function (message) {
@@ -32,8 +31,8 @@ document.addEventListener("DOMContentLoaded", function () {
 
         stompClient.send("/sent", {}, JSON.stringify({
             message: message,
-            user: user,
-            toUser: toUser
+            user: null,
+            toUser: selectedUser
         }));
 
         document.getElementById("message").value = "";
@@ -48,8 +47,8 @@ document.addEventListener("DOMContentLoaded", function () {
 
         const messageObject = {
             message: msg,
-            user: user,
-            toUser: toUser,
+            user: null,
+            toUser: selectedUser,
             fileName: null,
             fileContent: null
         };
@@ -77,50 +76,49 @@ document.addEventListener("DOMContentLoaded", function () {
         document.getElementById("msg").value = "";
         fileInput.value = "";
     });
-});
 
-function showMessage(receivedMessage) {
+    function showMessage(receivedMessage) {
 
-    // Create and append a new message element to the chat area
+        // Create and append a new message element to the chat area
 
-    if (receivedMessage.user === toUser || receivedMessage.user === user) {
-        let newMessageElement = createMessageElement(receivedMessage);
-        chatArea.appendChild(newMessageElement);
+        if (receivedMessage.user === selectedUser || receivedMessage.user === user) {
+            let newMessageElement = createMessageElement(receivedMessage);
+            chatArea.appendChild(newMessageElement);
 
-        // Auto-scroll to the latest message
-        chatArea.scrollTop = chatArea.scrollHeight;
-    } else {
-        showOnConnectionList(receivedMessage);
+            // Auto-scroll to the latest message
+            chatArea.scrollTop = chatArea.scrollHeight;
+        } else {
+            showOnConnectionList(receivedMessage);
+        }
     }
-}
 
-function showOnConnectionList(newMessageElement) {
-    const isHtml = /<\/?[a-z][\s\S]*>/i.test(newMessageElement.message);
-    for (let child of chatList.children) {
-        if (child.dataset.con === newMessageElement.user) {
-            let anchor = child.querySelector("a");
-            let unseenText = anchor.querySelector("#unseenText");
+    function showOnConnectionList(newMessageElement) {
+        const isHtml = /<\/?[a-z][\s\S]*>/i.test(newMessageElement.message);
+        for (let child of chatList.children) {
+            if (child.dataset.con === newMessageElement.user) {
+                let anchor = child.querySelector("a");
+                let unseenText = anchor.querySelector("#unseenText");
 
-            if (isHtml) {
-                unseenText.innerText = `Special Message`;
-                unseenText.classList.add("text-primary")
-            } else {
-                unseenText.innerText = newMessageElement.message.length <= 25 ?
-                    newMessageElement.message :
-                    newMessageElement.message.substring(0, 25) + "...";
+                if (isHtml) {
+                    unseenText.innerText = `Special Message`;
+                    unseenText.classList.add("text-primary")
+                } else {
+                    unseenText.innerText = newMessageElement.message.length <= 25 ?
+                        newMessageElement.message :
+                        newMessageElement.message.substring(0, 25) + "...";
+                }
             }
         }
     }
-}
 
-// Function to create a new message element for display
-function createMessageElement(messageData) {
+    // Function to create a new message element for display
+    function createMessageElement(messageData) {
 
-    const imageTag = messageData.fileName
-        ? `<img src="/picture/message/${messageData.fileName}" width="190" height="170" class="img-fluid clickable-image" alt="file" />`
-        : ''; // show nothing if no file
+        const imageTag = messageData.fileName
+            ? `<img src="/picture/message/${messageData.fileName}" width="190" height="170" class="img-fluid clickable-image" alt="file" />`
+            : ''; // show nothing if no file
 
-    const html = `
+        const html = `
         <div class="my-1 d-flex chat-wrapper" data-id="${messageData.id}">
             <img src="/picture/user/${messageData.userPicture}" alt="" class="icon-sm"/>
             <div class="ms-1 d-flex flex-column chat">
@@ -149,14 +147,15 @@ function createMessageElement(messageData) {
         </div>
     `.trim();
 
-    // Convert string HTML to a DOM element
-    const template = document.createElement('template');
-    template.innerHTML = html;
+        // Convert string HTML to a DOM element
+        const template = document.createElement('template');
+        template.innerHTML = html;
 
-    const element = template.content.firstElementChild;
-    element.querySelector("#message-content").innerHTML = messageData.message;
-    return element;
-}
+        const element = template.content.firstElementChild;
+        element.querySelector("#message-content").innerHTML = messageData.message;
+        return element;
+    }
+});
 
 // ------------------------------------ Delete Chat -------------------------------
 document.querySelectorAll('.remove_chat').forEach(function (item) {
