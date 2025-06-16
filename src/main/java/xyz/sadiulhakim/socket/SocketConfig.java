@@ -14,7 +14,6 @@ import org.springframework.web.socket.config.annotation.EnableWebSocketMessageBr
 import org.springframework.web.socket.config.annotation.StompEndpointRegistry;
 import org.springframework.web.socket.config.annotation.WebSocketMessageBrokerConfigurer;
 import org.springframework.web.socket.config.annotation.WebSocketTransportRegistration;
-import org.springframework.web.socket.server.support.DefaultHandshakeHandler;
 
 import java.util.List;
 
@@ -31,6 +30,12 @@ public class SocketConfig implements WebSocketMessageBrokerConfigurer {
     @Value("${app.socket.user_prefix:''}")
     private String userPrefix;
 
+    private final WebSocketAuthInterceptor authInterceptor;
+
+    public SocketConfig(WebSocketAuthInterceptor authInterceptor) {
+        this.authInterceptor = authInterceptor;
+    }
+
     @Override
     public boolean configureMessageConverters(List<MessageConverter> messageConverters) {
         MappingJackson2MessageConverter converter = new MappingJackson2MessageConverter();
@@ -42,7 +47,7 @@ public class SocketConfig implements WebSocketMessageBrokerConfigurer {
     @Override
     public void registerStompEndpoints(StompEndpointRegistry registry) {
         registry.addEndpoint(endpoint)
-                .setHandshakeHandler(new DefaultHandshakeHandler())
+                .addInterceptors(new AuthHandshakeInterceptor())
                 .withSockJS();
     }
 
@@ -73,6 +78,7 @@ public class SocketConfig implements WebSocketMessageBrokerConfigurer {
         SimpleAsyncTaskExecutor taskExecutor = new SimpleAsyncTaskExecutor();
         taskExecutor.setVirtualThreads(true);
         registration.executor(taskExecutor);
+        registration.interceptors(authInterceptor);
     }
 
     @Override

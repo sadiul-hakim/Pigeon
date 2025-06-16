@@ -10,6 +10,8 @@ import org.springframework.web.bind.annotation.*;
 import xyz.sadiulhakim.chat.pojo.ChatMessage;
 import xyz.sadiulhakim.chat.pojo.ChatSetup;
 
+import java.nio.file.AccessDeniedException;
+import java.security.Principal;
 import java.util.Map;
 import java.util.UUID;
 
@@ -39,8 +41,12 @@ public class ChatController {
 
     @MessageMapping("/sent")
     ChatMessage sendMessage(
-            @Payload ChatMessage message) {
+            @Payload ChatMessage message, Principal principal) throws AccessDeniedException {
+        if (principal == null) {
+            throw new AccessDeniedException("Unauthorized!");
+        }
 
+        message.setUser(principal.getName());
         chatService.sendMessage(message);
         return message;
     }
