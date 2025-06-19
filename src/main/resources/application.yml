@@ -50,6 +50,13 @@ default:
   message:
     image:
       folder: /message/
+  group:
+    image:
+      folder: /group/
+      name: group.png
+    message:
+      image:
+        folder: /group/message/
   pagination:
     size: 100
 

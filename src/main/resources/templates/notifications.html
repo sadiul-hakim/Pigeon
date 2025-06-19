@@ -60,7 +60,7 @@
 
                 let request = await fetch(`/notification/delete?id=${id}`, {
                     headers: {
-                        'X-CSRF-TOKEN': csrfToken
+                        'X-XSRF-TOKEN': csrfToken
                     }
                 });
 
