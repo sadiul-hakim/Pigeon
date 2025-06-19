@@ -10,6 +10,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 import xyz.sadiulhakim.chat.pojo.ChatMessage;
 import xyz.sadiulhakim.chat.pojo.ChatSetup;
+import xyz.sadiulhakim.group.ChatGroup;
+import xyz.sadiulhakim.group.service.ChatGroupService;
 import xyz.sadiulhakim.notification.NotificationService;
 import xyz.sadiulhakim.user.User;
 import xyz.sadiulhakim.user.UserService;
@@ -33,18 +35,21 @@ public class ChatService {
     private final NotificationService notificationService;
     private final SimpMessagingTemplate messagingTemplate;
     private final AppProperties appProperties;
+    private final ChatGroupService chatGroupService;
 
     public ChatSetup getChatSetup(UUID toUser) {
 
+        // Validate user
         SecurityContext context = SecurityContextHolder.getContext();
         Authentication authentication = context.getAuthentication();
-
         if (authentication == null || authentication.getName() == null) {
             return new ChatSetup();
         }
 
         User user = userService.findByEmail(authentication.getName());
         UserDTO userDTO = userService.convertToDto(user);
+
+        // Add connections
         List<UUID> connectedUsers = user.getConnectedUsers();
         List<UserDTO> connections = userService.findAllUserConnections(connectedUsers);
         for (UserDTO connection : connections) {
@@ -57,6 +62,7 @@ public class ChatService {
         chatSetup.setConnections(connections);
         chatSetup.setNotifications(notificationService.countByUser(user.getId()));
 
+        // Add selected user
         if (connections.isEmpty()) {
             chatSetup.setSelectedUser(null);
         } else if (toUser == null) {
@@ -73,6 +79,10 @@ public class ChatService {
         } else {
             chatSetup.setInitialChat(new ArrayList<>());
         }
+
+        // Add groups
+        List<ChatGroup> groups = chatGroupService.joinedGroups(user.getId());
+        chatSetup.setGroups(groups);
 
         return chatSetup;
     }

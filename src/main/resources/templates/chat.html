@@ -40,6 +40,89 @@
 </div>
 
 <!--Toast Ends-->
+
+
+<!--Group Modal Stars -->
+<div class="modal fade" id="groupModal" tabindex="-1" aria-labelledby="groupModalLabel"
+     aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header chat_bg">
+                <h1 class="modal-title fs-5 text-light d-flex align-items-center" id="groupModalLabel"><img
+                        th:src="@{/icons/group.svg}" class="me-1" alt="message"/> Create New Group</h1>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body chat_bg">
+                <form id="groupForm">
+                    <div>
+                        <label for="name" class="text-light">Name</label>
+                        <input type="text" name="name" id="name" class="form-control chat_area_bg" required/>
+                    </div>
+                    <br/>
+                    <div>
+                        <button class="btn chat_area_bg ms-1 text-light d-flex justify-content-center align-items-center">
+                            Create
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+<!--Modal Ends-->
+
+<!--Modal Stars -->
+<div class="modal fade" id="sendMessageModal" tabindex="-1" aria-labelledby="sendMessageModalLabel"
+     aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header chat_bg">
+                <h1 class="modal-title fs-5 text-light d-flex align-items-center" id="sendMessageModalLabel"><img
+                        th:src="@{/icons/message.svg}" class="me-1" alt="message"/> Send Message</h1>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body chat_bg">
+                <form id="chatFormWithFile">
+                    <div>
+                        <label for="msg" class="text-light">Message</label>
+                        <textarea rows="3" name="msg" id="msg" class="form-control chat_area_bg"
+                                  required></textarea>
+                    </div>
+                    <br/>
+                    <div>
+                        <label for="file" class="text-light">File <small
+                                class="text-light">(.svg,.png,.jpg,.jpeg) Maximum 2MB</small></label>
+                        <input type="file" name="file" id="file" class="form-control chat_area_bg"
+                               accept=".svg,.png,.jpg,.jpeg"/>
+                    </div>
+                    <br/>
+                    <div>
+                        <button class="btn chat_area_bg ms-1 text-light d-flex justify-content-center align-items-center">
+                            <img th:src="@{/icons/send.svg}" alt="send" width="20" height="20"/>
+                        </button>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer chat_bg">
+                <button type="button" class="btn chat_area_bg" data-bs-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
+</div>
+<!--Modal Ends-->
+<!--Image Modal Stars-->
+<div class="modal fade" id="imageModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered modal-lg">
+        <div class="modal-content bg-dark">
+            <div class="modal-body p-0">
+                <img src="" id="modalImage" class="img-fluid w-100" style="max-height: 90vh; object-fit: contain;"
+                     alt="Preview"/>
+            </div>
+        </div>
+    </div>
+</div>
+<!--Image Modal Ends-->
+
 </body>
 <script th:src="@{/js/sockjs.min.js}"></script>
 <script th:src="@{/js/stomp.min.js}"></script>

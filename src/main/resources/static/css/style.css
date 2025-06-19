@@ -209,3 +209,12 @@ input::placeholder {
 .remove_chat:hover{
     background-color: var(--p-secondary-color) !important;
 }
+
+.border_bottom{
+    border: none;
+    border-bottom: 1px solid var(--p-secondary-color);
+}
+
+#chatTab .nav-link.active {
+    color: var(--p-secondary-color) !important;
+}

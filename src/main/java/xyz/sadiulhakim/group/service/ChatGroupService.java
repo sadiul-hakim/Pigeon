@@ -15,6 +15,8 @@ import xyz.sadiulhakim.user.UserService;
 import xyz.sadiulhakim.util.AppProperties;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -182,4 +184,8 @@ public class ChatGroupService {
         return "Successfully left the group.";
     }
 
+    public List<ChatGroup> joinedGroups(UUID user) {
+        List<GroupMember> memberships = groupMemberRepository.findByUserId(user);
+        return memberships.stream().map(GroupMember::getGroup).toList();
+    }
 }
