@@ -218,3 +218,9 @@ input::placeholder {
 #chatTab .nav-link.active {
     color: var(--p-secondary-color) !important;
 }
+
+#groupList li:hover,
+#groupList li:active{
+    background-color: var(--p-secondary-color) !important;
+    color: white !important;
+}

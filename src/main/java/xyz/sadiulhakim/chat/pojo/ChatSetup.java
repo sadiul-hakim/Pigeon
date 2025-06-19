@@ -5,6 +5,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import xyz.sadiulhakim.chat.Chat;
+import xyz.sadiulhakim.chat.enumeration.ChatArea;
 import xyz.sadiulhakim.group.ChatGroup;
 import xyz.sadiulhakim.user.pojo.UserDTO;
 
@@ -23,4 +24,6 @@ public class ChatSetup {
     private List<Chat> initialChat = new ArrayList<>();
     private long notifications;
     private List<ChatGroup> groups;
+    private ChatArea area;
+    private ChatGroup selectedGroup;
 }

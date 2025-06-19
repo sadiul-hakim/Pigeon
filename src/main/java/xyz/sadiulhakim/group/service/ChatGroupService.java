@@ -7,6 +7,7 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import xyz.sadiulhakim.group.ChatGroup;
 import xyz.sadiulhakim.group.GroupMember;
+import xyz.sadiulhakim.group.GroupMemberId;
 import xyz.sadiulhakim.group.enumeration.GroupMemberRole;
 import xyz.sadiulhakim.group.repository.ChatGroupRepository;
 import xyz.sadiulhakim.group.repository.GroupMemberRepository;
@@ -15,7 +16,6 @@ import xyz.sadiulhakim.user.UserService;
 import xyz.sadiulhakim.util.AppProperties;
 
 import java.time.LocalDateTime;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
@@ -52,6 +52,7 @@ public class ChatGroupService {
         groupMember.setUser(user);
         groupMember.setJoinedAt(LocalDateTime.now());
         groupMember.setRole(GroupMemberRole.OWNER);
+        groupMember.setId(new GroupMemberId(group.getId(),user.getId()));
         GroupMember member = groupMemberRepository.save(groupMember);
 
         // Set the member to the group

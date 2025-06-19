@@ -9,6 +9,7 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 import xyz.sadiulhakim.chat.pojo.ChatMessage;
 import xyz.sadiulhakim.chat.pojo.ChatSetup;
+import xyz.sadiulhakim.group.service.ChatGroupService;
 
 import java.nio.file.AccessDeniedException;
 import java.security.Principal;
@@ -22,19 +23,32 @@ public class ChatController {
 
     private final ChatService chatService;
 
+    private final ChatGroupService groupService;
+
+    @GetMapping("/create-group")
+    String createGroup(@RequestParam String name) {
+        groupService.create(name);
+        return "redirect:/chat";
+    }
+
     @GetMapping
     public String chatWithoutUser(Model model) {
 
         // Handle case when no user is provided
-        ChatSetup chatSetup = chatService.getChatSetup(null);
+        ChatSetup chatSetup = chatService.getChatSetup(null, null, null);
         model.addAttribute("setup", chatSetup); // or some default
         return "chat";
     }
 
-    @GetMapping("/{toUser}")
-    public String chat(@PathVariable String toUser, Model model) {
-        UUID userId = UUID.fromString(toUser);
-        ChatSetup chatSetup = chatService.getChatSetup(userId);
+    @GetMapping("/{selectedUser}/{area}")
+    public String chat(
+            @PathVariable String selectedUser,
+            @PathVariable String selectedGroup,
+            @PathVariable String area, Model model
+    ) {
+        UUID userId = UUID.fromString(selectedUser);
+        UUID groupId = UUID.fromString(selectedGroup);
+        ChatSetup chatSetup = chatService.getChatSetup(userId, groupId, area);
         model.addAttribute("setup", chatSetup);
         return "chat";
     }

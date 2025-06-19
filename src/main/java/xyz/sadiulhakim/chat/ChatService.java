@@ -8,6 +8,7 @@ import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
+import xyz.sadiulhakim.chat.enumeration.ChatArea;
 import xyz.sadiulhakim.chat.pojo.ChatMessage;
 import xyz.sadiulhakim.chat.pojo.ChatSetup;
 import xyz.sadiulhakim.group.ChatGroup;
@@ -37,7 +38,7 @@ public class ChatService {
     private final AppProperties appProperties;
     private final ChatGroupService chatGroupService;
 
-    public ChatSetup getChatSetup(UUID toUser) {
+    public ChatSetup getChatSetup(UUID selectedUser, UUID selectedGroup, String area) {
 
         // Validate user
         SecurityContext context = SecurityContextHolder.getContext();
@@ -62,15 +63,39 @@ public class ChatService {
         chatSetup.setConnections(connections);
         chatSetup.setNotifications(notificationService.countByUser(user.getId()));
 
+
+        // Add groups
+        List<ChatGroup> groups = chatGroupService.joinedGroups(user.getId());
+        chatSetup.setGroups(groups);
+
+        // Set Area
+        ChatArea chatArea = ChatArea.of(area);
+        if (!StringUtils.hasText(area)) {
+            chatSetup.setArea(ChatArea.PEOPLE);
+        } else {
+            chatSetup.setArea(chatArea);
+        }
+
         // Add selected user
         if (connections.isEmpty()) {
             chatSetup.setSelectedUser(null);
-        } else if (toUser == null) {
+        } else if (selectedUser == null) {
             chatSetup.setSelectedUser(connections.getFirst());
         } else {
-            Optional<UserDTO> selectedUser = connections.stream()
-                    .filter(u -> u.getId().equals(toUser)).findFirst();
-            chatSetup.setSelectedUser(selectedUser.orElse(new UserDTO()));
+            Optional<UserDTO> selectedUserOpt = connections.stream()
+                    .filter(u -> u.getId().equals(selectedUser)).findFirst();
+            chatSetup.setSelectedUser(selectedUserOpt.orElse(new UserDTO()));
+        }
+
+        // Add selected group
+        if (groups.isEmpty()) {
+            chatSetup.setSelectedGroup(null);
+        } else if (selectedUser == null) {
+            chatSetup.setSelectedGroup(groups.getFirst());
+        } else {
+            Optional<ChatGroup> selectedGroupOpt = groups.stream()
+                    .filter(g -> g.getId().equals(selectedGroup)).findFirst();
+            chatSetup.setSelectedGroup(selectedGroupOpt.orElse(new ChatGroup()));
         }
 
         if (chatSetup.getSelectedUser() != null) {
@@ -79,10 +104,6 @@ public class ChatService {
         } else {
             chatSetup.setInitialChat(new ArrayList<>());
         }
-
-        // Add groups
-        List<ChatGroup> groups = chatGroupService.joinedGroups(user.getId());
-        chatSetup.setGroups(groups);
 
         return chatSetup;
     }

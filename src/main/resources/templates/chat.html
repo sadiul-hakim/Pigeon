@@ -41,7 +41,6 @@
 
 <!--Toast Ends-->
 
-
 <!--Group Modal Stars -->
 <div class="modal fade" id="groupModal" tabindex="-1" aria-labelledby="groupModalLabel"
      aria-hidden="true">
@@ -53,7 +52,7 @@
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             <div class="modal-body chat_bg">
-                <form id="groupForm">
+                <form id="groupForm" th:action="@{'/chat/create-group'}">
                     <div>
                         <label for="name" class="text-light">Name</label>
                         <input type="text" name="name" id="name" class="form-control chat_area_bg" required/>

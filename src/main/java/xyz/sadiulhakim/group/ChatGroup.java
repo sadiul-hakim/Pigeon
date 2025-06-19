@@ -4,6 +4,7 @@ import jakarta.persistence.*;
 import lombok.*;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
@@ -36,6 +37,10 @@ public class ChatGroup {
                 groupMember.getGroup() == null ||
                 groupMember.getUser() == null) {
             return;
+        }
+
+        if(getMembers() == null){
+            setMembers(new ArrayList<>());
         }
 
         getMembers().add(groupMember);
