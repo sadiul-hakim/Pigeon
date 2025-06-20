@@ -115,6 +115,7 @@ public class ChatGroupService {
         groupMember.setGroup(chatGroup.get());
         groupMember.setRole(GroupMemberRole.MEMBER);
         groupMember.setJoinedAt(LocalDateTime.now());
+        groupMember.setId(new GroupMemberId(groupId, candidate));
         groupMemberRepository.save(groupMember);
 
         return "Successfully added to the group.";

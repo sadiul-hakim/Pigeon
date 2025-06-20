@@ -33,4 +33,14 @@ public class GroupController {
         model.addFlashAttribute("groupActionMessage", message);
         return "redirect:/chat/" + groupId + "/" + "GROUP";
     }
+
+    @GetMapping("/add/{groupId}/{memberId}")
+    String addMember(@PathVariable String groupId, @PathVariable String memberId, RedirectAttributes model) {
+        UUID group = UUID.fromString(groupId);
+        UUID member = UUID.fromString(memberId);
+        String message = groupService.addToGroup(group, member);
+        model.addFlashAttribute("isGroupAction", true);
+        model.addFlashAttribute("groupActionMessage", message);
+        return "redirect:/chat/" + groupId + "/" + "GROUP";
+    }
 }

@@ -136,6 +136,43 @@
 
 <!-- Remove Member Toast Ends -->
 
+<!--Add User Canvas Starts-->
+<div class="offcanvas offcanvas-start chat_bg" tabindex="-1" id="addUserCanvas" aria-labelledby="addUserCanvasLabel">
+    <div class="offcanvas-header">
+        <h5 class="offcanvas-title" id="addUserCanvasLabel">
+            Add Member
+        </h5>
+        <button type="button" class="btn-close" data-bs-dismiss="offcanvas" aria-label="Close"></button>
+    </div>
+    <div class="offcanvas-body">
+        <ul class="list-group list-group-flush">
+            <li class="list-group-item list-group-item-action list-group-item-light d-flex connection_wrapper chat_area_bg my-1"
+                th:each="user:${setup.getConnections()}"
+                th:attr="data-user=${user.id}"
+            >
+                <img th:src="@{|/picture/user/${user.picture}|}"
+                     alt="user" class="icon-md me-2"/>
+                <div class="d-flex justify-content-between align-items-center w-100">
+                    <div class="d-flex flex-column">
+                        <h5>
+                            <span th:text="${user.firstname}"></span>&nbsp;
+                            <span th:text="${user.lastname}"></span>
+                        </h5>
+                        <small th:text="${user.email}"></small>
+                    </div>
+                    <a
+                            th:href="@{'/group/add/'+${setup.selectedGroup.id}+'/'+${user.id}}"
+                            class="btn chat_bg d-flex align-items-center"
+                            th:if="${setup.userMembershipInSelectedGroup.role.name().equals('OWNER') ||
+                                             setup.userMembershipInSelectedGroup.role.name().equals('ADMIN')}"
+                    ><img th:src="@{'/icons/person-add.svg'}" alt="plus member" class="me-1"/> Add</a>
+                </div>
+            </li>
+        </ul>
+    </div>
+</div>
+<!--Add User Canvas Ends-->
+
 </body>
 <script th:src="@{/js/sockjs.min.js}"></script>
 <script th:src="@{/js/stomp.min.js}"></script>
