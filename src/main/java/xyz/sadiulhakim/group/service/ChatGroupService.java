@@ -1,6 +1,7 @@
 package xyz.sadiulhakim.group.service;
 
 import lombok.RequiredArgsConstructor;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -10,6 +11,7 @@ import xyz.sadiulhakim.group.ChatGroup;
 import xyz.sadiulhakim.group.GroupMember;
 import xyz.sadiulhakim.group.GroupMemberId;
 import xyz.sadiulhakim.group.enumeration.GroupMemberRole;
+import xyz.sadiulhakim.group.event.GroupEvent;
 import xyz.sadiulhakim.group.repository.ChatGroupRepository;
 import xyz.sadiulhakim.group.repository.GroupMemberRepository;
 import xyz.sadiulhakim.user.User;
@@ -33,6 +35,7 @@ public class ChatGroupService {
     private final GroupMemberRepository groupMemberRepository;
     private final UserService userService;
     private final AppProperties appProperties;
+    private final ApplicationEventPublisher eventPublisher;
 
     public void create(String name) {
 
@@ -72,53 +75,79 @@ public class ChatGroupService {
         // Set the member to the group
         group.addMember(member);
         chatGroupRepository.save(group);
+
+        String message = "You created a group names " + name;
+        eventPublisher.publishEvent(new GroupEvent(message, user.getId()));
     }
 
-    public String addToGroup(UUID groupId, UUID candidate) {
-
-        // Check users validity
-        SecurityContext context = SecurityContextHolder.getContext();
-        Authentication authentication = context.getAuthentication();
-        User user = userService.findByEmail(authentication.getName());
-        if (user == null) {
+    public String addToGroup(UUID groupId, UUID candidateId) {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        if (authentication == null || !StringUtils.hasText(authentication.getName())) {
             return "Unauthenticated";
         }
 
-        // Check group validity
-        Optional<ChatGroup> chatGroup = chatGroupRepository.findById(groupId);
-        if (chatGroup.isEmpty()) {
-            return "Could not find the group!";
+        try (var executor = Executors.newVirtualThreadPerTaskExecutor()) {
+
+            // Run I/O tasks in parallel
+            Future<User> currentUserFuture = executor.submit(() -> userService.findByEmail(authentication.getName()));
+            Future<Optional<ChatGroup>> groupFuture = executor.submit(() -> chatGroupRepository.findById(groupId));
+            Future<Optional<User>> candidateFuture = executor.submit(() -> userService.findById(candidateId));
+
+            User currentUser = currentUserFuture.get();
+            Optional<ChatGroup> groupOpt = groupFuture.get();
+            Optional<User> candidateOpt = candidateFuture.get();
+
+            if (currentUser == null) {
+                return "Unauthenticated";
+            }
+
+            if (groupOpt.isEmpty()) {
+                return "Could not find the group!";
+            }
+
+            if (candidateOpt.isEmpty()) {
+                return "Could not find the candidate!";
+            }
+
+            ChatGroup group = groupOpt.get();
+            User candidate = candidateOpt.get();
+
+            // Check current user's membership
+            Optional<GroupMember> currentMembershipOpt =
+                    groupMemberRepository.findByGroupIdAndUserId(groupId, currentUser.getId());
+
+            if (currentMembershipOpt.isEmpty()) {
+                return "You are not a member of this group!";
+            }
+
+            GroupMember currentMembership = currentMembershipOpt.get();
+            GroupMemberRole role = currentMembership.getRole();
+
+            if (role != GroupMemberRole.OWNER && role != GroupMemberRole.ADMIN) {
+                return "You are not allowed to add anyone to the group!";
+            }
+
+            // Create and save new group member
+            GroupMember newMember = new GroupMember();
+            newMember.setId(new GroupMemberId(groupId, candidateId));
+            newMember.setUser(candidate);
+            newMember.setGroup(group);
+            newMember.setAddedBy(currentUser);
+            newMember.setRole(GroupMemberRole.MEMBER);
+            newMember.setJoinedAt(LocalDateTime.now());
+
+            groupMemberRepository.save(newMember);
+
+            executor.submit(() -> {
+                String message = currentUser.getFirstname() + " " + currentUser.getLastname() + " has added you to group " + group.getName();
+                eventPublisher.publishEvent(new GroupEvent(message, candidateId));
+            });
+
+            return "Successfully added to the group.";
+        } catch (InterruptedException | ExecutionException e) {
+            Thread.currentThread().interrupt();
+            return "Failed to add member due to internal error.";
         }
-
-        // Check candidate validity
-        Optional<User> candidateOpt = userService.findById(candidate);
-        if (candidateOpt.isEmpty()) {
-            return "Could not find the candidate!";
-        }
-
-        // Check member validity
-        Optional<GroupMember> addingPersonOpt = groupMemberRepository.findByGroupIdAndUserId(groupId, user.getId());
-        if (addingPersonOpt.isEmpty()) {
-            return "You are not a member of this group!";
-        }
-
-        // Check users role
-        GroupMember addingPerson = addingPersonOpt.get();
-        if (!(addingPerson.getRole().equals(GroupMemberRole.OWNER) ||
-                addingPerson.getRole().equals(GroupMemberRole.ADMIN))) {
-            return "You are not allowed to add anyone to the group!";
-        }
-
-        GroupMember groupMember = new GroupMember();
-        groupMember.setUser(candidateOpt.get());
-        groupMember.setAddedBy(user);
-        groupMember.setGroup(chatGroup.get());
-        groupMember.setRole(GroupMemberRole.MEMBER);
-        groupMember.setJoinedAt(LocalDateTime.now());
-        groupMember.setId(new GroupMemberId(groupId, candidate));
-        groupMemberRepository.save(groupMember);
-
-        return "Successfully added to the group.";
     }
 
     public String removeFromGroup(UUID groupId, UUID candidateId) {
@@ -181,7 +210,12 @@ public class ChatGroupService {
             chatGroupRepository.save(group);
 
             // 5. Delete orphaned membership
-            groupMemberRepository.delete(targetMembership);
+            executor.submit(() -> groupMemberRepository.delete(targetMembership));
+
+            executor.submit(() -> {
+                String message = currentUser.getFirstname() + " " + currentUser.getLastname() + " has removed you from group " + group.getName();
+                eventPublisher.publishEvent(new GroupEvent(message, candidateId));
+            });
 
             return "Successfully removed from the group.";
         } catch (InterruptedException | ExecutionException e) {

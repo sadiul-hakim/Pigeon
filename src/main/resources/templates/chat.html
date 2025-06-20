@@ -163,8 +163,9 @@
                     <a
                             th:href="@{'/group/add/'+${setup.selectedGroup.id}+'/'+${user.id}}"
                             class="btn chat_bg d-flex align-items-center"
-                            th:if="${setup.userMembershipInSelectedGroup.role.name().equals('OWNER') ||
-                                             setup.userMembershipInSelectedGroup.role.name().equals('ADMIN')}"
+                            th:if="${setup.area.name().equals('GROUP')
+                            && (setup.userMembershipInSelectedGroup.role.name().equals('OWNER') ||
+                                             setup.userMembershipInSelectedGroup.role.name().equals('ADMIN'))}"
                     ><img th:src="@{'/icons/person-add.svg'}" alt="plus member" class="me-1"/> Add</a>
                 </div>
             </li>

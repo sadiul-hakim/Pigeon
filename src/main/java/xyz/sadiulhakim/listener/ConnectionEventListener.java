@@ -10,13 +10,16 @@ import xyz.sadiulhakim.user.event.ConnectionEvent;
 
 @Component
 @RequiredArgsConstructor
-class ConnectionListener {
+class ConnectionEventListener {
 
     private final NotificationService notificationService;
 
     @Async("taskExecutor")
     @EventListener
     void connectionEvent(ConnectionEvent event) {
+
+        // Other Logic
+
         Notification notification = new Notification();
         notification.setMessage(event.message());
         notification.setUserId(event.user());
