@@ -52,7 +52,7 @@
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             <div class="modal-body chat_bg">
-                <form id="groupForm" th:action="@{'/chat/create-group'}">
+                <form id="groupForm" th:action="@{'/group/create'}">
                     <div>
                         <label for="name" class="text-light">Name</label>
                         <input type="text" name="name" id="name" class="form-control chat_area_bg" required/>
@@ -122,8 +122,31 @@
 </div>
 <!--Image Modal Ends-->
 
+<!-- Remove Member Toast Starts -->
+<div aria-live="polite" aria-atomic="true" class="position-fixed bottom-0 end-0 p-3" style="z-index: 9999">
+    <div th:if="${memberRemovalMessage}" class="toast show align-items-center text-white bg-primary border-0"
+         role="alert" id="memberRemovalMessageToast">
+        <div class="d-flex">
+            <div class="toast-body" th:text="${memberRemovalMessage}">You have a new message</div>
+            <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast"
+                    aria-label="Close"></button>
+        </div>
+    </div>
+</div>
+
+<!-- Remove Member Toast Ends -->
+
 </body>
 <script th:src="@{/js/sockjs.min.js}"></script>
 <script th:src="@{/js/stomp.min.js}"></script>
 <script th:src="@{/js/chat.js}" defer></script>
+<script>
+    window.addEventListener('DOMContentLoaded', () => {
+        const toastEl = document.querySelector('#memberRemovalMessageToast');
+        if (toastEl) {
+            const toast = new bootstrap.Toast(toastEl, {delay: 5000});
+            toast.show();
+        }
+    });
+</script>
 </html>

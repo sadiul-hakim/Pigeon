@@ -15,13 +15,15 @@ import xyz.sadiulhakim.group.repository.GroupMemberRepository;
 import xyz.sadiulhakim.user.User;
 import xyz.sadiulhakim.user.UserService;
 import xyz.sadiulhakim.util.AppProperties;
-import xyz.sadiulhakim.util.FileUtil;
 import xyz.sadiulhakim.util.SecureTextGenerator;
 
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
 
 @Service
 @RequiredArgsConstructor
@@ -118,51 +120,75 @@ public class ChatGroupService {
         return "Successfully added to the group.";
     }
 
-    public String removeFromGroup(UUID groupId, UUID candidate) {
+    public String removeFromGroup(UUID groupId, UUID candidateId) {
 
-        // Check users validity
-        SecurityContext context = SecurityContextHolder.getContext();
-        Authentication authentication = context.getAuthentication();
-        User user = userService.findByEmail(authentication.getName());
-        if (user == null) {
+        // 1. Authenticated user
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        if (authentication == null || !StringUtils.hasText(authentication.getName()) || candidateId == null) {
             return "Unauthenticated";
         }
 
-        // Check group validity
-        Optional<ChatGroup> chatGroup = chatGroupRepository.findById(groupId);
-        if (chatGroup.isEmpty()) {
-            return "Could not find the group!";
+        // 2. Parallel load user and group
+        try (var executor = Executors.newVirtualThreadPerTaskExecutor()) {
+            Future<User> userFuture = executor.submit(() -> userService.findByEmail(authentication.getName()));
+            Future<Optional<ChatGroup>> groupFuture = executor.submit(() -> chatGroupRepository.findById(groupId));
+
+            User currentUser = userFuture.get();
+            Optional<ChatGroup> chatGroupOpt = groupFuture.get();
+
+            if (currentUser == null) {
+                return "Unauthenticated";
+            }
+
+            if (currentUser.getId().equals(candidateId)) {
+                return "You can not remove yourself";
+            }
+
+            if (chatGroupOpt.isEmpty()) {
+                return "Could not find the group!";
+            }
+
+            ChatGroup group = chatGroupOpt.get();
+
+            // 3. Fetch both memberships in parallel
+            Future<Optional<GroupMember>> currentMembershipFuture = executor.submit(() ->
+                    groupMemberRepository.findByGroupIdAndUserId(groupId, currentUser.getId()));
+            Future<Optional<GroupMember>> targetMembershipFuture = executor.submit(() ->
+                    groupMemberRepository.findByGroupIdAndUserId(groupId, candidateId));
+
+            Optional<GroupMember> currentMembershipOpt = currentMembershipFuture.get();
+            Optional<GroupMember> targetMembershipOpt = targetMembershipFuture.get();
+
+            if (currentMembershipOpt.isEmpty()) {
+                return "You are not a member of this group!";
+            }
+
+            GroupMember currentMembership = currentMembershipOpt.get();
+            if (currentMembership.getRole() != GroupMemberRole.OWNER &&
+                    currentMembership.getRole() != GroupMemberRole.ADMIN) {
+                return "You are not allowed to remove anyone from the group!";
+            }
+
+            if (targetMembershipOpt.isEmpty()) {
+                return "Could not find the member!";
+            }
+
+            GroupMember targetMembership = targetMembershipOpt.get();
+
+            // 4. Remove the member from the group
+            group.getMembers().removeIf(member -> member.getId().equals(targetMembership.getId()));
+            chatGroupRepository.save(group);
+
+            // 5. Delete orphaned membership
+            groupMemberRepository.delete(targetMembership);
+
+            return "Successfully removed from the group.";
+        } catch (InterruptedException | ExecutionException e) {
+            Thread.currentThread().interrupt();
+            return "Failed to remove member due to internal error.";
         }
-
-        // Check member validity
-        Optional<GroupMember> removingPersonOpt = groupMemberRepository.findByGroupIdAndUserId(groupId, user.getId());
-        if (removingPersonOpt.isEmpty()) {
-            return "You are not a member of this group!";
-        }
-
-        // Check users role
-        GroupMember addingPerson = removingPersonOpt.get();
-        if (!(addingPerson.getRole().equals(GroupMemberRole.OWNER) ||
-                addingPerson.getRole().equals(GroupMemberRole.ADMIN))) {
-            return "You are not allowed to remove anyone from the group!";
-        }
-
-        Optional<GroupMember> member = groupMemberRepository.findByGroupIdAndUserId(groupId, candidate);
-        if (member.isEmpty()) {
-            return "Could not find the member!";
-        }
-
-        GroupMember groupMember = member.get();
-        ChatGroup group = chatGroup.get();
-
-        // remove from group
-        group.getMembers().remove(groupMember);
-        chatGroupRepository.save(group);
-
-        // As this user is not in this group anymore. There is no need of this membership.
-        groupMemberRepository.delete(groupMember);
-        return "Successfully removed from the group.";
     }
+
 
     public String leaveGroup(UUID groupId) {
 

@@ -7,6 +7,7 @@ import lombok.Setter;
 import xyz.sadiulhakim.chat.Chat;
 import xyz.sadiulhakim.chat.enumeration.ChatArea;
 import xyz.sadiulhakim.group.ChatGroup;
+import xyz.sadiulhakim.group.GroupMember;
 import xyz.sadiulhakim.user.pojo.UserDTO;
 
 import java.util.ArrayList;
@@ -26,4 +27,5 @@ public class ChatSetup {
     private List<ChatGroup> groups;
     private ChatArea area;
     private ChatGroup selectedGroup;
+    private GroupMember userMembershipInSelectedGroup;
 }

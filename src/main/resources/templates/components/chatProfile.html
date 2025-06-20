@@ -74,14 +74,37 @@
                          data-bs-parent="#groupChatMembersAccordion">
                         <div class="accordion-body">
                             <ul class="list-group list-group-flush">
-                                <li class="list-group-item chat_bg d-flex" th:each="member : ${setup.selectedGroup.members}">
-                                    <img th:src="@{/picture/user/{pic}(pic=${member.user.picture})}"
-                                         th:alt="${setup.selectedGroup.name}"
-                                         class="icon-sm me-1"/>
-                                    <p th:style="'color:'+${member.user.getTextColor()}+'!important;'" class="mb-0">
-                                        <span th:text="${member.user.firstname}"></span>&nbsp;
-                                        <span th:text="${member.user.lastname}"></span>
-                                    </p>
+                                <li class="list-group-item chat_bg d-flex justify-content-between align-items-center"
+                                    th:each="member : ${setup.selectedGroup.members}">
+                                    <div class="d-flex align-items-center">
+                                        <img th:src="@{/picture/user/{pic}(pic=${member.user.picture})}"
+                                             th:alt="${setup.selectedGroup.name}"
+                                             class="icon-sm me-1"/>
+                                        <div class="d-flex flex-column">
+                                            <p th:style="'color:'+${member.user.getTextColor()}+'!important;'"
+                                               class="mb-0">
+                                                <span th:text="${member.user.firstname}"></span>&nbsp;
+                                                <span th:text="${member.user.lastname}"></span>
+                                            </p>
+                                            <small class="text-light-dark" th:text="${member.role}"></small>
+                                        </div>
+                                    </div>
+                                    <div class="dropdown">
+                                        <button class="btn btn-secondary dropdown-toggle d-flex justify-content-between align-items-center"
+                                                type="button"
+                                                data-bs-toggle="dropdown" aria-expanded="false">
+                                            <img alt="three dots" th:src="@{/icons/three-dots.svg}"/>
+                                        </button>
+                                        <ul class="dropdown-menu chat_bg">
+                                            <li th:if="${setup.userMembershipInSelectedGroup.role.name().equals('OWNER') ||
+                                             setup.userMembershipInSelectedGroup.role.name().equals('ADMIN')}">
+                                                <a class="dropdown-item chat_bg d-flex align-items-center hover_chat_bg"
+                                                   th:href="@{'/group/remove/'+${setup.selectedGroup.id}+'/'+${member.user.id}}">
+                                                    <img alt="x" th:src="@{/icons/x-circle.svg}" class="me-1"/> Remove
+                                                </a>
+                                            </li>
+                                        </ul>
+                                    </div>
                                 </li>
                             </ul>
                         </div>

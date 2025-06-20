@@ -12,6 +12,8 @@ import xyz.sadiulhakim.chat.enumeration.ChatArea;
 import xyz.sadiulhakim.chat.pojo.ChatMessage;
 import xyz.sadiulhakim.chat.pojo.ChatSetup;
 import xyz.sadiulhakim.group.ChatGroup;
+import xyz.sadiulhakim.group.GroupMember;
+import xyz.sadiulhakim.group.repository.GroupMemberRepository;
 import xyz.sadiulhakim.group.service.ChatGroupService;
 import xyz.sadiulhakim.notification.NotificationService;
 import xyz.sadiulhakim.user.User;
@@ -37,8 +39,9 @@ public class ChatService {
     private final SimpMessagingTemplate messagingTemplate;
     private final AppProperties appProperties;
     private final ChatGroupService chatGroupService;
+    private final GroupMemberRepository groupMemberRepository;
 
-    public ChatSetup getChatSetupV2(UUID selectedUser, UUID selectedGroup, String area) {
+    public ChatSetup getChatSetup(UUID selectedUser, UUID selectedGroup, String area) {
 
         // 1. Auth Validation
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
@@ -84,11 +87,16 @@ public class ChatService {
             );
 
             // 7. Set selected group
-            chatSetup.setSelectedGroup(
-                    ListUtil.findOrDefault(groups, selectedGroup, g -> g.getId().equals(selectedGroup), ChatGroup::new)
-            );
+            ChatGroup selectedGroupObj = ListUtil.findOrDefault(groups, selectedGroup, g -> g.getId().equals(selectedGroup), ChatGroup::new);
+            chatSetup.setSelectedGroup(selectedGroupObj);
 
-            // 8. Initial Chat (optional)
+            // 8. Current user membership to the selected group
+            if (selectedGroupObj != null) {
+                Optional<GroupMember> currentUserMemberShip = groupMemberRepository.findByGroupIdAndUserId(selectedGroupObj.getId(), userId);
+                chatSetup.setUserMembershipInSelectedGroup(currentUserMemberShip.orElse(new GroupMember()));
+            }
+
+            // 9. Initial Chat
             if (chatSetup.getSelectedUser() != null) {
                 List<Chat> chats = findAllChat(userId, chatSetup.getSelectedUser().getId());
                 chatSetup.setInitialChat(chats);

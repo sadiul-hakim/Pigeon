@@ -24,19 +24,11 @@ public class ChatController {
 
     private final ChatService chatService;
 
-    private final ChatGroupService groupService;
-
-    @GetMapping("/create-group")
-    String createGroup(@RequestParam String name) {
-        groupService.create(name);
-        return "redirect:/chat";
-    }
-
     @GetMapping
     public String chatWithoutUser(Model model) {
 
         // Handle case when no user is provided
-        ChatSetup chatSetup = chatService.getChatSetupV2(null, null, null);
+        ChatSetup chatSetup = chatService.getChatSetup(null, null, null);
         model.addAttribute("setup", chatSetup); // or some default
         return "chat";
     }
@@ -55,9 +47,9 @@ public class ChatController {
         // User can use only one area at a time.
         // Meaning either can send message personally or in group
         if (chatArea.equals(ChatArea.PEOPLE)) {
-            chatSetup = chatService.getChatSetupV2(itemId, null, area);
+            chatSetup = chatService.getChatSetup(itemId, null, area);
         } else if (chatArea.equals(ChatArea.GROUP)) {
-            chatSetup = chatService.getChatSetupV2(null, itemId, area);
+            chatSetup = chatService.getChatSetup(null, itemId, area);
         }
         model.addAttribute("setup", chatSetup);
         return "chat";
