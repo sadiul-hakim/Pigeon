@@ -5,6 +5,7 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
+import org.springframework.util.StringUtils;
 import xyz.sadiulhakim.group.ChatGroup;
 import xyz.sadiulhakim.group.GroupMember;
 import xyz.sadiulhakim.group.GroupMemberId;
@@ -14,6 +15,8 @@ import xyz.sadiulhakim.group.repository.GroupMemberRepository;
 import xyz.sadiulhakim.user.User;
 import xyz.sadiulhakim.user.UserService;
 import xyz.sadiulhakim.util.AppProperties;
+import xyz.sadiulhakim.util.FileUtil;
+import xyz.sadiulhakim.util.SecureTextGenerator;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -31,6 +34,10 @@ public class ChatGroupService {
 
     public void create(String name) {
 
+        if (!StringUtils.hasText(name)) {
+            return;
+        }
+
         // Check users validity
         SecurityContext context = SecurityContextHolder.getContext();
         Authentication authentication = context.getAuthentication();
@@ -44,6 +51,11 @@ public class ChatGroupService {
         chatGroup.setName(name);
         chatGroup.setCreatedAt(LocalDateTime.now());
         chatGroup.setPicture(appProperties.getGroupImageName());
+
+        String channelName = SecureTextGenerator.generateRandomText(10) + "_" +
+                name.trim().toLowerCase().replace(" ", "_");
+        chatGroup.setChannel(channelName);
+
         ChatGroup group = chatGroupRepository.save(chatGroup);
 
         // Now create a GroupMember for this user and add to the group as OWNER
@@ -52,7 +64,7 @@ public class ChatGroupService {
         groupMember.setUser(user);
         groupMember.setJoinedAt(LocalDateTime.now());
         groupMember.setRole(GroupMemberRole.OWNER);
-        groupMember.setId(new GroupMemberId(group.getId(),user.getId()));
+        groupMember.setId(new GroupMemberId(group.getId(), user.getId()));
         GroupMember member = groupMemberRepository.save(groupMember);
 
         // Set the member to the group

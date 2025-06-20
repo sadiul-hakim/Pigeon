@@ -1,26 +1,45 @@
 <div class="col-md-8 h-100 overflow-auto d-flex flex-column justify-content-center align-items-center border-right-1 "
-     th:if="${setup.selectedUser != null}" th:fragment="chatArea(setup)">
+     th:if="${setup.selectedUser != null || setup.selectedGroup != null}" th:fragment="chatArea(setup)">
     <div class="d-flex align-items-center p-2 w-100">
+
+        <!--    Chat Area Image Starts    -->
         <img th:src="@{/picture/user/{pic}(pic=${setup.selectedUser.picture})}"
              th:alt="${setup.selectedUser.lastname}"
-             class="icon-md"/>&nbsp;
-        <div class="d-flex flex-column ms-1">
-            <div>
-                <span class="fs-4" th:text="${setup.selectedUser.firstname}"></span>&nbsp;
-                <span class="fs-4" th:text="${setup.selectedUser.lastname}"></span>
-            </div>
-            <span
-                    class="text-light-dark"
-                    th:if="${setup.selectedUser.status == null || setup.selectedUser.status.name().equals('OFFLINE')}"
-                    th:text="${setup.selectedUser.lastSeenText}">
-            </span>
-            <span
-                    class="text-primary"
-                    th:if="${setup.selectedUser.status != null && setup.selectedUser.status.name().equals('ONLINE')}"
-                    th:text="${setup.selectedUser.status}">
-            </span>
+             class="icon-md" th:if="${setup.area.name().equals('PEOPLE')}"/>&nbsp;
+        <img th:src="@{/picture/group/{pic}(pic=${setup.selectedGroup.picture})}"
+             th:alt="${setup.selectedGroup.name}"
+             class="icon-md" th:if="${setup.area.name().equals('GROUP')}"/>&nbsp;
+        <!--    Chat Area Image Ends    -->
 
+        <!--    Chat Area Name and Date Starts    -->
+        <div class="d-flex flex-column ms-1">
+            <th:block th:if="${setup.area.name().equals('GROUP')}">
+                <div>
+                    <span class="fs-4" th:text="${setup.selectedGroup.name}"></span>
+                </div>
+                <p class="text-light-dark m-0">
+                    <span th:text="${setup.selectedGroup.members.size()}"></span>
+                    <span th:text="${setup.selectedGroup.members.size() > 1 ? 'Members' : 'Member'}"></span>
+                </p>
+            </th:block>
+            <th:block th:if="${setup.area.name().equals('PEOPLE')}">
+                <div>
+                    <span class="fs-4" th:text="${setup.selectedUser.firstname}"></span>&nbsp;
+                    <span class="fs-4" th:text="${setup.selectedUser.lastname}"></span>
+                </div>
+                <span
+                        class="text-light-dark"
+                        th:if="${(setup.selectedUser.status == null || setup.selectedUser.status.name().equals('OFFLINE'))}"
+                        th:text="${setup.selectedUser.lastSeenText}">
+                </span>
+                <span
+                        class="text-primary"
+                        th:if="${setup.selectedUser.status != null && setup.selectedUser.status.name().equals('ONLINE')}"
+                        th:text="${setup.selectedUser.status}">
+                </span>
+            </th:block>
         </div>
+        <!--    Chat Area Name and Date Ends    -->
     </div>
 
     <div class="flex-grow-1 p-3 chat_area_bg overflow-auto border-1 w-100" id="chatArea">

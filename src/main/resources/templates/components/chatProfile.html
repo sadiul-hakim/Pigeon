@@ -1,6 +1,8 @@
-<div class="col-md-2" th:if="${setup.selectedUser != null}" th:fragment="chatProfile(setup)">
+<div class="col-md-2" th:if="${setup.selectedUser != null || setup.selectedGroup != null}"
+     th:fragment="chatProfile(setup)">
     <div class="row mt-2">
-        <div class="col-md-12 d-flex flex-column justify-content-center align-items-center mt-5">
+        <div class="col-md-12 d-flex flex-column justify-content-center align-items-center mt-5"
+             th:if="${setup.area.name().equals('PEOPLE')}">
             <img th:src="@{/picture/user/{pic}(pic=${setup.selectedUser.picture})}"
                  th:alt="${setup.selectedUser.lastname}"
                  class="icon-lg"/>
@@ -10,10 +12,24 @@
             </p>
             <p th:text="${setup.selectedUser.getEmail()}" class="mt-2"></p>
         </div>
+        <div class="col-md-12 d-flex flex-column justify-content-center align-items-center mt-5"
+             th:if="${setup.area.name().equals('GROUP')}">
+            <img th:src="@{/picture/group/{pic}(pic=${setup.selectedGroup.picture})}"
+                 th:alt="${setup.selectedGroup.name}"
+                 class="icon-lg"/>
+            <p th:style="'color:'+${setup.selectedUser.getTextColor()}+'!important;'" class="mb-0">
+                <span class="fs-3" th:text="${setup.selectedGroup.name}"></span>&nbsp;
+            </p>
+            <p class="text-light-dark m-0 d-flex">
+                <span th:text="${setup.selectedGroup.members.size()}" class="me-1"></span>
+                <span th:text="${setup.selectedGroup.members.size() > 1 ? 'Members' : 'Member'}"></span>
+            </p>
+        </div>
     </div>
     <div class="row mt-2">
         <div class="col-12">
-            <div class="accordion accordion-flush" id="usersChatActionsAccordion">
+            <div class="accordion accordion-flush" id="usersChatActionsAccordion"
+                 th:if="${setup.area.name().equals('PEOPLE')}">
                 <div class="accordion-item chat_area_bg">
                     <h2 class="accordion-header">
                         <button class="accordion-button collapsed chat_area_bg" type="button" data-bs-toggle="collapse"
@@ -38,6 +54,34 @@
                                         <img th:src="@{/icons/person-x-fill.svg}" alt="remove connection" class="me-1"/>
                                         Remove Connection
                                     </a>
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="accordion accordion-flush" id="groupChatMembersAccordion"
+                 th:if="${setup.area.name().equals('GROUP')}">
+                <div class="accordion-item chat_area_bg">
+                    <h2 class="accordion-header">
+                        <button class="accordion-button collapsed chat_area_bg" type="button" data-bs-toggle="collapse"
+                                data-bs-target="#flush-collapseTwo" aria-expanded="false"
+                                aria-controls="flush-collapseTwo">
+                            Members
+                        </button>
+                    </h2>
+                    <div id="flush-collapseTwo" class="accordion-collapse collapse chat_area_bg"
+                         data-bs-parent="#groupChatMembersAccordion">
+                        <div class="accordion-body">
+                            <ul class="list-group list-group-flush">
+                                <li class="list-group-item chat_bg d-flex" th:each="member : ${setup.selectedGroup.members}">
+                                    <img th:src="@{/picture/user/{pic}(pic=${member.user.picture})}"
+                                         th:alt="${setup.selectedGroup.name}"
+                                         class="icon-sm me-1"/>
+                                    <p th:style="'color:'+${member.user.getTextColor()}+'!important;'" class="mb-0">
+                                        <span th:text="${member.user.firstname}"></span>&nbsp;
+                                        <span th:text="${member.user.lastname}"></span>
+                                    </p>
                                 </li>
                             </ul>
                         </div>

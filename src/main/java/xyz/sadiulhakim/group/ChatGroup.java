@@ -20,13 +20,16 @@ public class ChatGroup {
     @GeneratedValue(strategy = GenerationType.UUID)
     private UUID id;
 
-    @Column(length = 55)
+    @Column(length = 55, nullable = false)
     private String name;
+
+    @Column(length = 75, nullable = false)
+    private String channel;
 
     @Column(length = 100, nullable = false)
     private String picture;
 
-    @OneToMany(mappedBy = "group", cascade = CascadeType.ALL, orphanRemoval = true)
+    @OneToMany(mappedBy = "group", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.EAGER)
     private List<GroupMember> members;
 
     private LocalDateTime createdAt;
@@ -39,7 +42,7 @@ public class ChatGroup {
             return;
         }
 
-        if(getMembers() == null){
+        if (getMembers() == null) {
             setMembers(new ArrayList<>());
         }
 
