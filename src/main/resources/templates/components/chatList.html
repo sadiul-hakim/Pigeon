@@ -104,16 +104,25 @@
     <!-- Nav tabs -->
     <ul class="nav nav-tabs border_bottom" id="chatTab" role="tablist">
         <li class="nav-item" role="presentation">
-            <button class="nav-link active text-light bg-transparent border-0 fw-bold" id="people-tab"
+            <button
+                    class="nav-link text-light bg-transparent border-0 fw-bold"
+                    id="people-tab"
                     data-bs-toggle="tab" data-bs-target="#people"
-                    type="button" role="tab" aria-controls="people" aria-selected="true">
+                    type="button" role="tab" aria-controls="people" aria-selected="true"
+                    th:classappend="${setup.area.name().equals('PEOPLE') ? 'active' : ''}"
+            >
                 People
             </button>
         </li>
         <li class="nav-item" role="presentation">
-            <button class="nav-link text-light bg-transparent border-0 fw-bold" id="group-tab" data-bs-toggle="tab"
+            <button
+                    class="nav-link text-light bg-transparent border-0 fw-bold"
+                    id="group-tab"
+                    data-bs-toggle="tab"
                     data-bs-target="#group"
-                    type="button" role="tab" aria-controls="group" aria-selected="false">
+                    type="button" role="tab" aria-controls="group" aria-selected="false"
+                    th:classappend="${setup.area.name().equals('GROUP') ? 'active' : ''}"
+            >
                 Group
             </button>
         </li>
@@ -121,13 +130,18 @@
 
     <!-- Tab panes -->
     <div class="tab-content pt-3" id="myTabContent">
-        <div class="tab-pane fade show active" id="people" role="tabpanel" aria-labelledby="people-tab">
+        <div class="tab-pane fade"
+             id="people"
+             role="tabpanel"
+             aria-labelledby="people-tab"
+             th:classappend="${setup.area.name().equals('PEOPLE') ? 'show active' : ''}"
+        >
             <div id="chat_list" class="overflow-auto">
                 <ul class="list-group w-100 list-group-flush" id="chatList">
                     <li th:each="connection:${setup.connections}" class="list-group-item"
                         th:classappend="${setup.selectedUser.id.equals(connection.id) ? 'chat_area_bg' : 'chat_bg'}"
                         th:data-con="${connection.email}">
-                        <a th:href="@{'/chat/'+${connection.id}}"
+                        <a th:href="@{'/chat/'+${connection.id}+'/PEOPLE'}"
                            class="d-flex text-light text-decoration-none">
                             <img th:src="@{/picture/user/{pic}(pic=${connection.picture})}"
                                  th:alt="${connection.lastname}"
@@ -145,11 +159,17 @@
                 </ul>
             </div>
         </div>
-        <div class="tab-pane fade" id="group" role="tabpanel" aria-labelledby="group-tab">
+        <div class="tab-pane fade"
+             id="group"
+             role="tabpanel"
+             aria-labelledby="group-tab"
+             th:classappend="${setup.area.name().equals('GROUP') ? 'show active' : ''}"
+        >
             <div id="group_list" class="overflow-auto">
                 <ul class="list-group w-100 list-group-flush" id="groupList">
                     <li th:each="group:${setup.groups}" class="list-group-item chat_bg">
-                        <a class="d-flex text-light text-decoration-none">
+                        <a class="d-flex text-light text-decoration-none"
+                           th:href="@{'/chat/'+${group.id}+'/GROUP'}">
                             <img th:src="@{/picture/group/{pic}(pic=${group.picture})}"
                                  th:alt="${group.name}"
                                  class="icon-md"/>&nbsp;

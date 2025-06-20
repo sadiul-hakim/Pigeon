@@ -17,14 +17,14 @@ import xyz.sadiulhakim.notification.NotificationService;
 import xyz.sadiulhakim.user.User;
 import xyz.sadiulhakim.user.UserService;
 import xyz.sadiulhakim.user.pojo.UserDTO;
-import xyz.sadiulhakim.util.AppProperties;
-import xyz.sadiulhakim.util.DateUtil;
-import xyz.sadiulhakim.util.FileUtil;
-import xyz.sadiulhakim.util.MarkdownUtils;
+import xyz.sadiulhakim.util.*;
 
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.*;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
 
 @Slf4j
 @Service
@@ -38,75 +38,70 @@ public class ChatService {
     private final AppProperties appProperties;
     private final ChatGroupService chatGroupService;
 
-    public ChatSetup getChatSetup(UUID selectedUser, UUID selectedGroup, String area) {
+    public ChatSetup getChatSetupV2(UUID selectedUser, UUID selectedGroup, String area) {
 
-        // Validate user
-        SecurityContext context = SecurityContextHolder.getContext();
-        Authentication authentication = context.getAuthentication();
+        // 1. Auth Validation
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         if (authentication == null || authentication.getName() == null) {
-            return new ChatSetup();
+            return new ChatSetup(); // unauthenticated fallback
         }
 
-        User user = userService.findByEmail(authentication.getName());
-        UserDTO userDTO = userService.convertToDto(user);
+        try (var executor = Executors.newVirtualThreadPerTaskExecutor()) {
 
-        // Add connections
-        List<UUID> connectedUsers = user.getConnectedUsers();
-        List<UserDTO> connections = userService.findAllUserConnections(connectedUsers);
-        for (UserDTO connection : connections) {
-            String text = DateUtil.getLastSeenTime(connection.getLastSeen());
-            connection.setLastSeenText(text);
+            // 2. Run major I/O tasks in parallel virtual threads
+            Future<User> userFuture = executor.submit(() -> userService.findByEmail(authentication.getName()));
+
+            // Wait for user first, as we need their ID for other queries
+            User user = userFuture.get(); // Fast, safe on Loom virtual threads
+            UUID userId = user.getId();
+            List<UUID> connectedUsers = user.getConnectedUsers();
+
+            Future<List<UserDTO>> connectionsFuture = executor.submit(() -> userService.findAllUserConnections(connectedUsers));
+            Future<Long> notificationsFuture = executor.submit(() -> notificationService.countByUser(userId));
+            Future<List<ChatGroup>> groupsFuture = executor.submit(() -> chatGroupService.joinedGroups(userId));
+
+            // 3. Wait for results
+            List<UserDTO> connections = connectionsFuture.get();
+            long notifications = notificationsFuture.get();
+            List<ChatGroup> groups = groupsFuture.get();
+
+            // 4. Post-process connections
+            for (UserDTO connection : connections) {
+                connection.setLastSeenText(DateUtil.getLastSeenTime(connection.getLastSeen()));
+            }
+
+            // 5. Build ChatSetup
+            ChatSetup chatSetup = new ChatSetup();
+            chatSetup.setUser(userService.convertToDto(user));
+            chatSetup.setConnections(connections);
+            chatSetup.setNotifications(notifications);
+            chatSetup.setGroups(groups);
+            chatSetup.setArea(StringUtils.hasText(area) ? ChatArea.of(area) : ChatArea.PEOPLE);
+
+            // 6. Set selected user
+            chatSetup.setSelectedUser(
+                    ListUtil.findOrDefault(connections, selectedUser, u -> u.getId().equals(selectedUser), UserDTO::new)
+            );
+
+            // 7. Set selected group
+            chatSetup.setSelectedGroup(
+                    ListUtil.findOrDefault(groups, selectedGroup, g -> g.getId().equals(selectedGroup), ChatGroup::new)
+            );
+
+            // 8. Initial Chat (optional)
+            if (chatSetup.getSelectedUser() != null) {
+                List<Chat> chats = findAllChat(userId, chatSetup.getSelectedUser().getId());
+                chatSetup.setInitialChat(chats);
+            } else {
+                chatSetup.setInitialChat(Collections.emptyList());
+            }
+
+            return chatSetup;
+        } catch (InterruptedException | ExecutionException e) {
+            throw new RuntimeException("Failed to build chat setup", e);
         }
-
-        ChatSetup chatSetup = new ChatSetup();
-        chatSetup.setUser(userDTO);
-        chatSetup.setConnections(connections);
-        chatSetup.setNotifications(notificationService.countByUser(user.getId()));
-
-
-        // Add groups
-        List<ChatGroup> groups = chatGroupService.joinedGroups(user.getId());
-        chatSetup.setGroups(groups);
-
-        // Set Area
-        ChatArea chatArea = ChatArea.of(area);
-        if (!StringUtils.hasText(area)) {
-            chatSetup.setArea(ChatArea.PEOPLE);
-        } else {
-            chatSetup.setArea(chatArea);
-        }
-
-        // Add selected user
-        if (connections.isEmpty()) {
-            chatSetup.setSelectedUser(null);
-        } else if (selectedUser == null) {
-            chatSetup.setSelectedUser(connections.getFirst());
-        } else {
-            Optional<UserDTO> selectedUserOpt = connections.stream()
-                    .filter(u -> u.getId().equals(selectedUser)).findFirst();
-            chatSetup.setSelectedUser(selectedUserOpt.orElse(new UserDTO()));
-        }
-
-        // Add selected group
-        if (groups.isEmpty()) {
-            chatSetup.setSelectedGroup(null);
-        } else if (selectedUser == null) {
-            chatSetup.setSelectedGroup(groups.getFirst());
-        } else {
-            Optional<ChatGroup> selectedGroupOpt = groups.stream()
-                    .filter(g -> g.getId().equals(selectedGroup)).findFirst();
-            chatSetup.setSelectedGroup(selectedGroupOpt.orElse(new ChatGroup()));
-        }
-
-        if (chatSetup.getSelectedUser() != null) {
-            List<Chat> chats = findAllChat(chatSetup.getUser().getId(), chatSetup.getSelectedUser().getId());
-            chatSetup.setInitialChat(chats);
-        } else {
-            chatSetup.setInitialChat(new ArrayList<>());
-        }
-
-        return chatSetup;
     }
+
 
     public void sendMessage(ChatMessage message) {
 

@@ -7,6 +7,7 @@ import org.springframework.messaging.handler.annotation.Payload;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
+import xyz.sadiulhakim.chat.enumeration.ChatArea;
 import xyz.sadiulhakim.chat.pojo.ChatMessage;
 import xyz.sadiulhakim.chat.pojo.ChatSetup;
 import xyz.sadiulhakim.group.service.ChatGroupService;
@@ -35,20 +36,29 @@ public class ChatController {
     public String chatWithoutUser(Model model) {
 
         // Handle case when no user is provided
-        ChatSetup chatSetup = chatService.getChatSetup(null, null, null);
+        ChatSetup chatSetup = chatService.getChatSetupV2(null, null, null);
         model.addAttribute("setup", chatSetup); // or some default
         return "chat";
     }
 
-    @GetMapping("/{selectedUser}/{area}")
+    @GetMapping("/{selectedItem}/{area}")
     public String chat(
-            @PathVariable String selectedUser,
-            @PathVariable String selectedGroup,
-            @PathVariable String area, Model model
+            @PathVariable String selectedItem,
+            @PathVariable String area,
+            Model model
     ) {
-        UUID userId = UUID.fromString(selectedUser);
-        UUID groupId = UUID.fromString(selectedGroup);
-        ChatSetup chatSetup = chatService.getChatSetup(userId, groupId, area);
+        ChatSetup chatSetup = null;
+        ChatArea chatArea = ChatArea.of(area);
+        UUID itemId = UUID.fromString(selectedItem);
+        assert chatArea != null;
+
+        // User can use only one area at a time.
+        // Meaning either can send message personally or in group
+        if (chatArea.equals(ChatArea.PEOPLE)) {
+            chatSetup = chatService.getChatSetupV2(itemId, null, area);
+        } else if (chatArea.equals(ChatArea.GROUP)) {
+            chatSetup = chatService.getChatSetupV2(null, itemId, area);
+        }
         model.addAttribute("setup", chatSetup);
         return "chat";
     }
