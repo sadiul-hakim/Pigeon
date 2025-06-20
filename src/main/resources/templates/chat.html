@@ -124,10 +124,10 @@
 
 <!-- Remove Member Toast Starts -->
 <div aria-live="polite" aria-atomic="true" class="position-fixed bottom-0 end-0 p-3" style="z-index: 9999">
-    <div th:if="${memberRemovalMessage}" class="toast show align-items-center text-white bg-primary border-0"
-         role="alert" id="memberRemovalMessageToast">
+    <div th:if="${isGroupAction}" class="toast show align-items-center text-white bg-primary border-0"
+         role="alert" id="groupActionToast">
         <div class="d-flex">
-            <div class="toast-body" th:text="${memberRemovalMessage}">You have a new message</div>
+            <div class="toast-body" th:text="${groupActionMessage}">You have a new message</div>
             <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast"
                     aria-label="Close"></button>
         </div>
@@ -142,7 +142,7 @@
 <script th:src="@{/js/chat.js}" defer></script>
 <script>
     window.addEventListener('DOMContentLoaded', () => {
-        const toastEl = document.querySelector('#memberRemovalMessageToast');
+        const toastEl = document.querySelector('#groupActionToast');
         if (toastEl) {
             const toast = new bootstrap.Toast(toastEl, {delay: 5000});
             toast.show();

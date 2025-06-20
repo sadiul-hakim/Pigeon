@@ -29,7 +29,8 @@ public class GroupController {
         UUID group = UUID.fromString(groupId);
         UUID member = UUID.fromString(memberId);
         String message = groupService.removeFromGroup(group, member);
-        model.addFlashAttribute("memberRemovalMessage", message);
+        model.addFlashAttribute("isGroupAction", true);
+        model.addFlashAttribute("groupActionMessage", message);
         return "redirect:/chat/" + groupId + "/" + "GROUP";
     }
 }
