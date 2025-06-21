@@ -1,6 +1,25 @@
 `This project is written in In-memory STOMP broker. This is not raw websocket. Raw websocket does not have 
 structure. Everything is manual. Best performance can be produced by Raw WebSocket + Kafka. Second best 
-performance can be produced by STOMP + VT + RabbitMQ/Redis. Least performance can be produced by STOMP + VT (Current Setup).`
+performance can be produced by STOMP + VT + RabbitMQ/Redis (Current Setup). Least performance can be produced by STOMP + VT.`
+
+```
+Client (STOMP)
+    └──> /app/chat.send
+           └──> @MessageMapping
+                   └──> Redis Pub/Sub
+                          └──> RedisChatSubscriber
+                                └──> messagingTemplate.convertAndSendToUser(...)
+                                        └──> STOMP (outbound)
+                                               └──> Client receives message
+
+Client → /app/sent (via STOMP)
+       └─> @MessageMapping("/sent")
+             └─> sendMessage() → redisTemplate.convertAndSend("chat-message-channel", RedisMessage)
+
+All app nodes
+       └─> Redis listener receives message
+             └─> messagingTemplate.convertAndSendToUser(...) on each instance
+```
 
 # WebSocket
 

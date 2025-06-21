@@ -2,7 +2,7 @@ package xyz.sadiulhakim.chat;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.messaging.simp.SimpMessagingTemplate;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -11,6 +11,7 @@ import org.springframework.util.StringUtils;
 import xyz.sadiulhakim.chat.enumeration.ChatArea;
 import xyz.sadiulhakim.chat.pojo.ChatMessage;
 import xyz.sadiulhakim.chat.pojo.ChatSetup;
+import xyz.sadiulhakim.chat.pojo.RedisMessage;
 import xyz.sadiulhakim.group.ChatGroup;
 import xyz.sadiulhakim.group.GroupMember;
 import xyz.sadiulhakim.group.repository.GroupMemberRepository;
@@ -36,10 +37,10 @@ public class ChatService {
     private final ChatRepo chatRepo;
     private final UserService userService;
     private final NotificationService notificationService;
-    private final SimpMessagingTemplate messagingTemplate;
     private final AppProperties appProperties;
     private final ChatGroupService chatGroupService;
     private final GroupMemberRepository groupMemberRepository;
+    private final RedisTemplate<String, Object> redisTemplate;
 
     public ChatSetup getChatSetup(UUID selectedUser, UUID selectedGroup, String area) {
 
@@ -148,8 +149,12 @@ public class ChatService {
         // empty the content
         message.setFileContent("");
 
-        messagingTemplate.convertAndSendToUser(user.getEmail(), "/queue/messages", message);
-        messagingTemplate.convertAndSendToUser(toUser.getEmail(), "/queue/messages", message);
+        List<String> recipients = new ArrayList<>();
+        recipients.add(user.getEmail());
+        recipients.add(toUser.getEmail());
+
+        RedisMessage redisMessage = new RedisMessage(recipients, message);
+        redisTemplate.convertAndSend("chat-message-channel", redisMessage); // Publish message to redis
     }
 
     public Chat save(String message, String fileName, User user, User toUser, LocalDateTime now) {

@@ -31,6 +31,10 @@ spring:
             paths: /**
       cache:
         period: 7d
+  data:
+    redis:
+      host: localhost
+      port: 6379
 
 # Server Properties
 server:
