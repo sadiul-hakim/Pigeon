@@ -1,4 +1,4 @@
-<div class="col-md-7 h-100 overflow-auto d-flex flex-column justify-content-center align-items-center border-right-1 "
+<div class="col-md-7 h-100 overflow-auto d-flex flex-column justify-content-center align-items-center border-right-2"
      th:if="${setup.selectedUser != null || setup.selectedGroup != null}" th:fragment="chatArea(setup)">
     <div class="d-flex align-items-center p-2 w-100">
 
@@ -101,10 +101,12 @@
                     title="Markdown is supported"
             />
             <button class="btn chat_area_bg ms-1 text-light d-flex justify-content-center align-items-center"
+                    type="button"
                     data-bs-toggle="modal" data-bs-target="#speechModal" onclick="startRecognition()">
                 <img th:src="@{/icons/mic.svg}" alt="send"/>
             </button>
-            <button class="btn chat_area_bg ms-1 text-light d-flex justify-content-center align-items-center">
+            <button class="btn chat_area_bg ms-1 text-light d-flex justify-content-center align-items-center"
+                    type="submit">
                 <img th:src="@{/icons/send.svg}" alt="send"/>
             </button>
         </form>
