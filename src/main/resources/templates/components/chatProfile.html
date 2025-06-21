@@ -1,4 +1,4 @@
-<div class="col-md-2" th:if="${setup.selectedUser != null || setup.selectedGroup != null}"
+<div class="col-md-3" th:if="${setup.selectedUser != null || setup.selectedGroup != null}"
      th:fragment="chatProfile(setup)">
     <div class="row mt-2">
         <div class="col-md-12 d-flex flex-column justify-content-center align-items-center mt-5"
@@ -61,7 +61,7 @@
                 </div>
             </div>
             <th:block th:if="${setup.area.name().equals('GROUP')}">
-                <div class="accordion accordion-flush" id="groupChatMembersAccordion">
+                <div class="accordion accordion-flush my-1" id="groupChatMembersAccordion">
                     <div class="accordion-item chat_area_bg">
                         <h2 class="accordion-header">
                             <button class="accordion-button collapsed chat_area_bg" type="button"
@@ -85,7 +85,11 @@
                                                 <p th:style="'color:'+${member.user.getTextColor()}+'!important;'"
                                                    class="mb-0">
                                                     <span th:text="${member.user.firstname}"></span>&nbsp;
-                                                    <span th:text="${member.user.lastname}"></span>
+                                                    <span th:text="${member.user.lastname}"></span>&nbsp;
+                                                    <span th:if="${member.addedBy != null}" class="text-light-dark">
+                                                        Added by <span th:text="${member.addedBy.firstname}"></span>&nbsp;
+                                                        <span th:text="${member.addedBy.lastname}"></span>
+                                                    </span>
                                                 </p>
                                                 <small class="text-light-dark" th:text="${member.role}"></small>
                                             </div>
@@ -122,6 +126,47 @@
                                         >
                                             <img th:src="@{'/icons/person-add.svg'}" alt="plus member" class="me-1"/>
                                             Add Member
+                                        </a>
+                                    </li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="accordion accordion-flush" id="groupChatActionsAccordion">
+                    <div class="accordion-item chat_area_bg">
+                        <h2 class="accordion-header">
+                            <button class="accordion-button collapsed chat_area_bg" type="button"
+                                    data-bs-toggle="collapse"
+                                    data-bs-target="#flush-collapseThree" aria-expanded="false"
+                                    aria-controls="flush-collapseThree">
+                                Group Actions
+                            </button>
+                        </h2>
+                        <div id="flush-collapseThree" class="accordion-collapse collapse chat_area_bg"
+                             data-bs-parent="#groupChatActionsAccordion">
+                            <div class="accordion-body">
+                                <ul class="list-group list-group-flush">
+                                    <li
+                                            class="list-group-item chat_bg"
+                                            th:if="${setup.userMembershipInSelectedGroup.role.name().equals('OWNER')}"
+                                    >
+                                        <a
+                                                th:href="@{'/group/close/'+${setup.selectedGroup.id}}"
+                                                class="text-light text-decoration-none d-flex align-items-center">
+                                            <img alt="x-circle" th:src="@{'/icons/x-circle.svg'}" class="me-1"/> Close
+                                            this group
+                                        </a>
+                                    </li>
+                                    <li
+                                            class="list-group-item chat_bg"
+                                            th:if="${!setup.userMembershipInSelectedGroup.role.name().equals('OWNER')}"
+                                    >
+                                        <a
+                                                th:href="@{'/group/leave/'+${setup.selectedGroup.id}}"
+                                                class="text-light text-decoration-none d-flex align-items-center">
+                                            <img alt="x-circle" th:src="@{'/icons/x-circle.svg'}" class="me-1"/> Leave
+                                            this group
                                         </a>
                                     </li>
                                 </ul>

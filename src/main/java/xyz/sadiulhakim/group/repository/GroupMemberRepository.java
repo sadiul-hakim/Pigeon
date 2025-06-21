@@ -1,6 +1,9 @@
 package xyz.sadiulhakim.group.repository;
 
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Modifying;
+import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 import xyz.sadiulhakim.group.GroupMember;
 import xyz.sadiulhakim.group.GroupMemberId;
 
@@ -21,4 +24,9 @@ public interface GroupMemberRepository extends JpaRepository<GroupMember, GroupM
 
     // Check if user is member of group
     boolean existsByGroupIdAndUserId(UUID groupId, UUID userId);
+
+    @Modifying
+    @Query("DELETE FROM GroupMember gm WHERE gm.id.groupId = :groupId")
+    void deleteAllByGroupId(@Param("groupId") UUID groupId);
+
 }

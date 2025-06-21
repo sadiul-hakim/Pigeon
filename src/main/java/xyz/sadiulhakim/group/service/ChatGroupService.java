@@ -20,6 +20,7 @@ import xyz.sadiulhakim.util.AppProperties;
 import xyz.sadiulhakim.util.SecureTextGenerator;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
@@ -226,36 +227,132 @@ public class ChatGroupService {
 
 
     public String leaveGroup(UUID groupId) {
-
-        // Check users validity
-        SecurityContext context = SecurityContextHolder.getContext();
-        Authentication authentication = context.getAuthentication();
-        User user = userService.findByEmail(authentication.getName());
-        if (user == null) {
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+        if (auth == null || !StringUtils.hasText(auth.getName())) {
             return "Unauthenticated";
         }
 
-        // Check group validity
-        Optional<ChatGroup> chatGroup = chatGroupRepository.findById(groupId);
-        if (chatGroup.isEmpty()) {
-            return "Could not find the group!";
+        try (var executor = Executors.newVirtualThreadPerTaskExecutor()) {
+
+            // Parallel fetch user, group, membership
+            Future<User> userFuture = executor.submit(() -> userService.findByEmail(auth.getName()));
+            Future<Optional<ChatGroup>> groupFuture = executor.submit(() -> chatGroupRepository.findById(groupId));
+            User user = userFuture.get();
+
+            if (user == null) {
+                return "Unauthenticated";
+            }
+
+            Optional<ChatGroup> groupOpt = groupFuture.get();
+            if (groupOpt.isEmpty()) {
+                return "Could not find the group!";
+            }
+
+            Future<Optional<GroupMember>> memberFuture = executor.submit(() ->
+                    groupMemberRepository.findByGroupIdAndUserId(groupId, user.getId()));
+            Optional<GroupMember> memberOpt = memberFuture.get();
+
+            if (memberOpt.isEmpty()) {
+                return "You are not a member of this group!";
+            }
+
+            GroupMember groupMember = memberOpt.get();
+
+            if (groupMember.getRole() == GroupMemberRole.OWNER) {
+                return "You can not leave this group. You can close this group!";
+            }
+
+            // Remove the member from group
+            ChatGroup group = groupOpt.get();
+            group.getMembers().removeIf(member -> member.getId().equals(groupMember.getId()));
+            chatGroupRepository.save(group);
+
+            // Delete the group membership directly
+            executor.submit(() -> groupMemberRepository.delete(groupMember));
+
+            // Publish event after successful leave
+            executor.submit(() -> {
+                String msg = "You successfully left the group " + groupOpt.get().getName();
+                eventPublisher.publishEvent(new GroupEvent(msg, user.getId()));
+            });
+
+            return "Successfully left the group.";
+
+        } catch (InterruptedException | ExecutionException e) {
+            Thread.currentThread().interrupt();
+            return "Failed to leave the group due to an internal error.";
+        }
+    }
+
+    public String closeGroup(UUID groupId) {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        if (authentication == null || !StringUtils.hasText(authentication.getName())) {
+            return "Unauthenticated";
         }
 
-        Optional<GroupMember> member = groupMemberRepository.findByGroupIdAndUserId(groupId, user.getId());
-        if (member.isEmpty()) {
-            return "Could not find the member!";
+        try (var executor = Executors.newVirtualThreadPerTaskExecutor()) {
+            Future<User> userFuture = executor.submit(() -> userService.findByEmail(authentication.getName()));
+            Future<Optional<ChatGroup>> groupFuture = executor.submit(() -> chatGroupRepository.findById(groupId));
+            User user = userFuture.get();
+            Optional<ChatGroup> groupOpt = groupFuture.get();
+
+            if (user == null) {
+                return "Unauthenticated";
+            }
+
+            if (groupOpt.isEmpty()) {
+                return "Could not find the group!";
+            }
+
+            ChatGroup group = groupOpt.get();
+
+            // Only OWNER can close
+            Optional<GroupMember> memberOpt = groupMemberRepository.findByGroupIdAndUserId(groupId, user.getId());
+            if (memberOpt.isEmpty()) {
+                return "You are not a member of this group!";
+            }
+
+            GroupMember member = memberOpt.get();
+            if (member.getRole() != GroupMemberRole.OWNER) {
+                return "You are not allowed to close this group!";
+            }
+
+            // --- Perform Cleanup ---
+            // TODO: Delete all chat messages and files for the group
+            // Example: chatMessageRepository.deleteAllByGroupId(groupId);
+
+            List<GroupMember> members = group.getMembers();
+            for (GroupMember groupMember : members) {
+
+                // Publish closure event
+                executor.submit(() -> {
+                    String msg = "Owner closed the group " + group.getName();
+                    eventPublisher.publishEvent(new GroupEvent(msg, groupMember.getUser().getId()));
+                });
+            }
+
+            // Remove members from group
+            group.setMembers(new ArrayList<>());
+            chatGroupRepository.save(group);
+
+            // Delete members and group parallel.
+            Future<?> deleteMembersFuture = executor.submit(() -> groupMemberRepository.deleteAll(members));
+            Future<?> deleteGroupFuture = executor.submit(() -> chatGroupRepository.delete(group));
+
+            deleteMembersFuture.get(); // Wait & catch exceptions
+            deleteGroupFuture.get();
+
+            // Publish closure event
+            executor.submit(() -> {
+                String msg = "You successfully closed the group " + group.getName();
+                eventPublisher.publishEvent(new GroupEvent(msg, user.getId()));
+            });
+
+            return "Successfully closed the group.";
+        } catch (InterruptedException | ExecutionException e) {
+            Thread.currentThread().interrupt();
+            return "Failed to close the group due to an internal error.";
         }
-
-        GroupMember groupMember = member.get();
-        ChatGroup group = chatGroup.get();
-
-        // remove from group
-        group.getMembers().remove(groupMember);
-        chatGroupRepository.save(group);
-
-        // As this user is not in this group anymore. There is no need of this membership.
-        groupMemberRepository.delete(groupMember);
-        return "Successfully left the group.";
     }
 
     public List<ChatGroup> joinedGroups(UUID user) {
