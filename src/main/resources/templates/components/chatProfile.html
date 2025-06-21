@@ -1,4 +1,4 @@
-<div class="col-md-3" th:if="${setup.selectedUser != null || setup.selectedGroup != null}"
+<div class="col-md-2" th:if="${setup.selectedUser != null || setup.selectedGroup != null}"
      th:fragment="chatProfile(setup)">
     <div class="row mt-2">
         <div class="col-md-12 d-flex flex-column justify-content-center align-items-center mt-5"
@@ -86,12 +86,17 @@
                                                    class="mb-0">
                                                     <span th:text="${member.user.firstname}"></span>&nbsp;
                                                     <span th:text="${member.user.lastname}"></span>&nbsp;
-                                                    <span th:if="${member.addedBy != null}" class="text-light-dark">
-                                                        Added by <span th:text="${member.addedBy.firstname}"></span>&nbsp;
-                                                        <span th:text="${member.addedBy.lastname}"></span>
-                                                    </span>
                                                 </p>
-                                                <small class="text-light-dark" th:text="${member.role}"></small>
+                                                <span class="text-light-dark fs-7">
+                                                    <th:block th:if="${member.addedBy != null}">
+                                                        <span>
+                                                            Added by <span th:text="${member.addedBy.firstname}"></span>&nbsp;
+                                                            <span th:text="${member.addedBy.lastname}"></span>
+                                                        </span>
+                                                        <span> | </span>
+                                                    </th:block>
+                                                    <small th:text="${member.role}"></small>
+                                                </span>
                                             </div>
                                         </div>
                                         <div class="dropdown">

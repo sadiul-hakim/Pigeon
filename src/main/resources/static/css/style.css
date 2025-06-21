@@ -231,3 +231,7 @@ input::placeholder {
     background-color: var(--p-secondary-color) !important;
     color: white !important;
 }
+
+.fs-7 {
+    font-size: 10px !important;
+}
