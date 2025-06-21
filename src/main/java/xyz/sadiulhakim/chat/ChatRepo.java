@@ -7,7 +7,6 @@ import org.springframework.data.repository.query.Param;
 import org.springframework.transaction.annotation.Transactional;
 import xyz.sadiulhakim.user.User;
 
-import java.time.LocalDateTime;
 import java.util.List;
 
 public interface ChatRepo extends JpaRepository<Chat, Long> {
