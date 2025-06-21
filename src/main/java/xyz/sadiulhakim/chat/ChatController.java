@@ -10,7 +10,6 @@ import org.springframework.web.bind.annotation.*;
 import xyz.sadiulhakim.chat.enumeration.ChatArea;
 import xyz.sadiulhakim.chat.pojo.ChatMessage;
 import xyz.sadiulhakim.chat.pojo.ChatSetup;
-import xyz.sadiulhakim.group.service.ChatGroupService;
 
 import java.nio.file.AccessDeniedException;
 import java.security.Principal;

@@ -1,3 +1,7 @@
+`This project is written in In-memory STOMP broker. This is not raw websocket. Raw websocket does not have 
+structure. Everything is manual. Best performance can be produced by Raw WebSocket + Kafka. Second best 
+performance can be produced by STOMP + VT + RabbitMQ/Redis. Least performance can be produced by STOMP + VT (Current Setup).`
+
 # WebSocket
 
 `In Spring WebSocket if you want to send data to a specific user, use the username not anything else.`

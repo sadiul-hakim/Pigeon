@@ -191,9 +191,7 @@ public class ChatService {
 
             // Delete the file if there is any
             if (StringUtils.hasText(chat.getFilename())) {
-                Thread.ofVirtual().name("#FileDeletingThread").start(() -> {
-                    FileUtil.deleteFile(appProperties.getMessageImageFolder(), chat.getFilename());
-                });
+                Thread.ofVirtual().name("#FileDeletingThread").start(() -> FileUtil.deleteFile(appProperties.getMessageImageFolder(), chat.getFilename()));
             }
         }
 
@@ -217,9 +215,7 @@ public class ChatService {
 
         // Delete the file if there is any
         if (StringUtils.hasText(chat.getFilename())) {
-            Thread.ofVirtual().name("#FileDeletingThread").start(() -> {
-                FileUtil.deleteFile(appProperties.getMessageImageFolder(), chat.getFilename());
-            });
+            Thread.ofVirtual().name("#FileDeletingThread").start(() -> FileUtil.deleteFile(appProperties.getMessageImageFolder(), chat.getFilename()));
         }
 
         chatRepo.delete(chat);
