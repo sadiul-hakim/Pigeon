@@ -100,6 +100,10 @@
                     name="message" id="message" required
                     title="Markdown is supported"
             />
+            <button class="btn chat_area_bg ms-1 text-light d-flex justify-content-center align-items-center"
+                    data-bs-toggle="modal" data-bs-target="#speechModal" onclick="startRecognition()">
+                <img th:src="@{/icons/mic.svg}" alt="send"/>
+            </button>
             <button class="btn chat_area_bg ms-1 text-light d-flex justify-content-center align-items-center">
                 <img th:src="@{/icons/send.svg}" alt="send"/>
             </button>
