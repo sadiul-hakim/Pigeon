@@ -76,6 +76,6 @@ public class ChatController {
     @GetMapping("/user/{user}/toUser/{toUser}")
     String delete(@PathVariable String user, @PathVariable String toUser, @RequestParam String selectedUser) {
         chatService.deleteAllMessageBetweenTwoUsers(user, toUser);
-        return "redirect:/chat/" + selectedUser;
+        return "redirect:/chat/" + selectedUser + "/PEOPLE";
     }
 }

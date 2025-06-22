@@ -114,6 +114,29 @@
                                                         Remove
                                                     </a>
                                                 </li>
+                                                <li
+                                                        th:if="${setup.userMembershipInSelectedGroup.role.name().equals('OWNER') &&
+                                                         !member.role.name().equals('OWNER')}"
+                                                >
+                                                    <a class="dropdown-item chat_bg d-flex align-items-center hover_chat_bg"
+                                                       th:href="@{'/group/admin/'+${setup.selectedGroup.id}+'/'+${member.user.id}+'/true'}">
+                                                        <img
+                                                                alt="x"
+                                                                th:src="@{/icons/person-up.svg}"
+                                                                class="me-1"
+                                                                th:if="${!member.role.name().equals('OWNER') && !member.role.name().equals('ADMIN')}"
+                                                        />
+                                                        <img
+                                                                alt="x"
+                                                                th:src="@{/icons/person-down.svg}"
+                                                                class="me-1"
+                                                                th:if="${member.role.name().equals('ADMIN')}"
+                                                        />
+
+                                                        <span th:if="${!member.role.name().equals('OWNER') && !member.role.name().equals('ADMIN')}">Make Admin</span>
+                                                        <span th:if="${member.role.name().equals('ADMIN')}">Remove as Admin</span>
+                                                    </a>
+                                                </li>
                                             </ul>
                                         </div>
                                     </li>
