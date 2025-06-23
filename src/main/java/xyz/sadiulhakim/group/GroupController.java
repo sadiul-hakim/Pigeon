@@ -61,4 +61,18 @@ public class GroupController {
         model.addFlashAttribute("groupActionMessage", message);
         return "redirect:/chat";
     }
+
+    @GetMapping("/admin/{groupId}/{memberId}/{make}")
+    String makeOrRemoveAdmin(
+            @PathVariable String groupId,
+            @PathVariable String memberId,
+            @PathVariable boolean make,
+            RedirectAttributes model) {
+        UUID group = UUID.fromString(groupId);
+        UUID member = UUID.fromString(memberId);
+        String message = groupService.makeOrRemoveAdmin(group, member, make);
+        model.addFlashAttribute("isGroupAction", true);
+        model.addFlashAttribute("groupActionMessage", message);
+        return "redirect:/chat/" + groupId + "/" + "GROUP";
+    }
 }

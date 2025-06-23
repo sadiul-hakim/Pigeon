@@ -359,4 +359,61 @@ public class ChatGroupService {
         List<GroupMember> memberships = groupMemberRepository.findByUserId(user);
         return memberships.stream().map(GroupMember::getGroup).toList();
     }
+
+    public String makeOrRemoveAdmin(UUID groupId, UUID candidateId, boolean make) {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        if (authentication == null || !StringUtils.hasText(authentication.getName())) {
+            return "Unauthenticated";
+        }
+
+        try (var executor = Executors.newVirtualThreadPerTaskExecutor()) {
+
+            // 1. Parallel fetch: current user, group, candidate
+            Future<User> currentUserFuture = executor.submit(() -> userService.findByEmail(authentication.getName()));
+            Future<Optional<ChatGroup>> groupFuture = executor.submit(() -> chatGroupRepository.findById(groupId));
+            Future<Optional<User>> candidateFuture = executor.submit(() -> userService.findById(candidateId));
+
+            User currentUser = currentUserFuture.get();
+            Optional<ChatGroup> groupOpt = groupFuture.get();
+            Optional<User> candidateOpt = candidateFuture.get();
+
+            if (currentUser == null) return "Unauthenticated";
+            if (groupOpt.isEmpty()) return "Group not found!";
+            if (candidateOpt.isEmpty()) return "Candidate not found!";
+
+            User candidate = candidateOpt.get();
+
+            // 2. Validate permissions and memberships
+            GroupMember currentMember = groupMemberRepository
+                    .findByGroupIdAndUserId(groupId, currentUser.getId())
+                    .orElse(null);
+            if (currentMember == null) return "You are not a member of this group!";
+            if (currentMember.getRole() != GroupMemberRole.OWNER)
+                return "Only the group owner can change admin status.";
+
+            GroupMember candidateMember = groupMemberRepository
+                    .findByGroupIdAndUserId(groupId, candidate.getId())
+                    .orElse(null);
+            if (candidateMember == null) return "The candidate is not in this group!";
+
+            // 3. Apply role change
+            candidateMember.setRole(make ? GroupMemberRole.ADMIN : GroupMemberRole.MEMBER);
+            groupMemberRepository.save(candidateMember);
+
+            ChatGroup chatGroup = groupOpt.get();
+
+            // Publish closure event
+            executor.submit(() -> {
+                String msg = "You have been promoted to ADMIN in group " + chatGroup.getName();
+                eventPublisher.publishEvent(new GroupEvent(msg, candidateId));
+            });
+
+            return make
+                    ? "Successfully promoted member to admin!"
+                    : "Successfully removed member from admin role!";
+        } catch (Exception ex) {
+            Thread.currentThread().interrupt(); // Preserve interrupt status
+            return "Internal error occurred while modifying admin status.";
+        }
+    }
 }
