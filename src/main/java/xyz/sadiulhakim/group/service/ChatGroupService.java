@@ -1,33 +1,41 @@
 package xyz.sadiulhakim.group.service;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.ApplicationEventPublisher;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
+import xyz.sadiulhakim.chat.enumeration.ChatArea;
+import xyz.sadiulhakim.chat.pojo.ChatMessage;
+import xyz.sadiulhakim.chat.pojo.RedisMessage;
 import xyz.sadiulhakim.group.ChatGroup;
+import xyz.sadiulhakim.group.GroupChat;
 import xyz.sadiulhakim.group.GroupMember;
 import xyz.sadiulhakim.group.GroupMemberId;
 import xyz.sadiulhakim.group.enumeration.GroupMemberRole;
 import xyz.sadiulhakim.group.event.GroupEvent;
 import xyz.sadiulhakim.group.repository.ChatGroupRepository;
+import xyz.sadiulhakim.group.repository.GroupChatRepository;
 import xyz.sadiulhakim.group.repository.GroupMemberRepository;
 import xyz.sadiulhakim.user.User;
 import xyz.sadiulhakim.user.UserService;
 import xyz.sadiulhakim.util.AppProperties;
+import xyz.sadiulhakim.util.FileUtil;
+import xyz.sadiulhakim.util.MarkdownUtils;
 import xyz.sadiulhakim.util.SecureTextGenerator;
 
 import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
-import java.util.UUID;
+import java.time.format.DateTimeFormatter;
+import java.util.*;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class ChatGroupService {
@@ -37,6 +45,8 @@ public class ChatGroupService {
     private final UserService userService;
     private final AppProperties appProperties;
     private final ApplicationEventPublisher eventPublisher;
+    private final RedisTemplate<String, Object> redisTemplate;
+    private final GroupChatRepository groupChatRepository;
 
     public void create(String name) {
 
@@ -414,6 +424,70 @@ public class ChatGroupService {
         } catch (Exception ex) {
             Thread.currentThread().interrupt(); // Preserve interrupt status
             return "Internal error occurred while modifying admin status.";
+        }
+    }
+
+    public void sendMessage(ChatMessage message) {
+
+        try (var service = Executors.newVirtualThreadPerTaskExecutor()) {
+
+            UUID groupId = UUID.fromString(message.getToGroup());
+
+            var groupFuture = service.submit(() -> chatGroupRepository.findById(groupId).orElse(null));
+            var userFuture = service.submit(() -> userService.findByEmail(message.getUser()));
+
+            var group = groupFuture.get();
+            var user = userFuture.get();
+
+            if (group == null || user == null) {
+                return;
+            }
+
+            Optional<GroupMember> member = groupMemberRepository.findByGroupIdAndUserId(groupId, user.getId());
+            if (member.isEmpty()) {
+                return;
+            }
+
+            LocalDateTime now = LocalDateTime.now();
+
+            // Handle File
+            if (StringUtils.hasText(message.getFileName()) && StringUtils.hasText(message.getFileContent())) {
+                try {
+                    byte[] fileData = Base64.getDecoder().decode(message.getFileContent());
+                    String uniqueFileName = FileUtil.getUniqueFileName(message.getFileName(), 20);
+                    message.setFileName(uniqueFileName);
+                    FileUtil.uploadFile(appProperties.getGroupMessageImageFolder(), uniqueFileName, fileData);
+                } catch (Exception e) {
+                    log.error("sendMessage() :: Could not upload file!");
+                }
+            }
+
+            String html = MarkdownUtils.toHtml(message.getMessage());
+            message.setMessage(html);
+
+            GroupChat chat = new GroupChat();
+            chat.setGroup(group);
+            chat.setSendTime(now);
+            chat.setFilename(message.getFileName());
+            chat.setSender(member.get());
+            chat.setMessage(message.getMessage());
+            GroupChat save = groupChatRepository.save(chat);
+            message.setId(save.getId());
+
+            // Prepare and send the message to both users so that they can see on screen
+            message.setSendTime(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss").format(now));
+            message.setUserName(user.getLastname());
+            message.setUserPicture(user.getPicture());
+            message.setUserTextColor(user.getTextColor());
+
+            // empty the content
+            message.setFileContent("");
+
+            RedisMessage redisMessage = RedisMessage.forGroupChannel(group.getChannel(), ChatArea.GROUP, message);
+            redisTemplate.convertAndSend("chat-message-channel", redisMessage); // Publish message to redis
+        } catch (Exception ex) {
+            Thread.currentThread().interrupt();
+            log.error("Could not send personal message. Error {}", ex.getMessage());
         }
     }
 }

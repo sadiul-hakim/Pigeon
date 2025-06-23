@@ -77,3 +77,4 @@ app:
     endpoint: /ws
     app_prefix: /
     user_prefix: /user
+    personal_message_channel: /queue/messages

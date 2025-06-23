@@ -58,7 +58,7 @@ public class SocketConfig implements WebSocketMessageBrokerConfigurer {
         SimpleAsyncTaskScheduler taskScheduler = new SimpleAsyncTaskScheduler();
         taskScheduler.setVirtualThreads(true);
 
-        registry.enableSimpleBroker("/queue")
+        registry.enableSimpleBroker("/queue", "/topic")
                 .setTaskScheduler(taskScheduler);
 
         registry.setApplicationDestinationPrefixes(appPrefix);

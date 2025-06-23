@@ -114,47 +114,56 @@ public class ChatService {
 
     public void sendMessage(ChatMessage message) {
 
-        User user = userService.findByEmail(message.getUser());
-        User toUser = userService.findByEmail(message.getToUser());
+        try (var service = Executors.newVirtualThreadPerTaskExecutor()) {
 
-        if (user == null || toUser == null)
-            return;
+            var userFuture = service.submit(() -> userService.findByEmail(message.getUser()));
+            var toUserFuture = service.submit(() -> userService.findByEmail(message.getToUser()));
 
-        LocalDateTime now = LocalDateTime.now();
+            var user = userFuture.get();
+            var toUser = toUserFuture.get();
 
-        // Handle File
-        if (StringUtils.hasText(message.getFileName()) && StringUtils.hasText(message.getFileContent())) {
-            try {
-                byte[] fileData = Base64.getDecoder().decode(message.getFileContent());
-                String uniqueFileName = FileUtil.getUniqueFileName(message.getFileName(), 20);
-                message.setFileName(uniqueFileName);
-                FileUtil.uploadFile(appProperties.getMessageImageFolder(), uniqueFileName, fileData);
-            } catch (Exception e) {
-                log.error("sendMessage() :: Could not upload file!");
+            if (user == null || toUser == null)
+                return;
+
+            LocalDateTime now = LocalDateTime.now();
+
+            // Handle File
+            if (StringUtils.hasText(message.getFileName()) && StringUtils.hasText(message.getFileContent())) {
+                try {
+                    byte[] fileData = Base64.getDecoder().decode(message.getFileContent());
+                    String uniqueFileName = FileUtil.getUniqueFileName(message.getFileName(), 20);
+                    message.setFileName(uniqueFileName);
+                    FileUtil.uploadFile(appProperties.getMessageImageFolder(), uniqueFileName, fileData);
+                } catch (Exception e) {
+                    log.error("sendMessage() :: Could not upload file!");
+                }
             }
+
+            String html = MarkdownUtils.toHtml(message.getMessage());
+            message.setMessage(html);
+
+            Chat save = save(message.getMessage(), message.getFileName(), user, toUser, now);
+            message.setId(save.getId());
+
+            // Prepare and send the message to both users so that they can see on screen
+            message.setSendTime(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss").format(now));
+            message.setUserName(user.getLastname());
+            message.setUserPicture(user.getPicture());
+            message.setUserTextColor(user.getTextColor());
+
+            // empty the content
+            message.setFileContent("");
+
+            List<String> recipients = new ArrayList<>();
+            recipients.add(user.getEmail());
+            recipients.add(toUser.getEmail());
+
+            RedisMessage redisMessage = RedisMessage.forPrivateRecipients(recipients, ChatArea.PEOPLE, message);
+            redisTemplate.convertAndSend("chat-message-channel", redisMessage); // Publish message to redis
+        } catch (Exception ex) {
+            Thread.currentThread().interrupt();
+            log.error("Could not send personal message. Error {}", ex.getMessage());
         }
-
-        String html = MarkdownUtils.toHtml(message.getMessage());
-        message.setMessage(html);
-
-        Chat save = save(message.getMessage(), message.getFileName(), user, toUser, now);
-        message.setId(save.getId());
-
-        // Prepare and send the message to both users so that they can see on screen
-        message.setSendTime(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss").format(now));
-        message.setUserName(user.getLastname());
-        message.setUserPicture(user.getPicture());
-        message.setUserTextColor(user.getTextColor());
-
-        // empty the content
-        message.setFileContent("");
-
-        List<String> recipients = new ArrayList<>();
-        recipients.add(user.getEmail());
-        recipients.add(toUser.getEmail());
-
-        RedisMessage redisMessage = new RedisMessage(recipients, message);
-        redisTemplate.convertAndSend("chat-message-channel", redisMessage); // Publish message to redis
     }
 
     public Chat save(String message, String fileName, User user, User toUser, LocalDateTime now) {
