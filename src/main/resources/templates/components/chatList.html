@@ -167,7 +167,11 @@
         >
             <div id="group_list" class="overflow-auto">
                 <ul class="list-group w-100 list-group-flush" id="groupList">
-                    <li th:each="group:${setup.groups}" class="list-group-item chat_bg hover_chat_bg active_chat_bg">
+                    <li
+                            th:each="group:${setup.groups}"
+                            class="list-group-item chat_bg hover_chat_bg active_chat_bg"
+                            th:classappend="${setup.selectedGroup.id.equals(group.id) ? 'chat_area_bg' : 'chat_bg'}"
+                    >
                         <a class="d-flex text-light text-decoration-none"
                            th:href="@{'/chat/'+${group.id}+'/GROUP'}">
                             <img th:src="@{/picture/group/{pic}(pic=${group.picture})}"

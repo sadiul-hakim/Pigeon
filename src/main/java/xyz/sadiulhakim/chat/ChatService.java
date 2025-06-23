@@ -87,13 +87,18 @@ public class ChatService {
             chatSetup.setGroups(groups);
             chatSetup.setArea(chatArea);
 
+            UserDTO selected = ListUtil.findOrDefault(
+                    connections, selectedUser, u -> u.getId().equals(selectedUser), UserDTO::new
+            );
+            ChatGroup selectedGrp = ListUtil.findOrDefault(
+                    groups, selectedGroup, g -> g.getId().equals(selectedGroup), ChatGroup::new
+            );
+
+            chatSetup.setSelectedUser(selected);
+            chatSetup.setSelectedGroup(selectedGrp);
+
             // 7. Handle PEOPLE Area
             if (chatArea == ChatArea.PEOPLE) {
-                UserDTO selected = ListUtil.findOrDefault(
-                        connections, selectedUser, u -> u.getId().equals(selectedUser), UserDTO::new
-                );
-                chatSetup.setSelectedUser(selected);
-
                 if (selected != null && selected.getId() != null) {
                     List<Chat> chats = findAllChat(userId, selected.getId());
                     chatSetup.setInitialChat(chats);
@@ -102,11 +107,6 @@ public class ChatService {
 
             // 8. Handle GROUP Area
             else if (chatArea == ChatArea.GROUP) {
-                ChatGroup selectedGrp = ListUtil.findOrDefault(
-                        groups, selectedGroup, g -> g.getId().equals(selectedGroup), ChatGroup::new
-                );
-                chatSetup.setSelectedGroup(selectedGrp);
-
                 if (selectedGrp != null && selectedGrp.getId() != null) {
                     Optional<GroupMember> memberOpt = groupMemberRepository.findByGroupIdAndUserId(selectedGrp.getId(), userId);
                     chatSetup.setUserMembershipInSelectedGroup(memberOpt.orElse(new GroupMember()));

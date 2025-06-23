@@ -45,7 +45,8 @@
     <div class="flex-grow-1 p-3 chat_area_bg overflow-auto border-1 w-100" id="chatArea">
         <!-- Existing chat messages (initial messages) -->
         <div class="my-1 d-flex chat-wrapper" th:each="chat : ${setup.initialChat}"
-             th:attr="data-id=${chat.id}">
+             th:attr="data-id=${chat.id}" th:if="${setup.area.name().equals('PEOPLE')}">
+
             <img th:src="@{'/picture/user/'+${chat.user.picture}}" alt="" class="icon-sm"/>
             <div class="ms-1 d-flex flex-column chat">
                 <div class="d-flex justify-content-between">
@@ -74,6 +75,45 @@
                 <img
                         th:if="${chat.filename != null && !chat.filename.isEmpty()}"
                         th:src="@{'/picture/message/'+${chat.filename}}"
+                        width="190"
+                        height="170"
+                        class="img-fluid clickable-image"
+                        alt="file"
+                />
+            </div>
+        </div>
+
+        <div class="my-1 d-flex chat-wrapper" th:each="chat : ${setup.initialGroupChat}"
+             th:attr="data-id=${chat.id}" th:if="${setup.area.name().equals('GROUP')}">
+
+            <img th:src="@{'/picture/user/'+${chat.sender.user.picture}}" alt="" class="icon-sm"/>
+            <div class="ms-1 d-flex flex-column chat">
+                <div class="d-flex justify-content-between">
+                    <div>
+                                <span class="fw-bold chat_area_color fs-6" th:text="${chat.sender.user.lastname}"
+                                      th:style="'color:'+${chat.sender.user.textColor}+'!important;'"></span>
+                        &nbsp;
+                        <small th:text="${#temporals.format(chat.sendTime, 'yyyy-MM-dd HH:mm:ss')}"
+                               class="text-light-dark"></small>
+                    </div>
+                    <div class="dropdown">
+                        <img th:src="@{/icons/three-dots.svg}" alt="send" class="dropdown-toggle"
+                             data-bs-toggle="dropdown"
+                             aria-expanded="false"/>
+
+                        <ul class="dropdown-menu chat_bg">
+                            <li
+                                    class="dropdown-item remove_group_chat chat_bg d-flex align-items-center"
+                                    th:data-id="${chat.id}"
+                            ><img th:src="@{/icons/x-circle.svg}" class="me-1" alt="x circle"/> Remove
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+                <span class="text-white" th:utext="${chat.message}"></span>
+                <img
+                        th:if="${chat.filename != null && !chat.filename.isEmpty()}"
+                        th:src="@{'/picture/group/message/'+${chat.filename}}"
                         width="190"
                         height="170"
                         class="img-fluid clickable-image"
