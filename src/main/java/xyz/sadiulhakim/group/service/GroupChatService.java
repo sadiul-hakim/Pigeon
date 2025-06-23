@@ -1,11 +1,13 @@
 package xyz.sadiulhakim.group.service;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
+import xyz.sadiulhakim.chat.Chat;
 import xyz.sadiulhakim.group.ChatGroup;
 import xyz.sadiulhakim.group.GroupChat;
 import xyz.sadiulhakim.group.GroupMember;
@@ -18,11 +20,9 @@ import xyz.sadiulhakim.util.AppProperties;
 import xyz.sadiulhakim.util.FileUtil;
 
 import java.time.LocalDateTime;
-import java.util.Collections;
-import java.util.List;
-import java.util.Optional;
-import java.util.UUID;
+import java.util.*;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class GroupChatService {
@@ -82,5 +82,29 @@ public class GroupChatService {
         }
 
         groupChatRepository.deleteAll(chats);
+    }
+
+    public Map<String, Object> delete(long chatId) {
+        Optional<GroupChat> chatOpt = groupChatRepository.findById(chatId);
+        if (chatOpt.isEmpty()) {
+            log.warn("ChatService.delete :: Could not find chat with id {}", chatId);
+            return Map.of("message", "Could not find the chat!", "success", false);
+        }
+
+        SecurityContext context = SecurityContextHolder.getContext();
+        Authentication authentication = context.getAuthentication();
+        String username = authentication.getName();
+        GroupChat chat = chatOpt.get();
+        if (!(chat.getSender().getUser().getEmail().equals(username))) {
+            return Map.of("message", "You are not allowed to delete this chat!", "success", false);
+        }
+
+        // Delete the file if there is any
+        if (StringUtils.hasText(chat.getFilename())) {
+            Thread.ofVirtual().name("#FileDeletingThread").start(() -> FileUtil.deleteFile(appProperties.getMessageImageFolder(), chat.getFilename()));
+        }
+
+        groupChatRepository.delete(chat);
+        return Map.of("message", "Successfully deleted the chat message!", "success", true);
     }
 }

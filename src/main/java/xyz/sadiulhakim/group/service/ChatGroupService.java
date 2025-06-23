@@ -19,7 +19,6 @@ import xyz.sadiulhakim.group.GroupMemberId;
 import xyz.sadiulhakim.group.enumeration.GroupMemberRole;
 import xyz.sadiulhakim.group.event.GroupEvent;
 import xyz.sadiulhakim.group.repository.ChatGroupRepository;
-import xyz.sadiulhakim.group.repository.GroupChatRepository;
 import xyz.sadiulhakim.group.repository.GroupMemberRepository;
 import xyz.sadiulhakim.user.User;
 import xyz.sadiulhakim.user.UserService;

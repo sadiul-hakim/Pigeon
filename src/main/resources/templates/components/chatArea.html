@@ -105,7 +105,9 @@
                             <li
                                     class="dropdown-item remove_group_chat chat_bg d-flex align-items-center"
                                     th:data-id="${chat.id}"
-                            ><img th:src="@{/icons/x-circle.svg}" class="me-1" alt="x circle"/> Remove
+                                    th:if="${chat.sender.user.email.equals(setup.user.email)}"
+                            >
+                                <img th:src="@{/icons/x-circle.svg}" class="me-1" alt="x circle"/> Remove
                             </li>
                         </ul>
                     </div>
@@ -136,7 +138,7 @@
             <input
                     type="text"
                     class="form-control chat_bg"
-                    th:placeholder="'Say Something to '+${setup.selectedUser.lastname}"
+                    th:placeholder="'Say Something to '+${setup.area.name().equals('PEOPLE') ? setup.selectedUser.lastname : setup.selectedGroup.name}"
                     name="message" id="message" required
                     title="Markdown is supported"
             />

@@ -1,19 +1,19 @@
 package xyz.sadiulhakim.group;
 
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.ResponseEntity;
 import org.springframework.messaging.handler.annotation.MessageMapping;
 import org.springframework.messaging.handler.annotation.Payload;
 import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 import xyz.sadiulhakim.chat.pojo.ChatMessage;
 import xyz.sadiulhakim.group.service.ChatGroupService;
+import xyz.sadiulhakim.group.service.GroupChatService;
 
 import java.nio.file.AccessDeniedException;
 import java.security.Principal;
+import java.util.Map;
 import java.util.UUID;
 
 @Controller
@@ -22,6 +22,7 @@ import java.util.UUID;
 public class GroupController {
 
     private final ChatGroupService groupService;
+    private final GroupChatService groupChatService;
 
     @MessageMapping("/sent-group")
     ChatMessage sendMessage(
@@ -33,6 +34,13 @@ public class GroupController {
         message.setUser(principal.getName());
         groupService.sendMessage(message);
         return message;
+    }
+
+    @ResponseBody
+    @DeleteMapping("/chat/{chatId}")
+    ResponseEntity<?> delete(@PathVariable long chatId) {
+        var message = groupChatService.delete(chatId);
+        return ResponseEntity.ok(message);
     }
 
     @GetMapping("/create")

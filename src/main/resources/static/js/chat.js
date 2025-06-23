@@ -234,6 +234,37 @@ document.querySelectorAll('.remove_chat').forEach(function (item) {
     });
 });
 
+document.querySelectorAll('.remove_group_chat').forEach(function (item) {
+    item.addEventListener('click', function () {
+        const chatId = this.getAttribute('data-id');
+        const csrfToken = document.querySelector('meta[name="_csrf"]').getAttribute('content');
+        const csrfHeader = document.querySelector('meta[name="_csrf_header"]').getAttribute('content');
+
+        fetch(`/group/chat/${chatId}`, {
+            method: 'DELETE',
+            headers: {
+                'Content-Type': 'application/json',
+                [csrfHeader]: csrfToken
+            }
+        })
+            .then(async response => {
+                let data = await response.json();
+                return {status: response.status, data}
+            })
+            .then(data => {
+                if (data.status === 200 && data.success) {
+                    const chatWrapper = document.querySelector(`.chat-wrapper[data-id="${chatId}"]`);
+                    chatWrapper.classList.add("hidden")
+                    chatWrapper.remove();
+                    showToast(data.data.message);
+                }
+            })
+            .catch(error => {
+                alert('An error occurred.');
+            });
+    });
+});
+
 function showToast(message) {
     let toastBody = document.getElementById("toast-body");
     toastBody.innerText = message;
