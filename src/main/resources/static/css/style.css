@@ -111,7 +111,7 @@ body {
 }
 
 .hidden {
-    display: none;
+    display: none !important;
 }
 
 .text-light-dark {
@@ -234,4 +234,8 @@ input::placeholder {
 
 .fs-7 {
     font-size: 10px !important;
+}
+
+.cursor_pointer{
+    cursor: pointer !important;
 }

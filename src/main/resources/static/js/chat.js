@@ -159,6 +159,7 @@ document.addEventListener("DOMContentLoaded", function () {
             ? `<img src="/picture/${folderPath}/${messageData.fileName}" width="190" height="170" class="img-fluid clickable-image" alt="file" />`
             : ''; // show nothing if no file
 
+        let hidden = area === 'GROUP' && messageData.user !== user ? 'hidden' : '';
         const removeClass = area === 'PEOPLE' ? 'remove_chat' : 'remove_group_chat';
 
         const html = `
@@ -178,7 +179,7 @@ document.addEventListener("DOMContentLoaded", function () {
                              data-bs-toggle="dropdown"
                              aria-expanded="false"/>
                         <ul class="dropdown-menu chat_bg">
-                            <li class="dropdown-item ${removeClass} chat_bg d-flex align-items-center" data-id="${messageData.id}">
+                            <li class="dropdown-item ${removeClass} chat_bg d-flex align-items-center cursor_pointer ${hidden}" data-id="${messageData.id}">
                             <img src="/icons/x-circle.svg" class="me-1" alt="x circle"/>
                             Remove</li>
                         </ul>
@@ -252,7 +253,7 @@ document.querySelectorAll('.remove_group_chat').forEach(function (item) {
                 return {status: response.status, data}
             })
             .then(data => {
-                if (data.status === 200 && data.success) {
+                if (data.status === 200 && data.data.success) {
                     const chatWrapper = document.querySelector(`.chat-wrapper[data-id="${chatId}"]`);
                     chatWrapper.classList.add("hidden")
                     chatWrapper.remove();

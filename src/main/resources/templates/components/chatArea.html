@@ -64,7 +64,7 @@
 
                         <ul class="dropdown-menu chat_bg">
                             <li
-                                    class="dropdown-item remove_chat chat_bg d-flex align-items-center"
+                                    class="dropdown-item remove_chat chat_bg d-flex align-items-center cursor_pointer"
                                     th:data-id="${chat.id}"
                             ><img th:src="@{/icons/x-circle.svg}" class="me-1" alt="x circle"/> Remove
                             </li>
@@ -103,7 +103,7 @@
 
                         <ul class="dropdown-menu chat_bg">
                             <li
-                                    class="dropdown-item remove_group_chat chat_bg d-flex align-items-center"
+                                    class="dropdown-item remove_group_chat chat_bg d-flex align-items-center cursor_pointer"
                                     th:data-id="${chat.id}"
                                     th:if="${chat.sender.user.email.equals(setup.user.email)}"
                             >
