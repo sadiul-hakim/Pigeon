@@ -46,7 +46,7 @@ public class ChatGroupService {
     private final AppProperties appProperties;
     private final ApplicationEventPublisher eventPublisher;
     private final RedisTemplate<String, Object> redisTemplate;
-    private final GroupChatRepository groupChatRepository;
+    private final GroupChatService groupChatService;
 
     public void create(String name) {
 
@@ -465,13 +465,8 @@ public class ChatGroupService {
             String html = MarkdownUtils.toHtml(message.getMessage());
             message.setMessage(html);
 
-            GroupChat chat = new GroupChat();
-            chat.setGroup(group);
-            chat.setSendTime(now);
-            chat.setFilename(message.getFileName());
-            chat.setSender(member.get());
-            chat.setMessage(message.getMessage());
-            GroupChat save = groupChatRepository.save(chat);
+            GroupChat save = groupChatService.save(group, member.get(), message.getMessage(),
+                    message.getFileName(), now);
             message.setId(save.getId());
 
             // Prepare and send the message to both users so that they can see on screen

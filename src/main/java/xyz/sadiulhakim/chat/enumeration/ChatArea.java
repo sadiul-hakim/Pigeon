@@ -11,6 +11,6 @@ public enum ChatArea {
             }
         }
 
-        return null;
+        return PEOPLE;
     }
 }

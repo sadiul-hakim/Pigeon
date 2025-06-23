@@ -13,9 +13,11 @@ import xyz.sadiulhakim.chat.pojo.ChatMessage;
 import xyz.sadiulhakim.chat.pojo.ChatSetup;
 import xyz.sadiulhakim.chat.pojo.RedisMessage;
 import xyz.sadiulhakim.group.ChatGroup;
+import xyz.sadiulhakim.group.GroupChat;
 import xyz.sadiulhakim.group.GroupMember;
 import xyz.sadiulhakim.group.repository.GroupMemberRepository;
 import xyz.sadiulhakim.group.service.ChatGroupService;
+import xyz.sadiulhakim.group.service.GroupChatService;
 import xyz.sadiulhakim.notification.NotificationService;
 import xyz.sadiulhakim.user.User;
 import xyz.sadiulhakim.user.UserService;
@@ -41,76 +43,88 @@ public class ChatService {
     private final ChatGroupService chatGroupService;
     private final GroupMemberRepository groupMemberRepository;
     private final RedisTemplate<String, Object> redisTemplate;
+    private final GroupChatService groupChatService;
 
     public ChatSetup getChatSetup(UUID selectedUser, UUID selectedGroup, String area) {
 
-        // 1. Auth Validation
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        if (authentication == null || authentication.getName() == null) {
-            return new ChatSetup(); // unauthenticated fallback
+        // Auth Validation
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+        if (auth == null || !StringUtils.hasText(auth.getName())) {
+            return new ChatSetup();
         }
 
         try (var executor = Executors.newVirtualThreadPerTaskExecutor()) {
 
-            // 2. Run major I/O tasks in parallel virtual threads
-            Future<User> userFuture = executor.submit(() -> userService.findByEmail(authentication.getName()));
+            // 1. Get User First
+            Future<User> userFuture = executor.submit(() -> userService.findByEmail(auth.getName()));
+            User user = userFuture.get(); // Safe with Loom
+            if (user == null) return new ChatSetup(); // Just in case
 
-            // Wait for user first, as we need their ID for other queries
-            User user = userFuture.get(); // Fast, safe on Loom virtual threads
             UUID userId = user.getId();
             List<UUID> connectedUsers = user.getConnectedUsers();
 
+            // 2. Run other I/O calls in parallel
             Future<List<UserDTO>> connectionsFuture = executor.submit(() -> userService.findAllUserConnections(connectedUsers));
             Future<Long> notificationsFuture = executor.submit(() -> notificationService.countByUser(userId));
             Future<List<ChatGroup>> groupsFuture = executor.submit(() -> chatGroupService.joinedGroups(userId));
 
-            // 3. Wait for results
+            // 3. Gather results
             List<UserDTO> connections = connectionsFuture.get();
             long notifications = notificationsFuture.get();
             List<ChatGroup> groups = groupsFuture.get();
 
             // 4. Post-process connections
-            for (UserDTO connection : connections) {
-                connection.setLastSeenText(DateUtil.getLastSeenTime(connection.getLastSeen()));
-            }
+            connections.forEach(c -> c.setLastSeenText(DateUtil.getLastSeenTime(c.getLastSeen())));
 
-            // 5. Build ChatSetup
+            // 5. Resolve area
+            ChatArea chatArea = StringUtils.hasText(area) ? ChatArea.of(area) : ChatArea.PEOPLE;
+
+            // 6. Build ChatSetup
             ChatSetup chatSetup = new ChatSetup();
             chatSetup.setUser(userService.convertToDto(user));
             chatSetup.setConnections(connections);
             chatSetup.setNotifications(notifications);
             chatSetup.setGroups(groups);
-            chatSetup.setArea(StringUtils.hasText(area) ? ChatArea.of(area) : ChatArea.PEOPLE);
+            chatSetup.setArea(chatArea);
 
-            // 6. Set selected user
-            chatSetup.setSelectedUser(
-                    ListUtil.findOrDefault(connections, selectedUser, u -> u.getId().equals(selectedUser), UserDTO::new)
-            );
+            // 7. Handle PEOPLE Area
+            if (chatArea == ChatArea.PEOPLE) {
+                UserDTO selected = ListUtil.findOrDefault(
+                        connections, selectedUser, u -> u.getId().equals(selectedUser), UserDTO::new
+                );
+                chatSetup.setSelectedUser(selected);
 
-            // 7. Set selected group
-            ChatGroup selectedGroupObj = ListUtil.findOrDefault(groups, selectedGroup, g -> g.getId().equals(selectedGroup), ChatGroup::new);
-            chatSetup.setSelectedGroup(selectedGroupObj);
-
-            // 8. Current user membership to the selected group
-            if (selectedGroupObj != null) {
-                Optional<GroupMember> currentUserMemberShip = groupMemberRepository.findByGroupIdAndUserId(selectedGroupObj.getId(), userId);
-                chatSetup.setUserMembershipInSelectedGroup(currentUserMemberShip.orElse(new GroupMember()));
+                if (selected != null && selected.getId() != null) {
+                    List<Chat> chats = findAllChat(userId, selected.getId());
+                    chatSetup.setInitialChat(chats);
+                }
             }
 
-            // 9. Initial Chat
-            if (chatSetup.getSelectedUser() != null) {
-                List<Chat> chats = findAllChat(userId, chatSetup.getSelectedUser().getId());
-                chatSetup.setInitialChat(chats);
-            } else {
-                chatSetup.setInitialChat(Collections.emptyList());
+            // 8. Handle GROUP Area
+            else if (chatArea == ChatArea.GROUP) {
+                ChatGroup selectedGrp = ListUtil.findOrDefault(
+                        groups, selectedGroup, g -> g.getId().equals(selectedGroup), ChatGroup::new
+                );
+                chatSetup.setSelectedGroup(selectedGrp);
+
+                if (selectedGrp != null && selectedGrp.getId() != null) {
+                    Optional<GroupMember> memberOpt = groupMemberRepository.findByGroupIdAndUserId(selectedGrp.getId(), userId);
+                    chatSetup.setUserMembershipInSelectedGroup(memberOpt.orElse(new GroupMember()));
+
+                    List<GroupChat> groupChats = groupChatService.findAllChat(selectedGrp.getId());
+                    chatSetup.setInitialGroupChat(groupChats);
+                }
             }
 
             return chatSetup;
-        } catch (InterruptedException | ExecutionException e) {
-            throw new RuntimeException("Failed to build chat setup", e);
+
+        } catch (InterruptedException e) {
+            Thread.currentThread().interrupt(); // Restore interrupt status
+            throw new RuntimeException("Thread interrupted during chat setup", e);
+        } catch (ExecutionException e) {
+            throw new RuntimeException("Error while preparing chat setup", e);
         }
     }
-
 
     public void sendMessage(ChatMessage message) {
 
