@@ -6,6 +6,9 @@ document.addEventListener("DOMContentLoaded", function () {
 
     let user = document.getElementById("user").textContent;
     let selectedUser = document.getElementById("selectedUser").textContent;
+    let selectedGroup = document.getElementById("selectedGroup").textContent;
+    let selectedChannel = document.getElementById("selectedChannel").textContent;
+    let area = document.getElementById("area").textContent;
 
     chatArea.scrollTop = chatArea.scrollHeight;
 
@@ -19,22 +22,40 @@ document.addEventListener("DOMContentLoaded", function () {
         stompClient.subscribe('/user/queue/messages', function (message) {
             let receivedMessage = JSON.parse(message.body);
             msg_tone.play();
-            showMessage(receivedMessage);
+            showPersonalMessage(receivedMessage);
+        });
+
+        stompClient.subscribe('/topic/' + selectedChannel, function (message) {
+            let receivedMessage = JSON.parse(message.body);
+            console.log(receivedMessage)
+            msg_tone.play();
+            showGroupMessage(receivedMessage);
         });
     });
 
     // Send a message
+    let sendUrl = area === 'PEOPLE' ? "/sent" : "/sent-group";
     document.querySelector("#chatForm").addEventListener("submit", function (event) {
         event.preventDefault();
 
         let message = document.getElementById("message").value;
 
-        stompClient.send("/sent", {}, JSON.stringify({
-            message: message,
-            user: null,
-            toUser: selectedUser
-        }));
+        let body;
+        if (area === 'PEOPLE') {
+            body = {
+                message: message,
+                user: null,
+                toUser: selectedUser
+            }
+        } else {
+            body = {
+                message: message,
+                user: null,
+                toGroup: selectedGroup
+            }
+        }
 
+        stompClient.send(sendUrl, {}, JSON.stringify(body));
         document.getElementById("message").value = "";
     });
 
@@ -45,13 +66,24 @@ document.addEventListener("DOMContentLoaded", function () {
         const fileInput = document.querySelector('#file');
         const file = fileInput.files[0];
 
-        const messageObject = {
-            message: msg,
-            user: null,
-            toUser: selectedUser,
-            fileName: null,
-            fileContent: null
-        };
+        let messageObject;
+        if (area === 'PEOPLE') {
+            messageObject = {
+                message: msg,
+                user: null,
+                toUser: selectedUser,
+                fileName: null,
+                fileContent: null
+            };
+        } else {
+            messageObject = {
+                message: msg,
+                user: null,
+                toGroup: selectedGroup,
+                fileName: null,
+                fileContent: null
+            };
+        }
 
         if (file) {
             const reader = new FileReader();
@@ -63,13 +95,13 @@ document.addEventListener("DOMContentLoaded", function () {
                 messageObject.fileContent = base64Content;
 
                 // Send full message with file
-                stompClient.send("/sent", {}, JSON.stringify(messageObject));
+                stompClient.send(sendUrl, {}, JSON.stringify(messageObject));
             };
 
             reader.readAsDataURL(file);
         } else {
             // No file, just send text message
-            stompClient.send("/sent", {}, JSON.stringify(messageObject));
+            stompClient.send(sendUrl, {}, JSON.stringify(messageObject));
         }
 
         // Clear inputs
@@ -77,10 +109,18 @@ document.addEventListener("DOMContentLoaded", function () {
         fileInput.value = "";
     });
 
-    function showMessage(receivedMessage) {
+    function showGroupMessage(receivedMessage) {
+
+        let newMessageElement = createMessageElement(receivedMessage);
+        chatArea.appendChild(newMessageElement);
+
+        // Auto-scroll to the latest message
+        chatArea.scrollTop = chatArea.scrollHeight;
+    }
+
+    function showPersonalMessage(receivedMessage) {
 
         // Create and append a new message element to the chat area
-
         if (receivedMessage.user === selectedUser || receivedMessage.user === user) {
             let newMessageElement = createMessageElement(receivedMessage);
             chatArea.appendChild(newMessageElement);
@@ -114,9 +154,12 @@ document.addEventListener("DOMContentLoaded", function () {
     // Function to create a new message element for display
     function createMessageElement(messageData) {
 
+        const folderPath = area === 'PEOPLE' ? 'message' : 'group/message';
         const imageTag = messageData.fileName
-            ? `<img src="/picture/message/${messageData.fileName}" width="190" height="170" class="img-fluid clickable-image" alt="file" />`
+            ? `<img src="/picture/${folderPath}/${messageData.fileName}" width="190" height="170" class="img-fluid clickable-image" alt="file" />`
             : ''; // show nothing if no file
+
+        const removeClass = area === 'PEOPLE' ? 'remove_chat' : 'remove_group_chat';
 
         const html = `
         <div class="my-1 d-flex chat-wrapper" data-id="${messageData.id}">
@@ -135,7 +178,7 @@ document.addEventListener("DOMContentLoaded", function () {
                              data-bs-toggle="dropdown"
                              aria-expanded="false"/>
                         <ul class="dropdown-menu chat_bg">
-                            <li class="dropdown-item remove_chat chat_bg d-flex align-items-center" data-id="${messageData.id}">
+                            <li class="dropdown-item ${removeClass} chat_bg d-flex align-items-center" data-id="${messageData.id}">
                             <img src="/icons/x-circle.svg" class="me-1" alt="x circle"/>
                             Remove</li>
                         </ul>
