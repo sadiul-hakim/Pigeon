@@ -29,10 +29,14 @@ public class MarkdownUtils {
         PolicyFactory policy = new HtmlPolicyBuilder()
                 .allowElements("a", "b", "i", "u", "em", "strong", "code", "pre", "blockquote",
                         "ul", "ol", "li", "p", "br", "span",
-                        "table", "thead", "tbody", "tr", "th", "td")
+                        "table", "thead", "tbody", "tr", "th", "td", "div", "h1", "h2", "h3", "h4", "h5", "h6", "img",
+                        "video", "audio")
                 .allowStandardUrlProtocols()
                 .allowAttributes("href").onElements("a")
-                .allowAttributes("class").onElements("code", "pre", "table", "span")
+                .allowAttributes("src").onElements("img", "video", "audio")
+                .allowAttributes("class").onElements(
+                        "code", "pre", "table", "span", "div"
+                )
                 .toFactory();
 
         return policy.sanitize(unsafeHtml);
