@@ -128,19 +128,17 @@ document.addEventListener('DOMContentLoaded', function() {
         '🇦🇷', '🇦🇸', '🇦🇹', '🇦🇺', '🇦🇼', '🇦🇽', '🇦🇿', '🇧🇦', '🇧🇧', '🇧🇩'
     ];
 
-    // Create emoji picker
+    let html = '';
     emojis.forEach(emoji => {
-        const emojiElement = document.createElement('span');
-        emojiElement.textContent = emoji;
-        emojiElement.style.fontSize = '24px';
-        emojiElement.style.cursor = 'pointer';
-        emojiElement.style.padding = '5px';
-        emojiElement.addEventListener('click', function() {
-            messageInput.value += emoji;
+        html += `<span class="emoji">${emoji}</span>`;
+    });
+    emojiPicker.innerHTML = html;
+
+    emojiPicker.addEventListener('click', function(e) {
+        if (e.target.classList.contains('emoji')) {
+            messageInput.value += e.target.textContent;
             messageInput.focus();
-            // emojiPicker.style.display = 'none';
-        });
-        emojiPicker.appendChild(emojiElement);
+        }
     });
 
     // Toggle emoji picker

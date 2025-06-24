@@ -239,3 +239,10 @@ input::placeholder {
 .cursor_pointer{
     cursor: pointer !important;
 }
+
+.emoji {
+    font-size: 24px;
+    cursor: pointer;
+    padding: 5px;
+    display: inline-block;
+}
