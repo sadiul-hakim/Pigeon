@@ -280,11 +280,16 @@ function showToast(message) {
 // ------------------------------------- Image Modal ---------------------------
 
 document.addEventListener("DOMContentLoaded", function () {
+    const message_image_download = document.getElementById("message_image_download");
     document.body.addEventListener("click", function (e) {
         if (e.target.classList.contains("clickable-image")) {
             const src = e.target.getAttribute("src");
             const modalImg = document.getElementById("modalImage");
             modalImg.src = src;
+            message_image_download.href = src;
+
+            let nameArr = src.split(".");
+            message_image_download.download = `pigeon_file.${nameArr[nameArr.length - 1]}`;
 
             const modal = new bootstrap.Modal(document.getElementById("imageModal"));
             modal.show();
