@@ -22,10 +22,7 @@ import xyz.sadiulhakim.group.repository.ChatGroupRepository;
 import xyz.sadiulhakim.group.repository.GroupMemberRepository;
 import xyz.sadiulhakim.user.User;
 import xyz.sadiulhakim.user.UserService;
-import xyz.sadiulhakim.util.AppProperties;
-import xyz.sadiulhakim.util.FileUtil;
-import xyz.sadiulhakim.util.MarkdownUtils;
-import xyz.sadiulhakim.util.SecureTextGenerator;
+import xyz.sadiulhakim.util.*;
 
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
@@ -469,7 +466,7 @@ public class ChatGroupService {
             message.setId(save.getId());
 
             // Prepare and send the message to both users so that they can see on screen
-            message.setSendTime(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss").format(now));
+            message.setSendTime(DateUtil.formatMessageDate(now));
             message.setUserName(user.getLastname());
             message.setUserPicture(user.getPicture());
             message.setUserTextColor(user.getTextColor());

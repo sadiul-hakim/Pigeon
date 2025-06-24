@@ -53,9 +53,6 @@
                     <div>
                                 <span class="fw-bold chat_area_color fs-6" th:text="${chat.user.lastname}"
                                       th:style="'color:'+${chat.user.textColor}+'!important;'"></span>
-                        &nbsp;
-                        <small th:text="${#temporals.format(chat.sendTime, 'yyyy-MM-dd HH:mm:ss')}"
-                               class="text-light-dark"></small>
                     </div>
                     <div class="dropdown">
                         <img th:src="@{/icons/three-dots.svg}" alt="send" class="dropdown-toggle"
@@ -71,15 +68,21 @@
                         </ul>
                     </div>
                 </div>
-                <span class="text-white" th:utext="${chat.message}"></span>
-                <img
-                        th:if="${chat.filename != null && !chat.filename.isEmpty()}"
-                        th:src="@{'/picture/message/'+${chat.filename}}"
-                        width="190"
-                        height="170"
-                        class="img-fluid clickable-image"
-                        alt="file"
-                />
+                <div>
+                    <span class="text-white" th:utext="${chat.message}"></span>
+                    <img
+                            th:if="${chat.filename != null && !chat.filename.isEmpty()}"
+                            th:src="@{'/picture/message/'+${chat.filename}}"
+                            width="190"
+                            height="170"
+                            class="img-fluid clickable-image"
+                            alt="file"
+                    />
+                </div>
+                <div class="d-flex justify-content-end">
+                    <small th:text="${#temporals.format(chat.sendTime, 'MMM dd, HH:mm a')}"
+                           class="text-light-dark"></small>
+                </div>
             </div>
         </div>
 
@@ -92,9 +95,6 @@
                     <div>
                                 <span class="fw-bold chat_area_color fs-6" th:text="${chat.sender.user.lastname}"
                                       th:style="'color:'+${chat.sender.user.textColor}+'!important;'"></span>
-                        &nbsp;
-                        <small th:text="${#temporals.format(chat.sendTime, 'yyyy-MM-dd HH:mm:ss')}"
-                               class="text-light-dark"></small>
                     </div>
                     <div class="dropdown">
                         <img th:src="@{/icons/three-dots.svg}" alt="send" class="dropdown-toggle"
@@ -112,15 +112,21 @@
                         </ul>
                     </div>
                 </div>
-                <span class="text-white" th:utext="${chat.message}"></span>
-                <img
-                        th:if="${chat.filename != null && !chat.filename.isEmpty()}"
-                        th:src="@{'/picture/group/message/'+${chat.filename}}"
-                        width="190"
-                        height="170"
-                        class="img-fluid clickable-image"
-                        alt="file"
-                />
+                <div>
+                    <span class="text-white" th:utext="${chat.message}"></span>
+                    <img
+                            th:if="${chat.filename != null && !chat.filename.isEmpty()}"
+                            th:src="@{'/picture/group/message/'+${chat.filename}}"
+                            width="190"
+                            height="170"
+                            class="img-fluid clickable-image"
+                            alt="file"
+                    />
+                </div>
+                <div class="d-flex justify-content-end">
+                    <small th:text="${#temporals.format(chat.sendTime, 'MMM dd, HH:mm a')}"
+                           class="text-light-dark"></small>
+                </div>
             </div>
         </div>
     </div>

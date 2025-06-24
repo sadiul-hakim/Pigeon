@@ -160,7 +160,7 @@ public class ChatService {
             message.setId(save.getId());
 
             // Prepare and send the message to both users so that they can see on screen
-            message.setSendTime(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss").format(now));
+            message.setSendTime(DateUtil.formatMessageDate(now));
             message.setUserName(user.getLastname());
             message.setUserPicture(user.getPicture());
             message.setUserTextColor(user.getTextColor());

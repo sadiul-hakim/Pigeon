@@ -171,8 +171,6 @@ document.addEventListener("DOMContentLoaded", function () {
                         <span class="fw-bold chat_area_color fs-6" style="color: ${messageData.userTextColor} !important;">
                             ${messageData.userName}
                         </span>
-                        &nbsp;
-                        <small class="text-light-dark">${messageData.sendTime}</small>
                     </div>
                     <div class="dropdown">
                         <img src="/icons/three-dots.svg" alt="send" class="dropdown-toggle"
@@ -185,8 +183,13 @@ document.addEventListener("DOMContentLoaded", function () {
                         </ul>
                     </div>
                 </div>
-                <div class="text-white" id="message-content"></div>
-                ${imageTag}
+                <div>
+                    <div class="text-white" id="message-content"></div>
+                    ${imageTag}
+                </div>
+                <div class="d-flex justify-content-end">
+                    <small class="text-light-dark">${messageData.sendTime}</small>
+                </div>
             </div>
         </div>
     `.trim();
