@@ -126,7 +126,7 @@
     </div>
 
     <!--    Chat board Starts        -->
-    <div class="p-3 w-100 d-flex align-items-center">
+    <div class="p-3 w-100 d-flex align-items-center position-relative">
         <img
                 th:src="@{/icons/file-image.svg}"
                 alt="file image" class="me-1" width="20"
@@ -134,6 +134,21 @@
                 data-bs-toggle="modal"
                 data-bs-target="#sendMessageModal"
         />
+        <button id="emojiPickerButton" class="bg-transparent border-0">😊</button>
+        <div id="emojiPicker" class="chat_area_bg"
+             style="display:none; position:absolute;
+                bottom: 50px; /* Positions above the button */
+                left: 20px;
+                max-height:300px;
+                max-width:400px;
+                overflow-y:auto;
+                z-index: 1000; /* Ensures it appears above other elements */
+                margin-bottom: 5px; /* Adds small gap between picker and button */
+                border-radius: 8px;
+                padding: 10px;
+                box-shadow: 0 2px 5px rgba(0,0,0,0.2);"
+        >
+        </div>
         <form class="d-flex flex-grow-1" id="chatForm">
             <input
                     type="text"

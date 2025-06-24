@@ -46,7 +46,7 @@ public class MarkdownUtils {
                         "margin", "margin-top", "margin-right", "margin-bottom", "margin-left",
                         "padding", "padding-top", "padding-right", "padding-bottom", "padding-left",
                         "border", "border-width", "border-style", "border-color", "border-radius",
-                        "box-sizing", "display", "vertical-align", "float", "clear",
+                        "display", "vertical-align", "float", "clear",
                         "position", "top", "right", "bottom", "left", "cursor", "border"
                 )))  // allow specific safe CSS
                 .toFactory();
