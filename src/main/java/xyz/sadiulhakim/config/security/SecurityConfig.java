@@ -33,7 +33,8 @@ class SecurityConfig {
                 "/images/**",
                 "/",
                 "/register_page",
-                "/register"
+                "/register",
+                "/unsupported"
         };
         return http
                 .csrf(csrf -> csrf

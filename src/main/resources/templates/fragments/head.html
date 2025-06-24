@@ -18,5 +18,9 @@
         if ('serviceWorker' in navigator) {
             navigator.serviceWorker.register('/js/sw.js');
         }
+
+        if (window.innerWidth < 1200) {
+            window.location.href = '/unsupported';
+        }
     </script>
 </head>

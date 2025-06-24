@@ -21,6 +21,11 @@ class PageController {
         return "index";
     }
 
+    @GetMapping("/unsupported")
+    String unsupported() {
+        return "unsupported";
+    }
+
     @GetMapping("/register_page")
     String registerPage(Model model) {
 
