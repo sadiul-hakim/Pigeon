@@ -40,7 +40,15 @@ public class MarkdownUtils {
                 .requireRelNofollowOnLinks()               // Helps avoid SEO abuse / spam
                 .allowAttributes("class").onElements("code", "pre", "table", "span", "div", "ul", "ol", "li")
                 .allowAttributes("style").onElements("span", "div", "code")  // Be careful here
-                .allowStyling(CssSchema.withProperties(List.of("color", "background-color", "text-align", "font-weight", "font-style", "text-transform", "border", "cursor")))  // allow specific safe CSS
+                .allowStyling(CssSchema.withProperties(List.of(
+                        "color", "background-color", "font-weight", "font-style", "font-family", "font-size",
+                        "text-align", "text-decoration", "text-transform", "letter-spacing", "line-height", "white-space", "word-break",
+                        "margin", "margin-top", "margin-right", "margin-bottom", "margin-left",
+                        "padding", "padding-top", "padding-right", "padding-bottom", "padding-left",
+                        "border", "border-width", "border-style", "border-color", "border-radius",
+                        "box-sizing", "display", "vertical-align", "float", "clear",
+                        "position", "top", "right", "bottom", "left", "cursor", "border"
+                )))  // allow specific safe CSS
                 .toFactory();
 
 
