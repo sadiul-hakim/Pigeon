@@ -30,12 +30,12 @@ public class MarkdownUtils {
                 .allowElements("a", "b", "i", "u", "em", "strong", "code", "pre", "blockquote",
                         "ul", "ol", "li", "p", "br", "span",
                         "table", "thead", "tbody", "tr", "th", "td", "div", "h1", "h2", "h3", "h4", "h5", "h6", "img",
-                        "video", "audio")
+                        "video", "audio", "marquee")
                 .allowStandardUrlProtocols()
                 .allowAttributes("href").onElements("a")
                 .allowAttributes("src").onElements("img", "video", "audio")
-                .allowAttributes("class").onElements(
-                        "code", "pre", "table", "span", "div"
+                .allowAttributes("class", "style").onElements(
+                        "code", "pre", "table", "span", "div", "marquee", "table", "tr", "td", "ul", "ol", "li"
                 )
                 .toFactory();
 
