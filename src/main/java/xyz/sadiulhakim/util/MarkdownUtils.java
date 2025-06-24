@@ -4,6 +4,7 @@ import org.commonmark.Extension;
 import org.commonmark.ext.gfm.tables.TablesExtension;
 import org.commonmark.parser.Parser;
 import org.commonmark.renderer.html.HtmlRenderer;
+import org.owasp.html.CssSchema;
 import org.owasp.html.HtmlPolicyBuilder;
 import org.owasp.html.PolicyFactory;
 
@@ -27,17 +28,21 @@ public class MarkdownUtils {
 
     public static String sanitizeHtml(String unsafeHtml) {
         PolicyFactory policy = new HtmlPolicyBuilder()
-                .allowElements("a", "b", "i", "u", "em", "strong", "code", "pre", "blockquote",
+                .allowElements(
+                        "a", "b", "i", "u", "em", "strong", "code", "pre", "blockquote",
                         "ul", "ol", "li", "p", "br", "span",
-                        "table", "thead", "tbody", "tr", "th", "td", "div", "h1", "h2", "h3", "h4", "h5", "h6", "img",
-                        "video", "audio", "marquee")
+                        "table", "thead", "tbody", "tr", "th", "td",
+                        "div", "h1", "h2", "h3", "h4", "h5", "h6", "marquee"
+                )
                 .allowStandardUrlProtocols()
                 .allowAttributes("href").onElements("a")
-                .allowAttributes("src").onElements("img", "video", "audio")
-                .allowAttributes("class", "style").onElements(
-                        "code", "pre", "table", "span", "div", "marquee", "table", "tr", "td", "ul", "ol", "li"
-                )
+                .allowAttributes("target").onElements("a")  // Optional for opening links in new tab
+                .requireRelNofollowOnLinks()               // Helps avoid SEO abuse / spam
+                .allowAttributes("class").onElements("code", "pre", "table", "span", "div", "ul", "ol", "li")
+                .allowAttributes("style").onElements("span", "div", "code")  // Be careful here
+                .allowStyling(CssSchema.withProperties(List.of("color", "background-color", "text-align", "font-weight", "font-style", "text-transform", "border", "cursor")))  // allow specific safe CSS
                 .toFactory();
+
 
         return policy.sanitize(unsafeHtml);
     }
