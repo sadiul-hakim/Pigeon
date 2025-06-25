@@ -1,32 +1,34 @@
 <!-- /unsupported.html -->
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" xmlns:th="https://www.thymeleaf.org">
 <head>
-  <meta charset="UTF-8">
-  <title>Unsupported Device</title>
-  <style>
-    body {
-      font-family: sans-serif;
-      background: #2E3A46;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      height: 100vh;
-      text-align: center;
-    }
-    .box {
-      background: #0B1A2A;
-      padding: 2rem;
-      border-radius: 8px;
-      box-shadow: 0 0 10px rgba(0,0,0,0.2);
-      color: white;
-    }
-  </style>
+    <meta charset="UTF-8">
+    <title>Unsupported Device</title>
+    <style>
+        body {
+            font-family: sans-serif;
+            background: #2E3A46;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            text-align: center;
+        }
+
+        .box {
+            background: #0B1A2A;
+            padding: 2rem;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
+            color: white;
+        }
+    </style>
 </head>
 <body>
 <div class="box">
-  <h1>Screen Too Small</h1>
-  <p>This site is only available on larger screens (≥ 1350px).</p>
+    <h1>Screen Too Small</h1>
+    <p>This site is only available on larger screens (≥ 1350px).</p>
+    <a th:href="@{/}" style="margin: 10px 0; text-decoration: none; color: #2E3A46;">Back to Home Page</a>
 </div>
 </body>
 </html>
