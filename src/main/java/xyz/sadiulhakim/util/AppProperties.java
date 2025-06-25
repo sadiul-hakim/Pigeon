@@ -22,7 +22,7 @@ public class AppProperties {
     private String groupImageFolder;
 
     @Value("${default.group.image.name:''}")
-    private String groupImageName;
+    private String defaultGroupImageName;
 
     @Value("${default.group.message.image.folder:''}")
     private String groupMessageImageFolder;

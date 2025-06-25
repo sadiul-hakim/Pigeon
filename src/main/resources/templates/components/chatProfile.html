@@ -17,8 +17,11 @@
             <img th:src="@{/picture/group/{pic}(pic=${setup.selectedGroup.picture})}"
                  th:alt="${setup.selectedGroup.name}"
                  class="icon-lg"/>
-            <p th:style="'color:'+${setup.selectedUser.getTextColor()}+'!important;'" class="mb-0">
-                <span class="fs-3" th:text="${setup.selectedGroup.name}"></span>&nbsp;
+            <p th:style="'color:'+${setup.selectedUser.getTextColor()}+'!important;'"
+               class="mb-0 d-flex align-items-center">
+                <span class="fs-3 me-1" th:text="${setup.selectedGroup.name}"></span>&nbsp;
+                <img alt="edit" th:src="@{'/icons/edit.svg'}" data-bs-toggle="modal"
+                     data-bs-target="#updateGroupModal"/>
             </p>
             <p class="text-light-dark m-0 d-flex">
                 <span th:text="${setup.selectedGroup.members.size()}" class="me-1"></span>

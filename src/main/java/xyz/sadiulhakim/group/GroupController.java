@@ -6,6 +6,7 @@ import org.springframework.messaging.handler.annotation.MessageMapping;
 import org.springframework.messaging.handler.annotation.Payload;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 import xyz.sadiulhakim.chat.pojo.ChatMessage;
 import xyz.sadiulhakim.group.service.ChatGroupService;
@@ -47,6 +48,20 @@ public class GroupController {
     String createGroup(@RequestParam String name) {
         groupService.create(name);
         return "redirect:/chat";
+    }
+
+    @PostMapping("/update")
+    String createGroup(
+            @RequestParam String groupId,
+            @RequestParam String name,
+            @RequestParam MultipartFile file,
+            RedirectAttributes model
+    ) {
+        UUID group = UUID.fromString(groupId);
+        String message = groupService.update(name, file, group);
+        model.addFlashAttribute("isGroupAction", true);
+        model.addFlashAttribute("groupActionMessage", message);
+        return "redirect:/chat/" + groupId + "/" + "GROUP";
     }
 
     @GetMapping("/remove/{groupId}/{memberId}")

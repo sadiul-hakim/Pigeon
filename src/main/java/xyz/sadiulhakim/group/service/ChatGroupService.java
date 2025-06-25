@@ -9,6 +9,7 @@ import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
+import org.springframework.web.multipart.MultipartFile;
 import xyz.sadiulhakim.chat.enumeration.ChatArea;
 import xyz.sadiulhakim.chat.pojo.ChatMessage;
 import xyz.sadiulhakim.chat.pojo.RedisMessage;
@@ -24,8 +25,8 @@ import xyz.sadiulhakim.user.User;
 import xyz.sadiulhakim.user.UserService;
 import xyz.sadiulhakim.util.*;
 
+import java.io.IOException;
 import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
 import java.util.*;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Executors;
@@ -43,6 +44,66 @@ public class ChatGroupService {
     private final ApplicationEventPublisher eventPublisher;
     private final RedisTemplate<String, Object> redisTemplate;
     private final GroupChatService groupChatService;
+
+    public String update(String name, MultipartFile photo, UUID groupId) {
+
+        try (var service = Executors.newVirtualThreadPerTaskExecutor()) {
+
+            SecurityContext context = SecurityContextHolder.getContext();
+            Authentication authentication = context.getAuthentication();
+            var userFuture = service.submit(() -> userService.findByEmail(authentication.getName()));
+            var groupFuture = service.submit(() -> chatGroupRepository.findById(groupId).orElse(null));
+
+            var user = userFuture.get();
+            var group = groupFuture.get();
+
+            if (user == null) {
+                return "Could not find the user!";
+            }
+
+            if (group == null) {
+                return "Could not find the group!";
+            }
+
+            var member = groupMemberRepository.findByGroupIdAndUserId(groupId, user.getId()).orElse(null);
+            if (member == null || !(member.getRole().equals(GroupMemberRole.ADMIN) || member.getRole().equals(GroupMemberRole.OWNER))) {
+                return "You are not allowed to update group information!";
+            }
+
+            if (StringUtils.hasText(name)) {
+                group.setName(name.trim());
+            }
+
+            if (photo != null && !Objects.requireNonNull(photo.getOriginalFilename()).isEmpty()) {
+                try {
+                    String uniqueFileName = FileUtil.getUniqueFileName(photo.getOriginalFilename(), 20);
+                    FileUtil.uploadFile(appProperties.getGroupImageFolder(), uniqueFileName, photo.getInputStream());
+
+                    if (StringUtils.hasText(uniqueFileName) && !group.getPicture().equals(appProperties.getDefaultGroupImageName())) {
+                        Thread.ofVirtual().name("#FileDeletingThread").start(() -> {
+                            boolean deleted = FileUtil.deleteFile(appProperties.getUserImageFolder(), group.getPicture());
+                            if (deleted) {
+                                log.info("UserService.update :: File {} is deleted", group.getPicture());
+                            }
+                        });
+                    }
+
+                    if (StringUtils.hasText(uniqueFileName)) {
+                        group.setPicture(uniqueFileName);
+                    }
+                } catch (IOException e) {
+                    throw new RuntimeException(e);
+                }
+            }
+
+            chatGroupRepository.save(group);
+
+            return "Successfully update group information";
+        } catch (Exception ex) {
+            log.error("Could not update group information. error {}", ex.getMessage());
+            return "Could not update group information!";
+        }
+    }
 
     public void create(String name) {
 
@@ -62,7 +123,7 @@ public class ChatGroupService {
         ChatGroup chatGroup = new ChatGroup();
         chatGroup.setName(name);
         chatGroup.setCreatedAt(LocalDateTime.now());
-        chatGroup.setPicture(appProperties.getGroupImageName());
+        chatGroup.setPicture(appProperties.getDefaultGroupImageName());
 
         String channelName = SecureTextGenerator.generateRandomText(10) + "_" +
                 name.trim().toLowerCase().replace(" ", "_");
