@@ -236,7 +236,7 @@ input::placeholder {
     font-size: 10px !important;
 }
 
-.cursor_pointer{
+.cursor_pointer {
     cursor: pointer !important;
 }
 
@@ -245,4 +245,26 @@ input::placeholder {
     cursor: pointer;
     padding: 5px;
     display: inline-block;
+}
+
+/* Background of the whole editor */
+.toastui-editor-defaultUI,
+.tab-item,
+.toastui-editor-contents,
+.toastui-editor-md-container,
+.toastui-editor-mode-switch,
+.toastui-editor-defaultUI-toolbar {
+    background-color: var(--p-secondary-color) !important; /* Your custom color */
+    color: white !important;
+}
+
+.toastui-editor-toolbar-icons {
+    background-color: var(--p-secondary-color) !important; /* Your custom color */
+    color: white !important;
+    box-shadow: 1px 0 2px #333;
+    border: none;
+}
+
+.toastui-editor-contents * {
+    color: white !important;
 }

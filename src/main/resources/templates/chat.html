@@ -6,6 +6,7 @@
     ></title>
 </head>
 <body class="dark_bg">
+<link rel="stylesheet" th:href="@{'/css/toastui-editor.min.css'}"/>
 <span class="hidden" th:text="${setup.user.email}" id="user"></span>
 <span class="hidden" th:text="${setup.area.name()}" id="area"></span>
 <span class="hidden" th:text="${setup.selectedUser != null ? setup.selectedUser.email : ''}" id="selectedUser"></span>
@@ -86,11 +87,8 @@
             </div>
             <div class="modal-body chat_bg">
                 <form id="chatFormWithFile">
-                    <div>
-                        <label for="msg" class="text-light">Message</label>
-                        <textarea rows="3" name="msg" id="msg" class="form-control chat_area_bg"
-                                  required></textarea>
-                    </div>
+                    <p class="text-light my-2">Message</p>
+                    <div id="editor" class="chat_area_bg"></div>
                     <br/>
                     <div>
                         <label for="file" class="text-light">File <small
@@ -243,9 +241,10 @@
 </body>
 <script th:src="@{/js/sockjs.min.js}"></script>
 <script th:src="@{/js/stomp.min.js}"></script>
-<script th:src="@{/js/chat.js}" defer></script>
 <script th:src="@{/js/mic.js}" defer></script>
 <script th:src="@{/js/emoji-button.js}" defer></script>
+<script th:src="@{/js/toastui-editor-all.min.js}" defer></script>
+<script th:src="@{/js/chat.js}" defer></script>
 <script>
     window.addEventListener('DOMContentLoaded', () => {
         const toastEl = document.querySelector('#groupActionToast');

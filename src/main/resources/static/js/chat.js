@@ -2,6 +2,14 @@ const chatArea = document.getElementById("chatArea");
 let chatList = document.getElementById("chatList");
 let msg_tone = document.getElementById("msg-tone");
 
+// Rich Text Editor
+const editor = new toastui.Editor({
+    el: document.querySelector('#editor'),
+    height: '200px',
+    initialEditType: 'wysiwyg', // or 'markdown'
+    previewStyle: 'vertical'
+});
+
 document.addEventListener("DOMContentLoaded", function () {
 
     let user = document.getElementById("user").textContent;
@@ -61,8 +69,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
     document.querySelector("#chatFormWithFile").addEventListener("submit", function (event) {
         event.preventDefault();
-
-        const msg = document.getElementById("msg").value;
+        const msg = editor.getHTML();
         const fileInput = document.querySelector('#file');
         const file = fileInput.files[0];
 
@@ -105,7 +112,6 @@ document.addEventListener("DOMContentLoaded", function () {
         }
 
         // Clear inputs
-        document.getElementById("msg").value = "";
         fileInput.value = "";
     });
 
@@ -296,4 +302,3 @@ document.addEventListener("DOMContentLoaded", function () {
         }
     });
 });
-
