@@ -12,10 +12,14 @@
             <ul class="navbar-nav ms-auto mb-2 mb-lg-0">
                 <th:block sec:authorize="!isAuthenticated()">
                     <li class="nav-item">
-                        <a class="nav-link active" aria-current="page" th:href="@{'/register_page'}">Register</a>
+                        <a class="nav-link active d-flex align-items-center" aria-current="page"
+                           th:href="@{'/register_page'}"> <img
+                                th:src="@{'/icons/person-add.svg'}" alt="login" class="me-1"/>Register</a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link active" aria-current="page" th:href="@{'/login_page'}">Login</a>
+                        <a class="nav-link active d-flex align-items-center" aria-current="page"
+                           th:href="@{'/login_page'}"> <img
+                                th:src="@{'/icons/login.svg'}" alt="login" class="me-1"/> Login</a>
                     </li>
                 </th:block>
                 <th:block sec:authorize="isAuthenticated()">
