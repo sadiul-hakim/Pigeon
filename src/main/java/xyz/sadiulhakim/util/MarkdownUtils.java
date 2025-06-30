@@ -41,14 +41,14 @@ public class MarkdownUtils {
                 .allowAttributes("data-task", "data-task-checked").onElements("li")
                 .allowAttributes("data-language").onElements("div", "code")
                 .allowAttributes("class").onElements("code", "pre", "table", "span", "div", "ul", "ol", "li")
-                .allowAttributes("style").onElements("span", "div", "code")  // Be careful here
+                .allowAttributes("style").onElements("span", "div", "code", "marquee")  // Be careful here
                 .allowStyling(CssSchema.withProperties(List.of(
                         "color", "background-color", "font-weight", "font-style", "font-family", "font-size",
                         "text-align", "text-decoration", "text-transform", "letter-spacing", "line-height", "white-space", "word-break",
                         "margin", "margin-top", "margin-right", "margin-bottom", "margin-left",
                         "padding", "padding-top", "padding-right", "padding-bottom", "padding-left",
                         "border", "border-width", "border-style", "border-color", "border-radius",
-                        "display", "vertical-align", "float", "clear",
+                        "display", "vertical-align", "float", "clear", "background",
                         "position", "top", "right", "bottom", "left", "cursor", "border"
                 )))  // allow specific safe CSS
                 .toFactory();
