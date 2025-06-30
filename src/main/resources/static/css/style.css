@@ -250,21 +250,32 @@ input::placeholder {
 /* Background of the whole editor */
 .toastui-editor-defaultUI,
 .tab-item,
+.ProseMirror,
 .toastui-editor-contents,
 .toastui-editor-md-container,
 .toastui-editor-mode-switch,
-.toastui-editor-defaultUI-toolbar {
+.toastui-editor-defaultUI-toolbar,
+.toastui-editor-popup-body,
+.toastui-editor-dropdown-toolbar {
     background-color: var(--p-secondary-color) !important; /* Your custom color */
     color: white !important;
 }
 
-.toastui-editor-toolbar-icons {
-    background-color: var(--p-secondary-color) !important; /* Your custom color */
+.toastui-editor-popup-body li:hover {
+    background-color: var(--p-primary-color) !important;
+}
+
+.toastui-editor-toolbar-group button {
+    background-color: var(--p-primary-color) !important; /* Your custom color */
     color: white !important;
-    box-shadow: 1px 0 2px #333;
-    border: none;
+    box-shadow: 2px 1px 3px #333 !important;
+    border: none !important;
 }
 
 .toastui-editor-contents * {
     color: white !important;
+}
+
+.toastui-editor-contents table, tr, td, th {
+    border: 1px solid #ffffff !important;
 }

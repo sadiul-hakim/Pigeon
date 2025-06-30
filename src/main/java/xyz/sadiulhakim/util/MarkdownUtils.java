@@ -38,6 +38,8 @@ public class MarkdownUtils {
                 .allowAttributes("href").onElements("a")
                 .allowAttributes("target").onElements("a")  // Optional for opening links in new tab
                 .requireRelNofollowOnLinks()               // Helps avoid SEO abuse / spam
+                .allowAttributes("data-task", "data-task-checked").onElements("li")
+                .allowAttributes("data-language").onElements("div", "code")
                 .allowAttributes("class").onElements("code", "pre", "table", "span", "div", "ul", "ol", "li")
                 .allowAttributes("style").onElements("span", "div", "code")  // Be careful here
                 .allowStyling(CssSchema.withProperties(List.of(

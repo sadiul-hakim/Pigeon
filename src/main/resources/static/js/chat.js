@@ -5,7 +5,7 @@ let msg_tone = document.getElementById("msg-tone");
 // Rich Text Editor
 const editor = new toastui.Editor({
     el: document.querySelector('#editor'),
-    height: '200px',
+    height: '300px',
     initialEditType: 'wysiwyg', // or 'markdown'
     previewStyle: 'vertical'
 });
