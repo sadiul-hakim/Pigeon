@@ -92,6 +92,15 @@ public class GroupController {
         return "redirect:/chat";
     }
 
+    @GetMapping("/clear-message/{groupId}")
+    String clearMessage(@PathVariable String groupId, RedirectAttributes model) {
+        UUID group = UUID.fromString(groupId);
+        String message = groupService.clearMessage(group);
+        model.addFlashAttribute("isGroupAction", true);
+        model.addFlashAttribute("groupActionMessage", message);
+        return "redirect:/chat/" + groupId + "/" + "GROUP";
+    }
+
     @GetMapping("/leave/{groupId}")
     String leaveGroup(@PathVariable String groupId, RedirectAttributes model) {
         UUID group = UUID.fromString(groupId);

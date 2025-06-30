@@ -61,14 +61,6 @@ public class GroupChatService {
 
     public void deleteAllChat(UUID groupId) {
 
-        SecurityContext context = SecurityContextHolder.getContext();
-        Authentication authentication = context.getAuthentication();
-        User userModel = userService.findByEmail(authentication.getName());
-        Optional<GroupMember> member = groupMemberRepository.findByGroupIdAndUserId(groupId, userModel.getId());
-        if (member.isEmpty()) {
-            return;
-        }
-
         List<GroupChat> chats = findAllChat(groupId);
         for (GroupChat chat : chats) {
 

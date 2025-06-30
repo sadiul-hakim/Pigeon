@@ -109,8 +109,8 @@
                                                 <img alt="three dots" th:src="@{/icons/three-dots.svg}"/>
                                             </button>
                                             <ul class="dropdown-menu chat_bg">
-                                                <li th:if="${(setup.userMembershipInSelectedGroup.role.name().equals('OWNER') || setup.userMembershipInSelectedGroup.role.name().equals('ADMIN')) &&
-                                                (!member.role.name().equals('OWNER') && !member.role.name().equals('ADMIN'))}">
+                                                <li th:if="${(setup.userMembershipInSelectedGroup.role.name().equals('OWNER') && !member.role.name().equals('OWNER')) ||
+                                                setup.userMembershipInSelectedGroup.role.name().equals('ADMIN') && (!member.role.name().equals('OWNER') && !member.role.name().equals('ADMIN'))}">
                                                     <a class="dropdown-item chat_bg d-flex align-items-center hover_chat_bg"
                                                        th:href="@{'/group/remove/'+${setup.selectedGroup.id}+'/'+${member.user.id}}">
                                                         <img alt="x" th:src="@{/icons/x-circle.svg}" class="me-1"/>
@@ -184,7 +184,7 @@
                             <div class="accordion-body">
                                 <ul class="list-group list-group-flush">
                                     <li
-                                            class="list-group-item chat_bg"
+                                            class="list-group-item chat_bg my-1"
                                             th:if="${setup.userMembershipInSelectedGroup.role.name().equals('OWNER')}"
                                     >
                                         <a
@@ -196,6 +196,18 @@
                                     </li>
                                     <li
                                             class="list-group-item chat_bg"
+                                            th:if="${setup.userMembershipInSelectedGroup.role.name().equals('OWNER') ||
+                                            setup.userMembershipInSelectedGroup.role.name().equals('ADMIN')}"
+                                    >
+                                        <a
+                                                th:href="@{'/group/clear-message/'+${setup.selectedGroup.id}}"
+                                                class="text-light text-decoration-none d-flex align-items-center">
+                                            <img alt="x-circle" th:src="@{'/icons/delete-message.svg'}" class="me-1"/> Clear
+                                            all Chat
+                                        </a>
+                                    </li>
+                                    <li
+                                            class="list-group-item chat_bg my-1"
                                             th:if="${!setup.userMembershipInSelectedGroup.role.name().equals('OWNER')}"
                                     >
                                         <a

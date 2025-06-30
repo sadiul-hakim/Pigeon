@@ -262,8 +262,8 @@ public class ChatGroupService {
             }
 
             GroupMember currentMembership = currentMembershipOpt.get();
-            if (currentMembership.getRole() != GroupMemberRole.OWNER &&
-                    currentMembership.getRole() != GroupMemberRole.ADMIN) {
+            if (!currentMembership.getRole().equals(GroupMemberRole.OWNER) &&
+                    !currentMembership.getRole().equals(GroupMemberRole.ADMIN)) {
                 return "You are not allowed to remove anyone from the group!";
             }
 
@@ -272,6 +272,12 @@ public class ChatGroupService {
             }
 
             GroupMember targetMembership = targetMembershipOpt.get();
+
+            if (currentMembership.getRole().equals(GroupMemberRole.ADMIN) &&
+                    (targetMembership.getRole().equals(GroupMemberRole.OWNER) ||
+                            targetMembership.getRole().equals(GroupMemberRole.ADMIN))) {
+                return "You can not remove OWNER or any ADMIN!";
+            }
 
             // 4. Remove the member from the group
             group.getMembers().removeIf(member -> member.getId().equals(targetMembership.getId()));
@@ -540,6 +546,53 @@ public class ChatGroupService {
         } catch (Exception ex) {
             Thread.currentThread().interrupt();
             log.error("Could not send personal message. Error {}", ex.getMessage());
+        }
+    }
+
+    public String clearMessage(UUID groupId) {
+
+        // 1. Authenticated user
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        if (authentication == null || !StringUtils.hasText(authentication.getName())) {
+            return "Unauthenticated";
+        }
+
+        // 2. Parallel load user and group
+        try (var executor = Executors.newVirtualThreadPerTaskExecutor()) {
+            Future<User> userFuture = executor.submit(() -> userService.findByEmail(authentication.getName()));
+            Future<Optional<ChatGroup>> groupFuture = executor.submit(() -> chatGroupRepository.findById(groupId));
+
+            User currentUser = userFuture.get();
+            Optional<ChatGroup> chatGroupOpt = groupFuture.get();
+
+            if (currentUser == null) {
+                return "Unauthenticated";
+            }
+
+            if (chatGroupOpt.isEmpty()) {
+                return "Could not find the group!";
+            }
+
+            ChatGroup group = chatGroupOpt.get();
+
+            // 3. Fetch both memberships in parallel
+            Optional<GroupMember> currentMembershipFutureOpt = groupMemberRepository.findByGroupIdAndUserId(groupId, currentUser.getId());
+
+            if (currentMembershipFutureOpt.isEmpty()) {
+                return "You are not a member of this group!";
+            }
+
+            GroupMember currentMembership = currentMembershipFutureOpt.get();
+            if (!currentMembership.getRole().equals(GroupMemberRole.OWNER) &&
+                    !currentMembership.getRole().equals(GroupMemberRole.ADMIN)) {
+                return "You are not allowed to clear messages!";
+            }
+
+            groupChatService.deleteAllChat(groupId);
+            return "Successfully cleared all chats!";
+        } catch (Exception ex) {
+            log.error("Could not clear chat: error {}", ex.getMessage());
+            return "Could not clear chat!";
         }
     }
 }
