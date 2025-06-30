@@ -14,7 +14,6 @@ import xyz.sadiulhakim.group.service.GroupChatService;
 
 import java.nio.file.AccessDeniedException;
 import java.security.Principal;
-import java.util.Map;
 import java.util.UUID;
 
 @Controller
