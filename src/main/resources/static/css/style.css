@@ -274,7 +274,19 @@ input::placeholder {
     border: 1px solid #ffffff !important;
 }
 
-.hover_children li:hover{
+.hover_children li:hover {
     background-color: var(--p-secondary-color) !important;
     color: white !important;
+}
+
+.theme_pallet button {
+    padding: 10px;
+    border: none;
+    border-radius: 50%;
+    margin: 0 2px;
+    box-shadow: 1px 0 2px #111;
+}
+
+.theme_pallet button:hover {
+    box-shadow: 5px 2px 7px #111;
 }
