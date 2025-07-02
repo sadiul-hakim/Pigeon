@@ -1,45 +1,73 @@
 <div class="col-md-8 h-100 overflow-auto d-flex flex-column justify-content-center align-items-center border-right-2"
      th:if="${setup.selectedUser != null || setup.selectedGroup != null}" th:fragment="chatArea(setup)">
-    <div class="d-flex align-items-center p-2 w-100">
+    <div class="d-flex align-items-center p-2 w-100 justify-content-between">
+        <div class="d-flex align-items-center">
+            <!--    Chat Area Image Starts    -->
+            <img th:src="@{/picture/user/{pic}(pic=${setup.selectedUser.picture})}"
+                 th:alt="${setup.selectedUser.lastname}"
+                 class="icon-md" th:if="${setup.area.name().equals('PEOPLE')}"/>&nbsp;
+            <img th:src="@{/picture/group/{pic}(pic=${setup.selectedGroup.picture})}"
+                 th:alt="${setup.selectedGroup.name}"
+                 class="icon-md" th:if="${setup.area.name().equals('GROUP')}"/>&nbsp;
+            <!--    Chat Area Image Ends    -->
 
-        <!--    Chat Area Image Starts    -->
-        <img th:src="@{/picture/user/{pic}(pic=${setup.selectedUser.picture})}"
-             th:alt="${setup.selectedUser.lastname}"
-             class="icon-md" th:if="${setup.area.name().equals('PEOPLE')}"/>&nbsp;
-        <img th:src="@{/picture/group/{pic}(pic=${setup.selectedGroup.picture})}"
-             th:alt="${setup.selectedGroup.name}"
-             class="icon-md" th:if="${setup.area.name().equals('GROUP')}"/>&nbsp;
-        <!--    Chat Area Image Ends    -->
-
-        <!--    Chat Area Name and Date Starts    -->
-        <div class="d-flex flex-column ms-1">
-            <th:block th:if="${setup.area.name().equals('GROUP')}">
-                <div>
-                    <span class="fs-4" th:text="${setup.selectedGroup.name}"></span>
-                </div>
-                <p class="text-light-dark m-0">
-                    <span th:text="${setup.selectedGroup.members.size()}"></span>
-                    <span th:text="${setup.selectedGroup.members.size() > 1 ? 'Members' : 'Member'}"></span>
-                </p>
-            </th:block>
-            <th:block th:if="${setup.area.name().equals('PEOPLE')}">
-                <div>
-                    <span class="fs-4" th:text="${setup.selectedUser.firstname}"></span>&nbsp;
-                    <span class="fs-4" th:text="${setup.selectedUser.lastname}"></span>
-                </div>
-                <span
-                        class="text-light-dark"
-                        th:if="${(setup.selectedUser.status == null || setup.selectedUser.status.name().equals('OFFLINE'))}"
-                        th:text="${setup.selectedUser.lastSeenText}">
+            <!--    Chat Area Name and Date Starts    -->
+            <div class="d-flex flex-column ms-1">
+                <th:block th:if="${setup.area.name().equals('GROUP')}">
+                    <div>
+                        <span class="fs-4" th:text="${setup.selectedGroup.name}"></span>
+                    </div>
+                    <p class="text-light-dark m-0">
+                        <span th:text="${setup.selectedGroup.members.size()}"></span>
+                        <span th:text="${setup.selectedGroup.members.size() > 1 ? 'Members' : 'Member'}"></span>
+                    </p>
+                </th:block>
+                <th:block th:if="${setup.area.name().equals('PEOPLE')}">
+                    <div>
+                        <span class="fs-4" th:text="${setup.selectedUser.firstname}"></span>&nbsp;
+                        <span class="fs-4" th:text="${setup.selectedUser.lastname}"></span>
+                    </div>
+                    <span
+                            class="text-light-dark"
+                            th:if="${(setup.selectedUser.status == null || setup.selectedUser.status.name().equals('OFFLINE'))}"
+                            th:text="${setup.selectedUser.lastSeenText}">
                 </span>
-                <span
-                        class="text-primary"
-                        th:if="${setup.selectedUser.status != null && setup.selectedUser.status.name().equals('ONLINE')}"
-                        th:text="${setup.selectedUser.status}">
+                    <span
+                            class="text-primary"
+                            th:if="${setup.selectedUser.status != null && setup.selectedUser.status.name().equals('ONLINE')}"
+                            th:text="${setup.selectedUser.status}">
                 </span>
-            </th:block>
+                </th:block>
+            </div>
+            <!--    Chat Area Name and Date Ends    -->
         </div>
-        <!--    Chat Area Name and Date Ends    -->
+        <div class="theme_pallet d-flex justify-content-between align-items-center">
+            <button onclick="applyCustomTheme('#2E3A46','#0B1A2A')" style="background-color: #2E3A46;color: #0B1A2A;">
+                Default
+            </button>
+            <button onclick="applyCustomTheme('#3B2F2F','#7E5A5A')" style="background:#3B2F2F;color:#7E5A5A;">Rose
+            </button>
+            <button onclick="applyCustomTheme('#1E293B', '#334155')" style="background:#1E293B;color:#334155;">Slate
+            </button>
+            <button onclick="applyCustomTheme('#3E2723', '#6D4C41')" style="background:#3E2723;color:#6D4C41;">Mocha
+            </button>
+            <button onclick="applyCustomTheme('#3B5249', '#A3B18A')" style="background:#3B5249;color:#A3B18A;">Green
+                Tea
+            </button>
+            <button onclick="applyCustomTheme('#3D314A', '#73628A')" style="background:#3D314A;color:#73628A;">Mauve
+            </button>
+            <button onclick="applyCustomTheme('#1B4965', '#CAE9FF')" style="background:#1B4965;color:#CAE9FF;">Sky
+            </button>
+            <button onclick="applyCustomTheme('#2a0e37', '#47104c')" style="background-color:#2a0e37; color:#47104c;">
+                Plum
+            </button>
+            <button onclick="applyCustomTheme('#0b2e2e', '#1c4f4f')" style="background-color:#0b2e2e; color:#1c4f4f;">
+                Emerald
+            </button>
+            <button onclick="applyCustomTheme('#1c1c1e', '#2c2c2e')" style="background-color:#1c1c1e; color:#2c2c2e;">
+                Carbon
+            </button>
+        </div>
     </div>
 
     <div class="flex-grow-1 p-3 chat_area_bg overflow-auto border-1 w-100" id="chatArea">
@@ -59,11 +87,17 @@
                              data-bs-toggle="dropdown"
                              aria-expanded="false"/>
 
-                        <ul class="dropdown-menu chat_bg">
+                        <ul class="dropdown-menu chat_bg hover_children">
                             <li
                                     class="dropdown-item remove_chat chat_bg d-flex align-items-center cursor_pointer"
                                     th:data-id="${chat.id}"
                             ><img th:src="@{/icons/x-circle.svg}" class="me-1" alt="x circle"/> Remove
+                            </li>
+                            <li
+                                    class="dropdown-item edit_chat chat_bg d-flex align-items-center cursor_pointer"
+                                    th:data-id="${chat.id}"
+                                    th:if="${chat.user.email.equals(setup.user.email)}"
+                            ><img th:src="@{/icons/edit.svg}" class="me-1" alt="x circle"/> Edit
                             </li>
                         </ul>
                     </div>
@@ -101,13 +135,20 @@
                              data-bs-toggle="dropdown"
                              aria-expanded="false"/>
 
-                        <ul class="dropdown-menu chat_bg">
+                        <ul class="dropdown-menu chat_bg hover_children">
                             <li
                                     class="dropdown-item remove_group_chat chat_bg d-flex align-items-center cursor_pointer"
                                     th:data-id="${chat.id}"
                                     th:if="${chat.sender.user.email.equals(setup.user.email)}"
                             >
                                 <img th:src="@{/icons/x-circle.svg}" class="me-1" alt="x circle"/> Remove
+                            </li>
+                            <li
+                                    class="dropdown-item edit_group_chat chat_bg d-flex align-items-center cursor_pointer"
+                                    th:data-id="${chat.id}"
+                                    th:if="${chat.sender.user.email.equals(setup.user.email)}"
+                            >
+                                <img th:src="@{/icons/edit.svg}" class="me-1" alt="x circle"/> Edit
                             </li>
                         </ul>
                     </div>

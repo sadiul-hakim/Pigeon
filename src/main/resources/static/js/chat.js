@@ -2,6 +2,18 @@ const chatArea = document.getElementById("chatArea");
 let chatList = document.getElementById("chatList");
 let msg_tone = document.getElementById("msg-tone");
 
+function applyCustomTheme(primary, secondary) {
+    const root = document.documentElement;
+    root.style.setProperty('--p-primary-color', primary);
+    root.style.setProperty('--p-secondary-color', secondary);
+
+    const theme = {
+        primary,
+        secondary
+    };
+    localStorage.setItem("theme", JSON.stringify(theme))
+}
+
 // Rich Text Editor
 const editor = new toastui.Editor({
     el: document.querySelector('#editor'),
@@ -17,6 +29,13 @@ document.addEventListener("DOMContentLoaded", function () {
     let selectedGroup = document.getElementById("selectedGroup").textContent;
     let selectedChannel = document.getElementById("selectedChannel").textContent;
     let area = document.getElementById("area").textContent;
+
+    // set theme
+    let theme = localStorage.getItem("theme");
+    if (theme) {
+        let themeObj = JSON.parse(theme);
+        applyCustomTheme(themeObj.primary, themeObj.secondary);
+    }
 
     chatArea.scrollTop = chatArea.scrollHeight;
 

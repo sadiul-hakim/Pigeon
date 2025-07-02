@@ -9,10 +9,10 @@
         <relativePath/> <!-- lookup parent from repository -->
     </parent>
     <groupId>xyz.sadiulhakim</groupId>
-    <artifactId>MvcChatApp</artifactId>
+    <artifactId>Pigeon</artifactId>
     <version>1.0</version>
-    <name>MvcChatApp</name>
-    <description>MvcChatApp</description>
+    <name>Pigeon</name>
+    <description>Pigeon</description>
     <url/>
     <licenses>
         <license/>
