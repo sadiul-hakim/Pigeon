@@ -95,7 +95,7 @@ spring:
   # JPA Properties
   jpa:
     hibernate:
-      ddl-auto: none # Enable when needed
+      ddl-auto: update # Enable when needed
     open-in-view: false
     # Session Properties
   session:
