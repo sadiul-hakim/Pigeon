@@ -12,7 +12,7 @@ import java.nio.file.Paths;
 public class FileUtil {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(FileUtil.class);
-    private static final String BASE_PATH = "F:/MvcChat/picture/";
+    private static final String BASE_PATH = "uploads/";
 
     private FileUtil() {
     }
