@@ -213,7 +213,7 @@ document.addEventListener("DOMContentLoaded", function () {
                     ${imageTag}
                 </div>
                 <div class="d-flex justify-content-end">
-                    <small class="text-light-dark">${messageData.sendTime}</small>
+                    <small class="chat_area_color">${messageData.sendTime}</small>
                 </div>
             </div>
         </div>
