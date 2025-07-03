@@ -7,6 +7,7 @@ WORKDIR /app
 # Copy Maven wrapper and project files
 COPY .mvn/ .mvn
 COPY mvnw pom.xml ./
+RUN chmod +x mvnw
 RUN ./mvnw dependency:go-offline
 
 # Copy the rest of the project
