@@ -3,10 +3,13 @@ package xyz.sadiulhakim.user;
 import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.boot.context.event.ApplicationReadyEvent;
 import org.springframework.context.ApplicationEventPublisher;
+import org.springframework.context.event.EventListener;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -41,19 +44,19 @@ public class UserService {
     private final ApplicationEventPublisher eventPublisher;
     private final NotificationService notificationService;
 
-//    @Async("taskExecutor")
-//    @EventListener
-//    void appStarted(ApplicationReadyEvent event) {
-//        User user = userRepo.findByEmail("sadiulhakim@gmail.com").orElse(null);
-//        if (user == null) {
-//            userRepo.save(
-//                    new User(null, "Sadiul", "Hakim", "sadiulhakim@gmail.com",
-//                            passwordEncoder.encode("hakim@123"), "ROLE_ADMIN",
-//                            appProperties.getDefaultUserPhotoName(), ColorUtil.getRandomColor(),
-//                            new ArrayList<>(), LocalDateTime.now())
-//            );
-//        }
-//    }
+    @Async("taskExecutor")
+    @EventListener
+    void appStarted(ApplicationReadyEvent event) {
+        User user = userRepo.findByEmail("sadiulhakim@gmail.com").orElse(null);
+        if (user == null) {
+            userRepo.save(
+                    new User(null, "Sadiul", "Hakim", "sadiulhakim@gmail.com",
+                            passwordEncoder.encode("hakim@123"), "ROLE_ADMIN",
+                            appProperties.getDefaultUserPhotoName(), ColorUtil.getRandomColor(),
+                            new ArrayList<>(), UserStatus.OFFLINE, LocalDateTime.now(), LocalDateTime.now())
+            );
+        }
+    }
 
     public Optional<User> currentUser() {
 
