@@ -22,6 +22,10 @@ public class FileUtil {
             try {
 
                 File file = new File(BASE_PATH, (folderName + fileName));
+                if (!file.exists()) {
+                    file.mkdirs();
+                }
+
                 Files.copy(is, file.toPath());
             } catch (Exception ex) {
                 LOGGER.error("FileUtil.upload :: failed to upload file {}", (folderName + fileName));
@@ -33,6 +37,9 @@ public class FileUtil {
         Thread.ofVirtual().name("#FileUploadingThread-", 0).start(() -> {
             try {
                 Path path = Paths.get(BASE_PATH, (folderName + fileName));
+                if (!path.toFile().exists()) {
+                    path.toFile().mkdirs();
+                }
                 Files.write(path, content);
             } catch (Exception ex) {
                 LOGGER.error("FileUtil.uploadFile :: failed to upload file {}", (folderName + fileName));

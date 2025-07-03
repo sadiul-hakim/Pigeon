@@ -1,18 +1,19 @@
 package xyz.sadiulhakim.group.service;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.data.redis.core.RedisTemplate;
+import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 import org.springframework.web.multipart.MultipartFile;
-import xyz.sadiulhakim.chat.enumeration.ChatArea;
 import xyz.sadiulhakim.chat.pojo.ChatMessage;
-import xyz.sadiulhakim.chat.pojo.RedisMessage;
 import xyz.sadiulhakim.group.ChatGroup;
 import xyz.sadiulhakim.group.GroupChat;
 import xyz.sadiulhakim.group.GroupMember;
@@ -37,12 +38,12 @@ import java.util.concurrent.Future;
 @RequiredArgsConstructor
 public class ChatGroupService {
 
+    private final SimpMessagingTemplate messagingTemplate;
     private final ChatGroupRepository chatGroupRepository;
     private final GroupMemberRepository groupMemberRepository;
     private final UserService userService;
     private final AppProperties appProperties;
     private final ApplicationEventPublisher eventPublisher;
-    private final RedisTemplate<String, Object> redisTemplate;
     private final GroupChatService groupChatService;
 
     public String update(String name, MultipartFile photo, UUID groupId) {
@@ -541,8 +542,7 @@ public class ChatGroupService {
             // empty the content
             message.setFileContent("");
 
-            RedisMessage redisMessage = RedisMessage.forGroupChannel(group.getChannel(), ChatArea.GROUP, message);
-            redisTemplate.convertAndSend("chat-message-channel", redisMessage); // Publish message to redis
+            messagingTemplate.convertAndSend("/topic/" + group.getChannel(), message);
         } catch (Exception ex) {
             Thread.currentThread().interrupt();
             log.error("Could not send personal message. Error {}", ex.getMessage());

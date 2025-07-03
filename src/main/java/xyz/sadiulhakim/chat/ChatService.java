@@ -2,7 +2,8 @@ package xyz.sadiulhakim.chat;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.data.redis.core.RedisTemplate;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -11,7 +12,6 @@ import org.springframework.util.StringUtils;
 import xyz.sadiulhakim.chat.enumeration.ChatArea;
 import xyz.sadiulhakim.chat.pojo.ChatMessage;
 import xyz.sadiulhakim.chat.pojo.ChatSetup;
-import xyz.sadiulhakim.chat.pojo.RedisMessage;
 import xyz.sadiulhakim.group.ChatGroup;
 import xyz.sadiulhakim.group.GroupChat;
 import xyz.sadiulhakim.group.GroupMember;
@@ -35,14 +35,17 @@ import java.util.concurrent.Future;
 @RequiredArgsConstructor
 public class ChatService {
 
+    @Value("${app.socket.personal_message_channel:''}")
+    private String PERSONAL_MESSAGE_CHANNEL;
+
     private final ChatRepo chatRepo;
     private final UserService userService;
     private final NotificationService notificationService;
     private final AppProperties appProperties;
     private final ChatGroupService chatGroupService;
     private final GroupMemberRepository groupMemberRepository;
-    private final RedisTemplate<String, Object> redisTemplate;
     private final GroupChatService groupChatService;
+    private final SimpMessagingTemplate messagingTemplate;
 
     public ChatSetup getChatSetup(UUID selectedUser, UUID selectedGroup, String area) {
 
@@ -167,12 +170,16 @@ public class ChatService {
             // empty the content
             message.setFileContent("");
 
-            List<String> recipients = new ArrayList<>();
-            recipients.add(user.getEmail());
-            recipients.add(toUser.getEmail());
-
-            RedisMessage redisMessage = RedisMessage.forPrivateRecipients(recipients, ChatArea.PEOPLE, message);
-            redisTemplate.convertAndSend("chat-message-channel", redisMessage); // Publish message to redis
+            messagingTemplate.convertAndSendToUser(
+                    user.getEmail(),
+                    PERSONAL_MESSAGE_CHANNEL,
+                    message
+            );
+            messagingTemplate.convertAndSendToUser(
+                    toUser.getEmail(),
+                    PERSONAL_MESSAGE_CHANNEL,
+                    message
+            );
         } catch (Exception ex) {
             Thread.currentThread().interrupt();
             log.error("Could not send personal message. Error {}", ex.getMessage());
